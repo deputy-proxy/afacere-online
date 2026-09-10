@@ -32,6 +32,10 @@ final class EntitlementService
     {
         $value = $this->value($user, 'business_limit');
 
+        if ($value === null) {
+            return 1;
+        }
+
         return $value === 'unlimited' ? null : (int) $value;
     }
 
