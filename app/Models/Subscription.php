@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
+/**
+ * @property string $status
+ * @property Carbon $starts_at
+ * @property Carbon|null $ends_at
+ */
 class Subscription extends Model
 {
     protected $guarded = ['id'];
