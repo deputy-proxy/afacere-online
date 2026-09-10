@@ -12,7 +12,7 @@ it('preserves action plan snapshots as immutable revisions', function (): void {
     $business = Business::factory()->create();
     $business->members()->attach($user, ['role' => 'owner', 'joined_at' => now()]);
     $plan = ActionPlan::create(['business_id' => $business->id, 'name' => 'Growth plan', 'status' => 'active']);
-    $plan->actions()->create(['title' => 'Talk to customers', 'status' => 'recommended']);
+    $plan->actions()->create(['position' => 1, 'title' => 'Talk to customers', 'status' => 'recommended']);
 
     $revision = app(ActionPlanRevisionService::class)->snapshot($plan, $user);
 
