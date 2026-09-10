@@ -45,9 +45,9 @@ final class EvaluationService
             }
 
             $rules = $question->getAttribute('validation_rules');
-            $rules = is_array($rules) ? $rules : [];
-            if ($question->required && ! array_key_exists('required', $rules)) {
-                $rules['required'] = true;
+            $rules = is_array($rules) ? array_values($rules) : [];
+            if ($question->required && ! in_array('required', $rules, true)) {
+                $rules[] = 'required';
             }
             Validator::make(['value' => $value], ['value' => $rules])->validate();
 
