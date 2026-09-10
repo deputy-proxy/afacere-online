@@ -3,13 +3,18 @@
 namespace App\Models;
 
 use App\Enums\BusinessStage;
+use App\Factories\BusinessFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property BusinessStage $stage
+ */
 class Business extends Model
 {
+    /** @use HasFactory<BusinessFactory> */
     use HasFactory;
 
     protected $guarded = ['id'];
