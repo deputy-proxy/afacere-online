@@ -10,6 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 uses(RefreshDatabase::class);
 
@@ -38,7 +39,7 @@ test('a non-manager cannot invite business members', function (): void {
     $business->members()->attach($member->id, ['role' => 'member']);
 
     expect(fn () => app(BusinessMembershipService::class)->invite($business, $member, 'new@example.com'))
-        ->toThrow(\Symfony\Component\HttpKernel\Exception\HttpException::class);
+        ->toThrow(HttpException::class);
 });
 
 test('an invitation cannot be accepted by another user', function (): void {
