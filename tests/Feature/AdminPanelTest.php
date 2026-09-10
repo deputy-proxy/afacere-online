@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 test('only administrator users can access the admin panel', function (): void {
-    $provider = app(AdminPanelProvider::class);
+    $provider = new AdminPanelProvider(app());
     $admin = User::factory()->admin()->create();
     $user = User::factory()->create();
 
