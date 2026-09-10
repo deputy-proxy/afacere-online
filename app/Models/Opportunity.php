@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
+/**
+ * @property bool $is_published
+ * @property Carbon|null $valid_from
+ * @property Carbon|null $valid_until
+ */
 class Opportunity extends Model
 {
     protected $guarded = ['id'];
