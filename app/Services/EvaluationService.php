@@ -31,8 +31,8 @@ final class EvaluationService
         $business = $evaluation->business;
         Gate::forUser($actor)->authorize('view', $business);
 
-        $status = EvaluationStatus::tryFrom((string) $evaluation->getAttribute('status'));
-        if ($status === EvaluationStatus::Completed || $status === EvaluationStatus::Archived) {
+        $status = $evaluation->getAttribute('status');
+        if ($status instanceof EvaluationStatus && ($status === EvaluationStatus::Completed || $status === EvaluationStatus::Archived)) {
             throw ValidationException::withMessages(['evaluation' => 'Completed evaluations cannot be changed.']);
         }
 
