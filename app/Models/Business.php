@@ -36,6 +36,12 @@ class Business extends Model
             ->withTimestamps();
     }
 
+    /** @return HasMany<BusinessInvitation, $this> */
+    public function invitations(): HasMany
+    {
+        return $this->hasMany(BusinessInvitation::class);
+    }
+
     /** @return HasMany<BusinessStageHistory, $this> */
     public function stageHistory(): HasMany
     {
