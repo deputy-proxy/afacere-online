@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Guide extends Model
 {
@@ -20,8 +21,8 @@ class Guide extends Model
         return $this->belongsTo(User::class, 'author_id');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\HasMany<GuideSection, $this> */
-    public function sections(): \Illuminate\Database\Eloquent\Relations\HasMany
+    /** @return HasMany<GuideSection, $this> */
+    public function sections(): HasMany
     {
         return $this->hasMany(GuideSection::class)->orderBy('position');
     }

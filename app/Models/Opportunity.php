@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 class Opportunity extends Model
 {
@@ -26,7 +27,7 @@ class Opportunity extends Model
         return $this->belongsTo(OpportunityType::class, 'opportunity_type_id');
     }
 
-    public function isCurrent(?\Illuminate\Support\Carbon $at = null): bool
+    public function isCurrent(?Carbon $at = null): bool
     {
         $at ??= now();
 

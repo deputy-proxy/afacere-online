@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\BusinessStage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class BusinessStageHistory extends Model
 {
@@ -13,8 +13,8 @@ class BusinessStageHistory extends Model
     protected function casts(): array
     {
         return [
-            'from_stage' => \App\Enums\BusinessStage::class,
-            'to_stage' => \App\Enums\BusinessStage::class,
+            'from_stage' => BusinessStage::class,
+            'to_stage' => BusinessStage::class,
             'changed_at' => 'datetime',
         ];
     }

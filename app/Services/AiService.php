@@ -2,17 +2,20 @@
 
 namespace App\Services;
 
+use App\Contracts\AiProvider;
 use App\Models\AiPrompt;
 use App\Models\AiRun;
 use App\Models\Business;
 use App\Models\User;
-use App\Contracts\AiProvider;
 use Illuminate\Support\Facades\Validator;
 use RuntimeException;
 
 final class AiService
 {
-    public function __construct(private readonly AiProvider $provider) {}
+    public function __construct(
+        private readonly AiProvider $provider,
+    ) {
+    }
 
     /** @param array<string, mixed> $input */
     /** @param array<string, string> $outputRules */
