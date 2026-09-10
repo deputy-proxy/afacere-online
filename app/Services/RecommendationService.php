@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Business;
 use App\Models\Priority;
 use App\Models\Recommendation;
 use App\Models\User;
