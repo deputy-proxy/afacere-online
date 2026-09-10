@@ -4,7 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property string $value
+ * @property Carbon|null $expires_at
+ */
 class Entitlement extends Model
 {
     protected $guarded = ['id'];
