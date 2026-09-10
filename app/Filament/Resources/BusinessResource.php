@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\BusinessResource\Pages;
 use App\Models\Business;
 use BackedEnum;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -39,7 +40,7 @@ class BusinessResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->recordActions([
-                \Filament\Actions\EditAction::make(),
+                EditAction::make(),
             ]);
     }
 
