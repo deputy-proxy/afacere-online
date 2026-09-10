@@ -42,7 +42,7 @@ return new class extends Migration
             $table->index(['user_id', 'role']);
         });
 
-        Schema::create('business_stage_history', function (Blueprint $table): void {
+        Schema::create('business_stage_histories', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('business_id')->constrained()->cascadeOnDelete();
             $table->string('from_stage', 40)->nullable();
@@ -462,7 +462,7 @@ return new class extends Migration
             'business_metric_values',
             'business_metrics',
             'business_goals',
-            'business_stage_history',
+            'business_stage_histories',
             'business_members',
             'businesses',
             'profiles',
