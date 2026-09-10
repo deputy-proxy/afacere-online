@@ -6,9 +6,9 @@ use App\Enums\ActionStatus;
 use App\Models\Action;
 use App\Models\AuditLog;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Carbon;
 use DomainException;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 final class TransitionAction
 {
@@ -23,7 +23,11 @@ final class TransitionAction
                 throw new DomainException(sprintf('Invalid action transition: %s -> %s.', $action->status->value, $next->value));
             }
 
-            $attributes = ['status' => $next, 'resolution_reason' => $reason];
+            $attributes = [
+                'status' => $next,
+                'resolution_reason' => $reason,
+            ];
+
             if ($next === ActionStatus::Accepted) {
                 $attributes['accepted_at'] = Carbon::now();
             } elseif ($next === ActionStatus::Active) {
@@ -39,11 +43,15 @@ final class TransitionAction
                 'subject_type' => Action::class,
                 'subject_id' => $action->id,
                 'action' => 'status_changed',
-                'context' => ['from' => $action->getOriginal('status'), 'to' => $next->value, 'reason' => $reason],
+                'context' => [
+                    'from' => $action->getOriginal('status'),
+                    'to' => $next->value,
+                    'reason' => $reason,
+                ],
                 'occurred_at' => Carbon::now(),
             ]);
 
-            return $action->fresh();
+            return $action->fresh() ?? $action;
         });
     }
 }
