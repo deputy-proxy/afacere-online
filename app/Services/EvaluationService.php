@@ -31,7 +31,8 @@ final class EvaluationService
         $business = $evaluation->business;
         Gate::forUser($actor)->authorize('view', $business);
 
-        if ($evaluation->status === EvaluationStatus::Completed || $evaluation->status === EvaluationStatus::Archived) {
+        $status = EvaluationStatus::tryFrom((string) $evaluation->getAttribute('status'));
+        if ($status === EvaluationStatus::Completed || $status === EvaluationStatus::Archived) {
             throw ValidationException::withMessages(['evaluation' => 'Completed evaluations cannot be changed.']);
         }
 
@@ -43,7 +44,8 @@ final class EvaluationService
                 throw ValidationException::withMessages(["answers.$key" => 'The question does not belong to the pinned evaluation version.']);
             }
 
-            $rules = $question->validation_rules ?? [];
+            $rules = $question->getAttribute('validation_rules');
+            $rules = is_array($rules) ? $rules : [];
             if ($question->required && ! array_key_exists('required', $rules)) {
                 $rules['required'] = true;
             }
