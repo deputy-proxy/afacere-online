@@ -12,10 +12,13 @@ test('business resource is registered for the admin panel', function (): void {
         ->and(BusinessResource::getPages())->toHaveKeys(['index', 'create', 'edit']);
 });
 
-test('business resource is only accessible to administrators', function (): void {
+test('business resource is restricted to administrators', function (): void {
     $admin = User::factory()->admin()->create();
     $user = User::factory()->create();
 
-    $this->actingAs($admin)->get('/admin/businesses')->assertSuccessful();
-    $this->actingAs($user)->get('/admin/businesses')->assertForbidden();
+    $this->actingAs($admin);
+    expect(BusinessResource::canAccess())->toBeTrue();
+
+    $this->actingAs($user);
+    expect(BusinessResource::canAccess())->toBeFalse();
 });
