@@ -27,6 +27,7 @@ class BusinessPolicy
         return $this->hasRole($user, $business, ['owner', 'admin']);
     }
 
+    /** @param array<int, string> $roles */
     private function hasRole(User $user, Business $business, array $roles): bool
     {
         return $business->members()
