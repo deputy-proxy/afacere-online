@@ -19,4 +19,10 @@ class EvaluationVersion extends Model
     {
         return $this->hasMany(Evaluation::class);
     }
+
+    /** @return HasMany<EvaluationSection, $this> */
+    public function sections(): HasMany
+    {
+        return $this->hasMany(EvaluationSection::class)->orderBy('position');
+    }
 }
