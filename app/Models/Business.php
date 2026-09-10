@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Enums\BusinessStage;
-use App\Factories\BusinessFactory;
+use Database\Factories\BusinessFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
