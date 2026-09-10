@@ -7,6 +7,11 @@ use App\Models\User;
 
 class BusinessPolicy
 {
+    public function viewAny(User $user): bool
+    {
+        return $user->isAdmin();
+    }
+
     public function view(User $user, Business $business): bool
     {
         return $user->isAdmin() || $this->hasRole($user, $business, ['owner', 'admin', 'member', 'viewer']);
