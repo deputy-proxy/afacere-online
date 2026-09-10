@@ -8,8 +8,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Priority extends Model
 {
     protected $guarded = ['id'];
+
     /** @return BelongsTo<Business, $this> */
-    public function business(): BelongsTo { return $this->belongsTo(Business::class); }
+    public function business(): BelongsTo
+    {
+        return $this->belongsTo(Business::class);
+    }
+
     /** @return BelongsTo<Recommendation, $this> */
-    public function recommendation(): BelongsTo { return $this->belongsTo(Recommendation::class); }
+    public function recommendation(): BelongsTo
+    {
+        return $this->belongsTo(Recommendation::class);
+    }
 }

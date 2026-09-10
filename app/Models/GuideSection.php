@@ -9,8 +9,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class GuideSection extends Model
 {
     protected $guarded = ['id'];
+
     /** @return BelongsTo<Guide, $this> */
-    public function guide(): BelongsTo { return $this->belongsTo(Guide::class); }
+    public function guide(): BelongsTo
+    {
+        return $this->belongsTo(Guide::class);
+    }
+
     /** @return HasMany<GuideStep, $this> */
-    public function steps(): HasMany { return $this->hasMany(GuideStep::class)->orderBy('position'); }
+    public function steps(): HasMany
+    {
+        return $this->hasMany(GuideStep::class)->orderBy('position');
+    }
 }

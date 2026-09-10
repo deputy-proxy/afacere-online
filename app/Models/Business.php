@@ -5,20 +5,9 @@ namespace App\Models;
 use App\Enums\BusinessStage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-/**
- * @property int $id
- * @property string $name
- * @property string $slug
- * @property BusinessStage $stage
- * @property array<string, mixed>|null $profile
- * @property array<string, mixed>|null $preferences
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- */
 class Business extends Model
 {
     use HasFactory;

@@ -8,7 +8,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Entitlement extends Model
 {
     protected $guarded = ['id'];
-    protected function casts(): array { return ['expires_at' => 'datetime']; }
+
+    protected function casts(): array
+    {
+        return ['expires_at' => 'datetime'];
+    }
+
     /** @return BelongsTo<User, $this> */
-    public function user(): BelongsTo { return $this->belongsTo(User::class); }
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

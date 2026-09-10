@@ -8,7 +8,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ProductPlan extends Model
 {
     protected $guarded = ['id'];
-    protected function casts(): array { return ['entitlements' => 'array', 'active' => 'boolean']; }
+
+    protected function casts(): array
+    {
+        return [
+            'entitlements' => 'array',
+            'active' => 'boolean',
+        ];
+    }
+
     /** @return BelongsTo<Product, $this> */
-    public function product(): BelongsTo { return $this->belongsTo(Product::class); }
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

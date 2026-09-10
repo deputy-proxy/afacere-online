@@ -2,12 +2,11 @@
 
 namespace App\Services;
 
-use App\Contracts\AiProvider;
 use App\Models\AiPrompt;
 use App\Models\AiRun;
-use App\Models\User;
 use App\Models\Business;
-use Illuminate\Support\Carbon;
+use App\Models\User;
+use App\Contracts\AiProvider;
 use Illuminate\Support\Facades\Validator;
 use RuntimeException;
 
@@ -17,8 +16,14 @@ final class AiService
 
     /** @param array<string, mixed> $input */
     /** @param array<string, string> $outputRules */
-    public function run(AiPrompt $prompt, string $model, array $input, ?User $user = null, ?Business $business = null, array $outputRules = []): AiRun
-    {
+    public function run(
+        AiPrompt $prompt,
+        string $model,
+        array $input,
+        ?User $user = null,
+        ?Business $business = null,
+        array $outputRules = [],
+    ): AiRun {
         $run = AiRun::create([
             'user_id' => $user?->id,
             'business_id' => $business?->id,
