@@ -29,4 +29,10 @@ class ActionPlan extends Model
     {
         return $this->hasMany(Action::class);
     }
+
+    /** @return HasMany<ActionPlanRevision, $this> */
+    public function revisions(): HasMany
+    {
+        return $this->hasMany(ActionPlanRevision::class)->orderByDesc('version');
+    }
 }

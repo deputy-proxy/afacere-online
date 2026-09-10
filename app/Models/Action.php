@@ -5,11 +5,10 @@ namespace App\Models;
 use App\Enums\ActionStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-/**
- * @property ActionStatus $status
- */
+/** @property ActionStatus $status */
 class Action extends Model
 {
     protected $guarded = ['id'];
@@ -46,5 +45,11 @@ class Action extends Model
     public function outcome(): HasOne
     {
         return $this->hasOne(ActionOutcome::class);
+    }
+
+    /** @return HasMany<ActionEvidence, $this> */
+    public function evidence(): HasMany
+    {
+        return $this->hasMany(ActionEvidence::class)->orderByDesc('recorded_at');
     }
 }
