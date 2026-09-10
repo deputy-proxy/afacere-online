@@ -30,7 +30,8 @@ final class RecommendationService
         Gate::forUser($actor)->authorize('view', $recommendation->business);
         $this->assertSuggested($recommendation);
 
-        $context = $recommendation->context ?? [];
+        $context = $recommendation->getAttribute('context');
+        $context = is_array($context) ? $context : [];
         $context['rejection_reason'] = $reason;
         $recommendation->update([
             'status' => 'rejected',
