@@ -4,8 +4,8 @@ namespace App\Filament\Resources\BusinessResource\Pages;
 
 use App\Actions\CreateBusiness as CreateBusinessAction;
 use App\Filament\Resources\BusinessResource;
-use Illuminate\Database\Eloquent\Model;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Database\Eloquent\Model;
 
 class CreateBusiness extends CreateRecord
 {

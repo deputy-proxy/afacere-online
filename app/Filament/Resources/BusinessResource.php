@@ -4,20 +4,22 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\BusinessResource\Pages;
 use App\Models\Business;
+use BackedEnum;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class BusinessResource extends Resource
 {
     protected static ?string $model = Business::class;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Business';
+    protected static string|UnitEnum|null $navigationGroup = 'Business';
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-office-2';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-building-office-2';
 
     public static function form(Schema $schema): Schema
     {
