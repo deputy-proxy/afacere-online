@@ -7,9 +7,14 @@ use App\Models\User;
 
 class BusinessPolicy
 {
+    public function viewAny(User $user): bool
+    {
+        return $user->isAdmin();
+    }
+
     public function view(User $user, Business $business): bool
     {
-        return $this->hasRole($user, $business, ['owner', 'admin', 'member', 'viewer']);
+        return $user->isAdmin() || $this->hasRole($user, $business, ['owner', 'admin', 'member', 'viewer']);
     }
 
     public function create(User $user): bool
@@ -19,12 +24,12 @@ class BusinessPolicy
 
     public function update(User $user, Business $business): bool
     {
-        return $this->hasRole($user, $business, ['owner', 'admin', 'member']);
+        return $user->isAdmin() || $this->hasRole($user, $business, ['owner', 'admin', 'member']);
     }
 
     public function delete(User $user, Business $business): bool
     {
-        return $this->hasRole($user, $business, ['owner', 'admin']);
+        return $user->isAdmin() || $this->hasRole($user, $business, ['owner', 'admin']);
     }
 
     /** @param array<int, string> $roles */
