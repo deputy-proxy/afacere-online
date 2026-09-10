@@ -2,378 +2,172 @@
 
 ## Application Plan
 
-**Status:** Planned  
-**Product:** Product & Subscription platform  
-**Language:** Romanian  
-**Stack:** Laravel 13, Filament 5, Livewire 4, PHP 8.4  
-**Primary domain:** `afacere.online`
+> **Status:** Phase 1 in progress · Application foundation established
+> **Product:** afacere.online Business Progression
+> **Stack:** Laravel 13, Filament 5, Livewire 4, PHP 8.4
+>
+> This document is the high-level application blueprint and implementation roadmap. Important product, domain, architecture and business decisions are recorded in the repository and referenced documents. Those documents are authoritative for their respective subjects.
+
+### Phase status
+
+- **Phase 0 — Product, domain, methodology and architecture:** Complete
+- **Phase 1 — Application foundation and domain implementation:** In progress
+
+### Authoritative specifications
+
+- [`README.md`](README.md) — high-level product blueprint, application structure and implementation roadmap.
+- Repository issues — authoritative record of unresolved product, business and architecture decisions and the answers that govern implementation.
+
+### Decision-recording rule
+
+Important decisions made during development must be reflected in the relevant repository documentation or decision issue. The README remains the high-level project record; detailed decisions belong in the appropriate issue or specification. Documentation must be updated when an architectural, product, workflow, monetization, AI, security or other implementation-significant decision changes.
 
 ---
 
-## 1. Product Direction
+## 1. Product Definition
 
-afacere.online is a platform for Romanian entrepreneurs that helps them move from an **unvalidated idea to a viable business and then toward steady cash flow**.
+afacere.online is a business progression platform for Romanian entrepreneurs that helps them move from an **unvalidated idea to a viable business and then toward steady cash flow**.
 
-The platform is not intended to become a generic business-content website, a directory, or a collection of unrelated consulting services. The application must create a continuous progression:
+A user creates a business workspace, evaluates its current situation, receives priorities and recommended actions, executes those actions with the help of practical Guides, Opportunities, Experts and Marketplace providers, and returns to measure progress through Monitor.
 
-> **Evaluate → Plan → Act → Measure → Improve → Grow**
-
-The central product principle is:
-
-> **Do not give entrepreneurs more information. Help them decide what to do next and make that action easier.**
-
-The platform combines:
-
-- structured business evaluation;
-- actionable plans and guides;
-- AI-assisted analysis and recommendations;
-- peer review and community interaction;
-- mentoring and expert access;
-- business opportunities;
-- curated providers and marketplace services;
-- events and learning experiences;
-- recurring monitoring and subscriptions.
-
-The application must therefore behave as a **business progression system**, not merely as a CMS with a login screen attached to it.
-
----
-
-## 2. Business Objective
-
-The refactored business has one primary commercial objective:
-
-### Target: €5,000 MRR
-
-The product architecture must support recurring revenue while keeping acquisition friction low.
-
-The intended monetization logic is:
-
-1. **Free entry** through the Evaluator.
-2. Evaluation produces concrete priorities.
-3. Priorities lead naturally to Guides, Opportunities, Marketplace services, Consultation, or other paid actions.
-4. Successful users have an ongoing reason to return through Monitor.
-5. Recurring subscriptions become the principal scalable revenue layer.
-6. Experts and providers create additional transaction and lead-generation revenue without turning the company into a labor-heavy agency.
-
-The application should optimize for **activation, useful outcomes, retention and conversion**, rather than maximizing the number of features.
-
----
-
-## 3. Core User Model
-
-### Primary user
-
-**Romanian entrepreneur / founder / small-business owner**, particularly:
-
-- first-time entrepreneurs;
-- people validating a business idea;
-- early-stage founders;
-- small business owners trying to improve an existing operation;
-- entrepreneurs seeking funding, customers, expertise or operational support.
-
-### Core user lifecycle
+The fundamental product loop is:
 
 ```text
-Visitor
+Create business
   ↓
-Account
+Evaluate
   ↓
-Business / Idea
+Prioritize
   ↓
-Evaluator
+Act
   ↓
-Priorities
+Record progress
   ↓
-Action Plan
-  ↓
-Guides / Experts / Opportunities / Marketplace
-  ↓
-Progress & Evidence
-  ↓
-Monitor
-  ↓
-Recurring Subscription
+Return
 ```
 
-A user may have multiple businesses or ideas. The business must be the central workspace object, not the user profile itself.
+### The fundamental promise
+
+**Help entrepreneurs understand what matters now, decide what to do next, and make measurable progress toward a healthier business and steadier cash flow.**
+
+### What afacere.online is not
+
+- Not a generic business-content portal.
+- Not a business directory disguised as a product.
+- Not a generic consulting agency delivered through software.
+- Not a funding-only platform.
+- Not a social network built for engagement metrics rather than useful outcomes.
+- Not an AI chatbot pretending to be a business operating system.
+- Not a marketplace that recommends providers simply because they paid for visibility.
+- Not a collection of unrelated tools without a coherent business progression.
+
+The platform exists to improve entrepreneurial decisions and execution. Information, AI, community, experts, opportunities and providers are means to that end.
 
 ---
 
-## 4. Product Portfolio
+## 2. Product Principles
 
-The platform should expose a coherent product family rather than isolated applications.
+The application must encode these principles in both UX and data architecture.
 
-### 4.1 Evaluator Afacere
-
-**Role:** Free entry point and diagnostic engine.
-
-Purpose:
-
-> Transform an unclear business situation into a structured list of problems, priorities and recommended next actions.
-
-Core capabilities:
-
-- evaluate a business idea;
-- evaluate an operating business;
-- collect structured business information;
-- identify strengths, weaknesses, risks and opportunities;
-- calculate diagnostic dimensions where useful;
-- generate prioritized actions;
-- explain why each action matters;
-- link recommendations to Guides, Experts, Marketplace providers and Opportunities;
-- create or update the user's business profile;
-- save evaluation history;
-- allow reevaluation after changes.
-
-Principle:
-
-> **We do not evaluate to produce a score. We evaluate to decide what happens next.**
+1. **Action over information** — every important insight should lead to a useful next step.
+2. **Business context first** — recommendations should be grounded in the user's business, stage, goals and history.
+3. **Progress over scores** — evaluation is valuable because it produces priorities and action, not because it produces a number.
+4. **Explainability** — users should understand why a recommendation, opportunity, guide, expert or provider is being suggested.
+5. **Human judgment where it matters** — AI assists analysis and execution but does not replace professional judgment when stakes or ambiguity require it.
+6. **User ownership** — AI suggestions remain suggestions until the user accepts, edits or rejects them.
+7. **Continuous improvement** — the system should learn from business progress, outcomes and feedback.
+8. **Low acquisition friction** — the free Evaluator should create enough immediate value to establish trust before asking for payment.
+9. **Recurring value** — paid recurring products must solve problems that return over time, especially through Monitor.
+10. **Contextual commerce** — paid services and providers should appear because a business need exists, not because the platform needs inventory exposure.
 
 ---
 
-### 4.2 Plan de Acțiune
+## 3. Primary Actors
 
-**Role:** Convert diagnosis into execution.
+### 3.1 Entrepreneur
 
-The plan is the bridge between the free diagnostic experience and recurring product usage.
+The primary user: a Romanian entrepreneur, founder or small-business owner.
 
-Capabilities:
+Capabilities include creating businesses, completing evaluations, accepting and executing action plans, using Guides, tracking Opportunities, requesting Expert or Marketplace assistance, participating in Community, registering for Events, monitoring business progress and managing subscriptions.
 
-- prioritized actions;
-- objectives;
-- milestones;
-- tasks;
-- dependencies;
-- deadlines;
-- suggested Guides;
-- suggested Experts;
-- suggested Opportunities;
-- suggested Marketplace providers;
-- progress tracking;
-- completion evidence;
-- notes;
-- reassessment triggers.
+### 3.2 Expert
 
-The system should distinguish between:
+A qualified human who provides mentoring, consultation or specialist assistance.
 
-- recommended actions;
-- accepted actions;
-- active actions;
-- completed actions;
-- skipped actions;
-- blocked actions.
+Expert participation should be structured around business needs and outcomes rather than generic profile browsing. Experts receive only the business context the user explicitly shares and only the access permitted by the relevant workflow.
 
----
+### 3.3 Marketplace Provider
 
-### 4.3 Ghiduri de Acțiune
+A business or professional offering services relevant to entrepreneurial needs.
 
-**Role:** Self-service execution layer.
+Providers have profiles, services, verification information where applicable and lead or transaction capabilities. Provider visibility must not override relevance or recommendation quality.
 
-Guides must be practical and action-oriented. They are not long-form educational articles disguised as products.
+### 3.4 Community / Peer Reviewer
 
-Each Guide should contain:
+An entrepreneur or approved contributor who participates in structured peer review.
 
-- problem/context;
-- expected outcome;
-- prerequisites;
-- steps;
-- templates/checklists where appropriate;
-- estimated effort;
-- expected evidence of completion;
-- related Evaluator findings;
-- related Opportunities;
-- related Marketplace providers;
-- related Experts;
-- next recommended action.
+Peer review exists to improve entrepreneurial decisions, not to create an unrestricted social network. Visibility and participation are controlled according to the sensitivity of the business information.
 
-Guide types should support both free and paid content.
+### 3.5 Platform Administrator
+
+Internal staff operating the service. Administrators manage users, businesses, evaluations, content, opportunities, experts, providers, moderation, subscriptions, payments, events, AI configuration, recommendation rules and audit data.
+
+Administrative capabilities must respect explicit workflow boundaries and must remain auditable where they affect user data, recommendations, commercial state or trust-sensitive records.
 
 ---
 
-### 4.4 Monitor Afacere
+## 4. Core Domain Model
 
-**Role:** Recurring retention and subscription product.
+The application is built around the following bounded concepts. The Business is the central aggregate and other domains attach to it where meaningful.
 
-The Monitor keeps the entrepreneur aware of what changed and what requires attention.
-
-Capabilities should include:
-
-- business health indicators;
-- progress against active plans;
-- overdue or blocked actions;
-- important business metrics;
-- recurring check-ins;
-- new relevant Opportunities;
-- new relevant Guides;
-- recommended interventions;
-- alerts based on user-defined or system-defined thresholds;
-- periodic AI summaries;
-- historical trend views.
-
-Monitor is the primary mechanism for turning a one-time evaluator user into a recurring customer.
-
----
-
-### 4.5 Oportunități
-
-**Role:** Opportunity discovery engine.
-
-Opportunities are a platform capability, not merely a funding directory.
-
-Potential opportunity types:
-
-- grants;
-- funding programs;
-- investors;
-- partnerships;
-- competitions;
-- tenders;
-- accelerators;
-- incubators;
-- events;
-- relevant commercial opportunities.
-
-Each opportunity should have:
-
-- eligibility criteria;
-- business-stage relevance;
-- sector relevance;
-- geographic relevance;
-- deadline;
-- source;
-- required preparation;
-- related business actions.
-
-#### Funding
-
-Funding is a vertical within Opportunities.
-
-Principle:
-
-> **Funding is an opportunity for the business, not the purpose of the platform.**
-
-The system should connect funding opportunities to the user's business diagnosis and action plan instead of presenting an undifferentiated list of grants.
-
----
-
-### 4.6 Marketplace
-
-**Role:** Connect entrepreneurs with vetted external providers.
-
-Marketplace categories may include:
-
-- accounting;
-- legal;
-- web development;
-- branding;
-- marketing;
-- SEO;
-- design;
-- business analysis;
-- HR;
-- procurement;
-- technology;
-- finance;
-- other services validated by demand.
-
-The Marketplace should not initially attempt to become a full transactional marketplace with complex fulfillment infrastructure.
-
-MVP model:
-
-> **Discovery → Match → Lead / Contact → Outcome**
-
-Later versions may add:
-
-- service packages;
-- quotes;
-- booking;
-- payments;
-- reviews;
-- provider subscriptions;
-- transaction fees.
-
-Recommendations must be contextual. A provider should appear because it solves a detected business need, not because the platform needs somewhere to put a banner.
-
----
-
-### 4.7 Consultanță
-
-**Role:** Human assistance for problems where self-service or AI is insufficient.
-
-Consultation should be structured around specific business outcomes rather than generic hourly consulting.
-
-Capabilities:
-
-- consultation requests;
-- matching to expert profiles;
-- defined scope;
-- objectives;
-- preparation materials from the user's business profile;
-- session scheduling;
-- notes and outcomes;
-- recommended follow-up actions;
-- conversion into a plan.
-
-The platform should progressively automate intake and preparation so human time is spent on judgment rather than administration.
-
----
-
-### 4.8 Branding Services
-
-Branding is a specialized Marketplace / service vertical.
-
-It should use the same provider, service, recommendation and lead infrastructure rather than introducing a separate architecture.
-
----
-
-## 5. Core Domain Model
-
-The application should be organized around the following domain objects.
-
-### Identity
+### Identity & Access
 
 - User
 - Profile
+- Organization / Team where applicable
+- Membership
 - Role
 - Permission
-- Subscription
 - Notification
 
 ### Business
 
 - Business
-- BusinessMember
-- BusinessStage
-- BusinessProfile
-- BusinessMetric
-- BusinessMetricValue
-- BusinessGoal
-- BusinessDocument
+- Business Member
+- Business Stage
+- Business Profile
+- Business Metric
+- Business Metric Value
+- Business Goal
+- Business Document
+- Business Preference
 
 ### Evaluation
 
 - Evaluation
-- EvaluationSection
-- EvaluationAnswer
-- EvaluationFinding
-- EvaluationScore / DimensionScore where required
+- Evaluation Version
+- Evaluation Section
+- Evaluation Answer
+- Evaluation Finding
+- Evaluation Score / Dimension Score where required
 - Recommendation
 - Priority
 
-### Planning
+### Planning & Progress
 
-- ActionPlan
-- PlanItem
+- Action Plan
+- Plan Item
 - Milestone
 - Task
-- ActionEvidence
-- ProgressEvent
+- Action Evidence
+- Progress Event
+- Outcome
 
-### Content
+### Guides & Content
 
 - Guide
-- GuideSection
-- GuideStep
+- Guide Section
+- Guide Step
 - Template
 - Checklist
 - Resource
@@ -383,67 +177,80 @@ The application should be organized around the following domain objects.
 ### Opportunities
 
 - Opportunity
-- OpportunityType
-- OpportunityCriteria
-- OpportunityApplication / UserOpportunity
-- OpportunityMatch
+- Opportunity Type
+- Opportunity Criteria
+- Opportunity Application / User Opportunity
+- Opportunity Match
+
+Funding is one Opportunity type rather than a separate platform architecture.
 
 ### Marketplace
 
 - Provider
-- ProviderProfile
-- ServiceCategory
+- Provider Profile
+- Service Category
 - Service
-- ServicePackage
-- ProviderVerification
-- ProviderReview
+- Service Package
+- Provider Verification
+- Provider Review
 - Lead
+- Transaction where applicable
 
-### Experts / Mentoring
+### Experts & Consultation
 
 - Expert
-- ExpertProfile
+- Expert Profile
 - Expertise
 - Availability
 - Consultation
-- MentoringRelationship
+- Mentoring Relationship
 - Session
-- SessionNote
-- ExpertRecommendation
+- Session Note
+- Expert Recommendation
 
-### Community / Peer Review
+### Community & Peer Review
 
-- CommunityPost
+- Community Post
 - Comment
 - Reaction
-- PeerReview
-- ReviewRequest
-- ReviewResponse
-- ModerationReport
+- Peer Review
+- Review Request
+- Review Response
+- Moderation Report
 
 ### Events
 
 - Event
-- EventType
-- EventRegistration
-- EventSession
-- EventAttendance
+- Event Type
+- Event Registration
+- Event Session
+- Event Attendance
+
+### Monitor & Recurring Value
+
+- Monitor Subscription / Configuration
+- Check-in
+- Health Indicator
+- Threshold
+- Alert
+- Periodic Summary
+- Trend Snapshot
 
 ### AI
 
-- AiProvider
-- AiPrompt / PromptVersion
-- AiRun
-- AiRecommendation
-- AiUsage
-- AiFeedback
+- AI Provider
+- Prompt / Prompt Version
+- AI Run
+- AI Recommendation
+- AI Usage
+- AI Feedback
 
-### Commercial
+### Commerce
 
 - Product
-- ProductPlan
+- Product Plan
 - Subscription
-- SubscriptionItem
+- Subscription Item
 - Payment
 - Invoice
 - Coupon / Promotion
@@ -452,106 +259,267 @@ The application should be organized around the following domain objects.
 ### Analytics
 
 - Event
-- FunnelEvent
+- Funnel Event
 - Conversion
-- CohortSnapshot
-- MetricSnapshot
+- Cohort Snapshot
+- Metric Snapshot
 
 ---
 
-## 6. Business as the Central Aggregate
+## 5. Core Lifecycle Rules
 
-Every meaningful user action should be attributable to a business where applicable.
+The workflow is explicit and state-driven. Important transitions require an authorized actor, validation rules, timestamps, audit entries and appropriate notifications.
 
-Examples:
+```text
+Business / Idea
+  ↓
+Evaluator
+  ↓
+Diagnosis
+  ↓
+Priorities
+  ↓
+Action Plan
+  ↓
+Action / Guide / Expert / Opportunity / Marketplace
+  ↓
+Progress & Evidence
+  ↓
+Monitor
+  ↓
+New signals / reassessment
+  ↺
+```
 
-- evaluation belongs to a business;
-- action plan belongs to a business;
-- guide progress belongs to a business/user context;
-- opportunity matches belong to a business;
-- consultation requests belong to a business;
-- marketplace leads belong to a business;
-- monitor data belongs to a business.
+A business may move between lifecycle stages without losing its history. Historical evaluations, plans, outcomes and important recommendations remain traceable.
 
-This allows the platform to produce a coherent history instead of a pile of disconnected user actions.
+### Business lifecycle
 
----
+```text
+Idea
+  ↓
+Validation
+  ↓
+Launch
+  ↓
+Early Operations
+  ↓
+Growth
+  ↓
+Stable Business
+  ↓
+Transformation / Exit
+```
 
-## 7. Main User Journeys
+Stage changes should be based on explicit business signals and/or user confirmation rather than arbitrary calendar rules.
 
-### Journey A: New entrepreneur
+### Action lifecycle
 
-1. Visitor lands on afacere.online.
-2. Understands the proposition.
-3. Starts Evaluator.
-4. Creates account at the appropriate point.
-5. Creates business/idea.
-6. Completes evaluation.
-7. Receives diagnosis.
-8. Receives prioritized actions.
-9. Starts Action Plan.
-10. Executes first action.
-11. Uses Guide / Expert / Marketplace / Opportunity.
-12. Returns to track progress.
-13. Activates Monitor.
-14. Converts to subscription when recurring value is established.
+```text
+Recommended
+  ↓
+Accepted
+  ↓
+Active
+  ├── Completed → Outcome recorded
+  ├── Skipped
+  └── Blocked → Reassess / replace
+```
 
-### Journey B: Existing business
-
-1. Create/import business.
-2. Complete diagnostic.
-3. Establish baseline.
-4. Identify highest-impact bottlenecks.
-5. Build action plan.
-6. Track progress.
-7. Monitor business health.
-8. Receive contextual recommendations.
-
-### Journey C: Funding
-
-1. Evaluation identifies capital requirement.
-2. Opportunity engine determines relevant funding types.
-3. User sees matched opportunities.
-4. User sees eligibility and preparation requirements.
-5. Platform creates preparation actions.
-6. User accesses relevant Guides / Experts.
-7. User tracks opportunity status.
-
-### Journey D: Expert help
-
-1. User receives recommendation that human assistance is useful.
-2. Platform identifies appropriate expertise.
-3. User reviews expert/service profile.
-4. User requests consultation or contact.
-5. Business context is shared with the expert according to permissions.
-6. Session produces decisions/actions.
-7. Actions are added to the Action Plan.
-
-### Journey E: Marketplace
-
-1. Business need is detected.
-2. Matching engine recommends category/provider.
-3. User reviews providers.
-4. User requests contact/quote.
-5. Lead is created.
-6. Provider follows up.
-7. Outcome can later be recorded.
-
-### Journey F: Monitor
-
-1. User has an active business.
-2. Baseline and goals exist.
-3. User activates Monitor.
-4. System periodically evaluates changes.
-5. System identifies risks/opportunities/progress.
-6. User receives concise recommendations.
-7. User acts.
-8. Platform records outcome.
-9. Recommendations improve over time.
+The platform should preserve why an action was skipped, blocked or replaced whenever that information is useful for future recommendations.
 
 ---
 
-## 8. AI Architecture
+## 6. Evaluation & Recommendation Methodology
+
+afacere.online uses a structured business evaluation to understand the current situation and determine what should happen next.
+
+The evaluator is not primarily a scoring product. Scores and dimensions may be used internally where they improve diagnosis, but the user-facing outcome is a prioritized set of business problems, opportunities and actions.
+
+Core diagnostic areas may include:
+
+1. Problem & Customer
+2. Offer & Value Proposition
+3. Market & Competition
+4. Business Model & Economics
+5. Sales & Acquisition
+6. Operations & Delivery
+7. Team & Capability
+8. Financial Health & Cash Flow
+9. Risk & Resilience
+10. Growth Readiness
+
+The exact evaluation framework should remain versioned. In-progress evaluations must retain the version under which they were completed.
+
+### Recommendation model
+
+Recommendations should connect diagnosis to action.
+
+Each recommendation should contain, where applicable:
+
+- reason;
+- priority;
+- recommended action;
+- expected outcome;
+- source/context;
+- target object;
+- confidence where useful;
+- status;
+- created timestamp;
+- accepted/rejected state.
+
+The system should distinguish between:
+
+- system-generated recommendations;
+- user-confirmed decisions;
+- actions completed and supported by evidence.
+
+---
+
+## 7. Public Website & Discovery
+
+Core public pages:
+
+- Home
+- How It Works
+- Evaluator
+- For Entrepreneurs
+- Guides
+- Opportunities
+- Funding
+- Experts
+- Marketplace
+- Community
+- Events
+- Pricing
+- About
+- FAQ
+- Contact
+- Legal pages
+
+Public discovery should be useful without requiring an account wherever practical. Account creation should happen when persistence, personalization or business-specific output requires it.
+
+The public website is an acquisition and trust layer. The authenticated application is the progression layer.
+
+---
+
+## 8. Entrepreneur Application
+
+The entrepreneur-facing application is a separate experience from the internal operations interface, even if both are implemented in the same Laravel application.
+
+The dashboard centers on the user's current business state rather than on a generic list of modules.
+
+Core areas include:
+
+- business overview;
+- evaluation and latest diagnosis;
+- current priorities;
+- active Action Plan;
+- recommended Guides;
+- matched Opportunities;
+- relevant Experts and Marketplace providers;
+- Community / Peer Review activity;
+- Events;
+- Monitor;
+- subscription and account management.
+
+The primary home-screen question should always be:
+
+> **What should I do next?**
+
+---
+
+## 9. Internal Filament Application
+
+Filament is the primary operations back office.
+
+### Platform
+
+- Dashboard
+- Users
+- Roles / Permissions
+- Subscriptions
+- Payments
+- Notifications
+
+### Businesses
+
+- Businesses
+- Business Stages
+- Evaluations
+- Findings
+- Action Plans
+- Metrics
+- Goals
+
+### Content
+
+- Guides
+- Guide Sections / Steps
+- Templates
+- Topics
+- Resources
+
+### Opportunities
+
+- Opportunities
+- Opportunity Types
+- Criteria
+- Matching Rules
+- Applications / User Opportunities
+
+### Marketplace
+
+- Providers
+- Services
+- Categories
+- Leads
+- Reviews
+- Verification
+
+### Experts
+
+- Experts
+- Expertise
+- Availability
+- Consultations
+- Mentoring Relationships
+- Sessions
+
+### Community
+
+- Posts
+- Peer Reviews
+- Reports
+- Moderation
+
+### Events
+
+- Events
+- Sessions
+- Registrations
+- Attendance
+
+### AI & Recommendations
+
+- AI Providers
+- Prompts / Versions
+- AI Runs
+- Recommendations
+- Usage / Cost
+- Feedback
+
+### System
+
+- Settings
+- Audit Log
+- Analytics
+
+Not every model needs a generic CRUD resource. Workflow-specific pages should be used where uncontrolled editing would violate domain rules or obscure the user's business history.
+
+---
+
+## 10. AI Architecture
 
 AI is an assistance layer, not the product itself.
 
@@ -560,8 +528,8 @@ AI should support:
 - evaluation interpretation;
 - finding explanations;
 - recommendation generation;
-- action-plan generation;
-- guide personalization;
+- Action Plan generation;
+- Guide personalization;
 - opportunity matching;
 - provider matching;
 - consultation preparation;
@@ -573,14 +541,15 @@ AI should support:
 ### AI rules
 
 1. Never present AI output as guaranteed business advice.
-2. Preserve the source/context behind recommendations where possible.
-3. Store important AI outputs for auditability.
+2. Preserve the source/context behind important recommendations where possible.
+3. Store important AI outputs for auditability and later analysis.
 4. Version prompts and relevant model configuration.
 5. Separate AI-generated suggestions from user-confirmed decisions.
 6. Allow users to reject, edit or accept recommendations.
-7. Do not build the core architecture around one AI vendor.
+7. Do not build core domain logic around one AI vendor.
 8. Track AI usage and cost.
 9. Use deterministic business rules where deterministic rules are sufficient.
+10. Prefer structured outputs that can be validated before entering the domain workflow.
 
 ### AI abstraction
 
@@ -600,7 +569,7 @@ OpenAI / other provider
 
 ---
 
-## 9. Recommendation Engine
+## 11. Recommendation, Matching & Personalization
 
 The recommendation engine is one of the most important architectural components.
 
@@ -611,32 +580,33 @@ Recommendations should be generated from:
 - business profile;
 - active goals;
 - previous actions;
-- completed guides;
+- completed Guides;
 - opportunity eligibility;
 - user preferences;
-- available experts;
-- marketplace services;
-- historical behavior.
+- available Experts;
+- Marketplace services;
+- historical behavior;
+- Monitor signals and outcomes.
 
-Each recommendation should have:
+Matching should cover at least:
 
-- reason;
-- priority;
-- recommended action;
-- expected outcome;
-- source/context;
-- target object;
-- confidence where applicable;
-- status;
-- timestamp.
+- Guide relevance;
+- Opportunity eligibility;
+- Expert relevance;
+- Provider relevance;
+- Event relevance.
+
+The engine should support deterministic filters first and AI-assisted ranking where appropriate. Business eligibility rules should not be delegated to an unconstrained language model.
 
 Recommendations must be explainable enough that users understand **why the platform is telling them to do something**.
 
 ---
 
-## 10. Peer Review and Community
+## 12. Peer Review, Community & Events
 
-Peer review is a core differentiator of the business model.
+### Peer review
+
+Peer review is a core differentiator of the platform.
 
 MVP capabilities:
 
@@ -655,11 +625,7 @@ The system should support controlled visibility:
 - community;
 - anonymized.
 
-Do not build a social network for the sake of having one. Community exists to improve entrepreneurial decisions and outcomes.
-
----
-
-## 11. Events
+### Events
 
 Events support acquisition, community and monetization.
 
@@ -674,1096 +640,217 @@ Capabilities:
 - attendance;
 - speakers/experts;
 - related business topics;
-- related guides/opportunities;
+- related Guides/Opportunities;
 - paid/free status.
 
-Events should connect to businesses and user goals where possible.
+Community and events should connect back to businesses and user goals rather than becoming disconnected content channels.
 
 ---
 
-## 12. Subscription Architecture
+## 13. Authorization & Security
 
-Subscription must be capability-based rather than hard-coded around individual screens.
+Authorization must be policy-driven and scoped to the business context.
+
+Business data belongs to the user and/or team explicitly associated with that business. Access must follow least-privilege principles.
+
+Experts and Providers access only the business information that the user has intentionally shared through the relevant workflow.
+
+Community content requires separate visibility and moderation controls.
+
+Administrators have broader operational access, but sensitive transitions remain explicit and auditable.
+
+Do not rely on hidden UI controls as the security boundary. Authorization must be enforced server-side.
+
+Business documents and user-provided content must be treated as private by default unless intentionally published or shared.
+
+---
+
+## 14. Commerce & Subscription
+
+The business model is designed around a low-friction free entry point and recurring value.
+
+The commercial architecture must support:
+
+- free access;
+- monthly subscription;
+- annual subscription;
+- one-time purchases where appropriate;
+- paid consultation;
+- provider subscriptions;
+- Marketplace lead/transaction revenue;
+- event revenue;
+- premium Guides.
 
 ### Entitlements
+
+Subscription capabilities should be represented through configurable entitlements rather than hard-coded screens or roles.
 
 Examples:
 
 - number of businesses;
-- evaluation history;
-- advanced evaluations;
+- evaluation depth/history;
 - Monitor access;
 - AI usage limits;
 - premium Guides;
 - opportunity matching depth;
 - community capabilities;
-- expert access;
+- Expert access;
 - reporting;
-- export;
+- exports;
 - team members.
 
-This permits pricing experiments without architectural rewrites.
+The primary commercial target is **€5,000 MRR**. Recurring subscriptions are the principal scalable revenue layer; services, providers and events are supporting monetization channels.
 
-### Commercial strategy
-
-The exact pricing should remain configurable while validating demand.
-
-The initial architecture should support:
-
-- free;
-- monthly subscription;
-- annual subscription;
-- one-time purchase where appropriate;
-- paid consultation;
-- provider subscriptions;
-- Marketplace lead/transaction revenue;
-- event revenue.
-
-The first commercial priority remains **recurring revenue**, not maximizing every possible transaction fee.
+The exact pricing remains configurable until validated through actual demand.
 
 ---
 
-## 13. Filament 5 Administration
+## 15. Implementation Roadmap
 
-Filament is the operational back office.
+### Phase 0 — Product & Architecture
 
-Admin navigation should be grouped by domain:
+**Status: Complete.**
 
-### Platform
+Completed:
 
-- Dashboard
-- Users
-- Roles & permissions
-- Subscriptions
-- Payments
+- Product refactoring around the business progression loop
+- Core promise and product principles
+- Primary actor definitions
+- Business as the central aggregate
+- Business lifecycle definition
+- Evaluator → Priorities → Action Plan progression
+- Guide / Opportunity / Expert / Marketplace relationship to business needs
+- Monitor as the recurring-value layer
+- Opportunity engine with funding as a vertical
+- Recommendation and matching architecture
+- AI assistance boundaries and provider abstraction
+- Peer review and community purpose
+- Event role in acquisition, community and monetization
+- Subscription and entitlement strategy
+- €5,000 MRR commercial objective
+- Domain model and bounded concepts
+- Authorization and privacy boundaries
+- Repository decision-recording workflow
 
-### Businesses
+Authoritative outputs:
 
-- Businesses
-- Business stages
-- Evaluations
-- Findings
-- Action plans
-- Metrics
+- `README.md`
+- repository decision issues
 
-### Content
+### Phase 1 — Application Foundation & Domain Implementation
 
-- Guides
-- Templates
-- Topics
-- Resources
+**Status: In progress.**
 
-### Opportunities
+Current focus:
 
-- Opportunities
-- Opportunity types
-- Matching rules
+- application foundation and configuration
+- domain models and enums
+- Business and Business Profile persistence
+- business stage and lifecycle primitives
+- evaluation persistence
+- recommendation and priority persistence
+- Action Plan foundations
+- policy-driven authorization
+- auditability of important state changes
+- subscription and entitlement foundations
+- AI abstraction boundaries
+- CI, linting, PHPStan and automated tests
 
-### Marketplace
+Remaining Phase 1 work:
 
-- Providers
-- Services
-- Categories
-- Leads
-- Reviews
-- Verification
+- reconcile implementation with the approved domain model
+- complete remaining lifecycle entities and relationships
+- harden domain invariants against all mutation paths
+- complete evaluation and recommendation workflow foundations
+- expand authorization, business lifecycle and subscription test coverage
+- keep CI green across lint, PHPStan and test suites
 
-### Experts
+### Phase 2 — Evaluator & Action Plan
 
-- Experts
-- Expertise
-- Availability
-- Consultations
-- Sessions
+- entrepreneur business onboarding
+- evaluator flow
+- evaluation sections and answers
+- diagnostic findings
+- priorities
+- recommendation generation
+- Action Plan creation
+- plan item lifecycle
+- progress and evidence
+- evaluation history
+- reassessment workflow
 
-### Community
+### Phase 3 — Guides, Opportunities & Matching
 
-- Posts
-- Peer reviews
-- Reports
-- Moderation
+- Guide catalogue and authoring
+- Guide execution flow
+- templates/checklists/resources
+- Opportunity catalogue
+- funding vertical
+- eligibility and matching rules
+- contextual recommendations
+- Opportunity preparation actions
+- recommendation ranking and explanation
 
-### Events
+### Phase 4 — Experts, Marketplace & Community
 
-- Events
-- Registrations
-- Attendance
+- Expert onboarding and profiles
+- expertise and availability
+- consultation workflow
+- mentoring relationships
+- Marketplace providers and services
+- provider verification
+- contextual provider matching
+- lead workflow
+- peer review
+- community moderation
+- controlled visibility
 
-### AI
+### Phase 5 — Monitor, Subscription & Public Product
 
-- AI runs
-- Prompt versions
-- Usage
-- Failed runs
-- Feedback
+- Monitor configuration
+- business health indicators
+- recurring check-ins
+- alerts and thresholds
+- periodic summaries
+- trend/history views
+- subscription plans and entitlements
+- billing/payment flows
+- public website
+- Events and registrations
+- launch readiness
 
-### Analytics
+### Phase 6 — Optimization & Scale
 
-- Acquisition
-- Activation
-- Engagement
-- Retention
-- Conversion
-- Revenue
-
-Admin resources should prioritize operational workflows over exposing every database table. Not every model deserves a CRUD screen. Civilization has suffered enough CRUD already.
-
----
-
-## 14. Public Application Areas
-
-### Marketing site
-
-- Home
-- How it works
-- For entrepreneurs
-- Product pages
-- Guides catalogue
-- Opportunities catalogue
-- Marketplace
-- Experts
-- Events
-- Pricing
-- About
-- FAQ
-- Legal
-
-### Authenticated application
-
-Primary navigation:
-
-1. **Dashboard**
-2. **Afaceri**
-3. **Evaluare**
-4. **Plan de acțiune**
-5. **Oportunități**
-6. **Ghiduri**
-7. **Experți / Servicii**
-8. **Monitor**
-9. **Comunitate**
-10. **Evenimente**
-
-The navigation should adapt to the user's current state. A brand-new user should not be presented with fifteen equally important destinations.
-
----
-
-## 15. Dashboard
-
-The authenticated dashboard is the user's operational home.
-
-It should answer four questions immediately:
-
-1. **Where am I?**
-2. **What matters now?**
-3. **What should I do next?**
-4. **What changed since I last visited?**
-
-Core widgets:
-
-- active business selector;
-- current stage;
-- health/status summary;
-- top priorities;
-- active plan progress;
-- recommended next action;
-- new opportunities;
-- relevant guides;
-- monitor alerts;
-- upcoming events;
-- recent activity.
-
-Avoid dashboard decoration masquerading as analytics.
+- recommendation quality improvement
+- AI cost and quality optimization
+- cohort and funnel analytics
+- retention optimization
+- provider and Expert network growth
+- marketplace monetization
+- event monetization
+- pricing experimentation
+- operational automation
+- performance and infrastructure hardening
+- progression toward and beyond €5,000 MRR
 
 ---
 
-## 16. Search and Discovery
+## 16. Development Rules
 
-Global search should eventually cover:
+1. Keep business rules in explicit domain services, policies and workflows rather than relying on UI behavior.
+2. Treat the Business as the central aggregate and preserve meaningful historical context.
+3. Record important state changes, administrative actions and materially relevant AI decisions in auditable data where appropriate.
+4. Never allow commercial incentives to override recommendation relevance or business need.
+5. Keep AI-generated suggestions distinguishable from user-confirmed decisions.
+6. Use deterministic rules for deterministic eligibility and policy decisions.
+7. Update the relevant documentation or decision issue whenever an important product, architecture, business, AI, workflow or security decision changes.
+8. Prefer explicit domain workflows over generic CRUD when direct editing could violate an invariant.
+9. Build for the current phase and target MRR rather than prematurely implementing the entire product portfolio.
+10. Keep acquisition, activation, retention and conversion measurable from the beginning.
 
-- Guides;
-- Opportunities;
-- Experts;
-- Marketplace providers;
-- Services;
-- Events;
-- community content where appropriate.
 
-Search should be complemented by contextual recommendations. Search answers "what exists"; recommendations answer "what matters to me now".
+## Static Analysis
 
----
+Phase 1 development uses Laravel Pint, PHPStan and automated tests as CI quality gates. Domain models and services should provide concrete types for relationships, factories, enums, dates, collections and workflow results so static analysis can reason about business logic without broad suppressions.
 
-## 17. Notifications
-
-Notification infrastructure should support:
-
-- in-app notifications;
-- email;
-- future push notifications if justified.
-
-Notification types:
-
-- plan deadlines;
-- opportunity deadlines;
-- Monitor alerts;
-- consultation updates;
-- peer-review activity;
-- event reminders;
-- subscription/payment events;
-- important recommendations.
-
-Notifications must be actionable and preference-controlled. The platform should not become another machine for manufacturing unread badges.
-
----
-
-## 18. Privacy and Permissions
-
-Business data may be commercially sensitive.
-
-Required principles:
-
-- explicit ownership of business data;
-- business-level authorization;
-- role-based permissions;
-- granular sharing for peer review and experts;
-- private-by-default business information;
-- audit trail for sensitive actions;
-- clear AI data usage policy;
-- secure document handling;
-- no accidental exposure through public URLs or search.
-
-Authorization should be implemented at the domain level, not only through UI hiding.
-
----
-
-## 19. Analytics and Business Metrics
-
-The application must instrument the complete business funnel.
-
-### Acquisition
-
-- visitors;
-- evaluator starts;
-- registrations;
-- acquisition source;
-- landing-page conversion.
-
-### Activation
-
-- first business created;
-- evaluation completed;
-- first recommendation accepted;
-- first action started;
-- first action completed.
-
-### Engagement
-
-- weekly active businesses;
-- returning users;
-- plan activity;
-- guide completion;
-- opportunity interaction;
-- community participation;
-- Monitor usage.
-
-### Retention
-
-- subscription activation;
-- monthly retention;
-- churn;
-- reactivation;
-- business survival/progress proxies.
-
-### Revenue
-
-- MRR;
-- ARR;
-- ARPU;
-- conversion rate;
-- trial/free-to-paid conversion;
-- revenue by product;
-- provider revenue;
-- consultation revenue;
-- event revenue;
-- lifetime value.
-
-### North-star operating metric
-
-A strong candidate is:
-
-> **Businesses completing meaningful progress actions per month.**
-
-Revenue remains the commercial target, but the product should optimize for the behavior that creates durable value.
-
----
-
-## 20. Architecture Principles
-
-### 20.1 Laravel-first
-
-Use Laravel conventions and framework capabilities before introducing custom infrastructure.
-
-### 20.2 Filament-first for internal operations
-
-Use Filament resources, pages, actions, widgets and relation managers where they fit naturally.
-
-### 20.3 Livewire-first
-
-Prefer Livewire for application interactivity. Introduce JavaScript only where it provides a material UX benefit.
-
-### 20.4 Modular domain boundaries
-
-Organize application code around clear business domains rather than one enormous collection of generic services.
-
-Suggested conceptual domains:
-
-```text
-App/
-├── Domain/
-│   ├── Businesses/
-│   ├── Evaluations/
-│   ├── Planning/
-│   ├── Guides/
-│   ├── Opportunities/
-│   ├── Marketplace/
-│   ├── Experts/
-│   ├── Community/
-│   ├── Events/
-│   ├── AI/
-│   ├── Billing/
-│   └── Analytics/
-├── Filament/
-├── Livewire/
-└── Support/
-```
-
-This is a target architecture, not permission to create twelve abstraction layers before the first user completes an evaluation.
-
-### 20.5 Services should represent business capabilities
-
-Avoid generic `BusinessService`, `Helper`, or `Manager` classes that eventually become junk drawers.
-
-Prefer explicit capabilities such as:
-
-- `EvaluateBusiness`
-- `GenerateActionPlan`
-- `MatchOpportunities`
-- `RecommendServices`
-- `GenerateBusinessSummary`
-- `CompletePlanItem`
-
-### 20.6 Events for meaningful domain changes
-
-Use domain/application events where asynchronous or decoupled behavior is valuable.
-
-Examples:
-
-- EvaluationCompleted
-- RecommendationAccepted
-- PlanItemCompleted
-- OpportunityMatched
-- ConsultationBooked
-- SubscriptionActivated
-
-Do not event-source every button click simply because events sound architectural.
-
----
-
-## 21. Data Design Principles
-
-- UUIDs/ULIDs where appropriate for public-facing identifiers.
-- Foreign keys and database constraints for relational integrity.
-- Soft deletes only where business recovery/audit value exists.
-- Explicit statuses using enums where state transitions matter.
-- Timestamps on important domain records.
-- Auditability for sensitive changes.
-- Avoid storing derived data when it can be safely calculated, unless performance or historical accuracy requires snapshots.
-- Use JSON only for genuinely flexible structures, not as an excuse to avoid designing tables.
-
----
-
-## 22. Background Processing
-
-Queues should be used for operations that are slow, external, or non-critical to the immediate HTTP response.
-
-Candidates:
-
-- AI generation;
-- email delivery;
-- opportunity ingestion;
-- matching recalculation;
-- Monitor calculations;
-- analytics aggregation;
-- document processing;
-- notifications;
-- scheduled reports.
-
-Jobs should be idempotent where practical and observable when they fail.
-
----
-
-## 23. External Integrations
-
-Integrations should be isolated behind application services/adapters.
-
-Likely integrations:
-
-- AI provider;
-- email provider;
-- payment/subscription provider;
-- calendar/scheduling provider;
-- analytics;
-- storage;
-- social authentication where justified.
-
-No external integration should leak provider-specific objects throughout the domain model.
-
----
-
-## 24. Content Architecture
-
-Content must be structured enough to support personalization and recommendations.
-
-Every important content object should be classifiable by:
-
-- topic;
-- business stage;
-- problem;
-- objective;
-- industry where relevant;
-- difficulty;
-- expected effort;
-- outcome;
-- product relationship.
-
-This metadata is essential for the recommendation engine.
-
----
-
-## 25. Opportunity Ingestion
-
-The opportunity engine should eventually support structured ingestion from multiple sources.
-
-Pipeline:
-
-```text
-Source
-  ↓
-Raw opportunity
-  ↓
-Normalization
-  ↓
-Validation
-  ↓
-Classification
-  ↓
-Eligibility metadata
-  ↓
-Publication
-  ↓
-Matching
-```
-
-Admin users must be able to review and correct imported opportunities before publication where source reliability requires it.
-
----
-
-## 26. Provider Quality
-
-Marketplace quality is more important than marketplace volume.
-
-Provider records should support:
-
-- verification status;
-- specialties;
-- service area;
-- price positioning;
-- evidence/portfolio;
-- reviews;
-- response rate where measurable;
-- recommendation eligibility;
-- active/inactive status.
-
-Provider recommendations should be driven by fit, not simply paid placement.
-
----
-
-## 27. Security
-
-Minimum requirements:
-
-- Laravel authentication and authorization;
-- CSRF protection;
-- secure password handling;
-- rate limiting for sensitive endpoints;
-- validation at boundaries;
-- authorization policies;
-- secure file uploads;
-- signed URLs for private assets where appropriate;
-- secrets only in environment configuration;
-- audit logging for sensitive business-data access;
-- careful handling of AI prompts containing business information;
-- privacy-compliant deletion/export mechanisms.
-
-Security tests are required for business-level authorization and sensitive sharing flows.
-
----
-
-## 28. Testing Strategy
-
-Use Pest and feature tests as the primary safety net.
-
-### Critical feature coverage
-
-- authentication;
-- business ownership;
-- business member permissions;
-- evaluation completion;
-- recommendation generation;
-- action-plan creation;
-- task completion;
-- guide access;
-- opportunity matching;
-- provider matching;
-- consultation lifecycle;
-- peer-review permissions;
-- event registration;
-- subscription entitlements;
-- payment/webhook handling;
-- Monitor alerts;
-- notification preferences.
-
-### Testing principles
-
-- test business behavior, not implementation trivia;
-- test authorization boundaries;
-- test important failure modes;
-- use factories;
-- keep tests deterministic;
-- isolate external services through appropriate fakes/mocks.
-
-Every implementation phase must add or update tests for the behavior introduced.
-
----
-
-## 29. MVP Scope
-
-The first production milestone must be deliberately narrow.
-
-### MVP must include
-
-1. Authentication.
-2. Business creation and management.
-3. Evaluator.
-4. Diagnostic findings.
-5. Prioritized recommendations.
-6. Action Plan.
-7. Basic Guides.
-8. Basic Opportunities.
-9. Basic contextual recommendations.
-10. Basic subscription/entitlement infrastructure.
-11. Basic Monitor foundation.
-12. Admin management in Filament.
-13. Core analytics.
-14. Privacy/authorization.
-15. Automated tests.
-
-### MVP should not include initially
-
-- full marketplace transactions;
-- sophisticated scheduling marketplace;
-- complex social networking;
-- mobile applications;
-- elaborate gamification;
-- dozens of AI agents;
-- custom recommendation ML;
-- excessive dashboard visualizations;
-- broad enterprise functionality.
-
-The MVP is successful when a real entrepreneur can go from **business idea → diagnosis → action → measurable progress** without needing a human to manually operate the system behind the scenes.
-
----
-
-## 30. Implementation Roadmap
-
-### Phase 0: Foundation
-
-**Goal:** Establish a clean Laravel 13 / Filament 5 foundation.
-
-Deliverables:
-
-- authentication baseline;
-- application shell;
-- user/business domain foundation;
-- roles/permissions;
-- testing setup;
-- coding standards;
-- domain structure;
-- basic admin navigation;
-- core design system;
-- analytics event foundation.
-
-Exit criteria:
-
-- clean application boot;
-- tests run;
-- admin accessible;
-- business can be created;
-- authorization works.
-
----
-
-### Phase 1: Evaluator
-
-**Goal:** Build the free acquisition and diagnostic engine.
-
-Deliverables:
-
-- evaluation schema;
-- evaluation flow;
-- questions/sections;
-- answers;
-- findings;
-- scoring/dimensions where justified;
-- prioritized recommendations;
-- evaluation history;
-- evaluation completion analytics.
-
-Exit criteria:
-
-> A new entrepreneur can complete a meaningful evaluation and receive actionable priorities.
-
----
-
-### Phase 2: Action Plan
-
-**Goal:** Turn recommendations into execution.
-
-Deliverables:
-
-- action plans;
-- plan items;
-- milestones;
-- statuses;
-- deadlines;
-- evidence;
-- progress tracking;
-- recommendation-to-action links.
-
-Exit criteria:
-
-> A user can take a recommendation and execute it through a measurable workflow.
-
----
-
-### Phase 3: Guides
-
-**Goal:** Make recommended actions executable without human intervention.
-
-Deliverables:
-
-- Guide model;
-- structured guide editor;
-- guide catalogue;
-- contextual guide recommendations;
-- progress/completion;
-- templates/checklists;
-- free/paid access.
-
-Exit criteria:
-
-> The platform can resolve a meaningful percentage of common recommendations through self-service content.
-
----
-
-### Phase 4: Opportunities
-
-**Goal:** Connect business needs to relevant external opportunities.
-
-Deliverables:
-
-- opportunity model;
-- types/categories;
-- eligibility metadata;
-- admin curation;
-- matching;
-- opportunity detail;
-- save/follow/status;
-- funding vertical.
-
-Exit criteria:
-
-> A business receives opportunities that are meaningfully more relevant than a generic directory search.
-
----
-
-### Phase 5: AI Assistance
-
-**Goal:** Increase diagnostic and recommendation quality while controlling cost.
-
-Deliverables:
-
-- AI abstraction;
-- prompt/version management;
-- evaluation interpretation;
-- recommendation assistance;
-- action-plan assistance;
-- guide personalization;
-- usage tracking;
-- failure handling;
-- AI feedback.
-
-Exit criteria:
-
-> AI measurably improves usefulness without becoming an un-auditable black box.
-
----
-
-### Phase 6: Monitor
-
-**Goal:** Create recurring user value.
-
-Deliverables:
-
-- baseline metrics;
-- check-ins;
-- business health indicators;
-- progress summaries;
-- alerts;
-- recurring recommendations;
-- scheduled jobs;
-- subscription entitlements.
-
-Exit criteria:
-
-> A user has a compelling reason to return after completing the initial evaluation.
-
----
-
-### Phase 7: Marketplace & Experts
-
-**Goal:** Monetize the gap between recommendations and execution.
-
-Deliverables:
-
-- providers;
-- services;
-- verification;
-- matching;
-- leads;
-- expert profiles;
-- consultations;
-- outcomes;
-- recommendation integration.
-
-Exit criteria:
-
-> A user can move from identified need to qualified external help with minimal friction.
-
----
-
-### Phase 8: Community & Peer Review
-
-**Goal:** Add differentiated human intelligence and network effects.
-
-Deliverables:
-
-- peer-review requests;
-- responses;
-- community posts;
-- moderation;
-- reputation signals;
-- privacy controls.
-
-Exit criteria:
-
-> Users can obtain useful peer feedback without compromising business confidentiality.
-
----
-
-### Phase 9: Events
-
-**Goal:** Build acquisition, trust and additional revenue channels.
-
-Deliverables:
-
-- event catalogue;
-- registration;
-- attendance;
-- speakers;
-- event-linked recommendations;
-- paid events where validated.
-
----
-
-### Phase 10: Optimization Toward €5k MRR
-
-**Goal:** Optimize the complete commercial funnel.
-
-Focus:
-
-- evaluator conversion;
-- activation;
-- first-value time;
-- subscription conversion;
-- retention;
-- Monitor engagement;
-- ARPU;
-- churn;
-- product-led conversion;
-- provider economics;
-- content ROI;
-- AI cost per active business.
-
-No major new product should be introduced unless it improves one of the core business metrics or creates a strategically important capability.
-
----
-
-## 31. Commercial Funnel
-
-The intended funnel is:
-
-```text
-Traffic
-  ↓
-Evaluator start
-  ↓
-Account creation
-  ↓
-Evaluation completion
-  ↓
-First recommendation accepted
-  ↓
-First meaningful action
-  ↓
-Second return session
-  ↓
-Monitor activation
-  ↓
-Paid subscription
-  ↓
-Retention
-```
-
-Secondary monetization paths:
-
-```text
-Business need
-  ├── Guide purchase
-  ├── Expert consultation
-  ├── Marketplace lead
-  ├── Marketplace transaction
-  ├── Event
-  └── Subscription
-```
-
-The platform should always attempt to solve the user's need first and monetize the appropriate next step second.
-
----
-
-## 32. MRR Strategy
-
-A plausible target composition for €5,000 MRR should be tested rather than assumed.
-
-Example architecture:
-
-- recurring entrepreneur subscriptions as the core;
-- provider subscriptions as a secondary recurring layer;
-- consultation/marketplace revenue as variable upside;
-- events and paid content as additional revenue.
-
-The product database and billing layer must allow pricing experiments without code changes to core business logic.
-
-Key experiments:
-
-- free vs trial;
-- monthly vs annual;
-- Monitor included vs separate;
-- AI limits;
-- business-count limits;
-- premium Guide bundles;
-- provider subscription tiers.
-
----
-
-## 33. What the Application Must NOT Become
-
-The following are explicit strategic constraints:
-
-1. Not a generic business blog.
-2. Not a generic AI chatbot.
-3. Not a directory of consultants.
-4. Not a grant directory.
-5. Not an online course platform.
-6. Not a social network.
-7. Not a conventional consulting agency disguised as SaaS.
-8. Not a feature catalogue without a coherent user journey.
-
-Every feature must answer:
-
-> **Does this help an entrepreneur make or execute a better business decision?**
-
-If not, it probably does not belong in the core product.
-
----
-
-## 34. Product Principles
-
-### Principle 1: Action over information
-
-Every important piece of information should lead toward a decision or action.
-
-### Principle 2: Context over catalogue
-
-Recommendations must use business context.
-
-### Principle 3: Progress over activity
-
-The platform should measure meaningful progress, not clicks.
-
-### Principle 4: Human expertise where it matters
-
-AI handles scale and preparation. Humans handle judgment, relationships and specialist expertise.
-
-### Principle 5: Recurring value
-
-The product must continuously create value after the first evaluation.
-
-### Principle 6: Trust
-
-Recommendations, providers, opportunities and AI outputs must be transparent enough to earn user confidence.
-
-### Principle 7: Simplicity
-
-The product should become more powerful underneath while becoming simpler for the entrepreneur on the surface.
-
-### Principle 8: Build the smallest system that proves the business
-
-Do not build speculative infrastructure before validating the underlying behavior.
-
----
-
-## 35. Definition of Done for Features
-
-A feature is not done when its UI exists.
-
-It is done when:
-
-- domain behavior is implemented;
-- authorization is implemented;
-- validation is implemented;
-- relevant states are handled;
-- important failure cases are covered;
-- tests pass;
-- analytics events exist where relevant;
-- admin operations exist where operationally required;
-- notifications exist where appropriate;
-- documentation is updated for durable decisions;
-- the feature contributes to a measurable product outcome.
-
----
-
-## 36. Initial Development Order
-
-The implementation order should be:
-
-```text
-Foundation
-    ↓
-Business
-    ↓
-Evaluator
-    ↓
-Findings & Recommendations
-    ↓
-Action Plan
-    ↓
-Guides
-    ↓
-Opportunities
-    ↓
-AI assistance
-    ↓
-Monitor
-    ↓
-Billing / Subscriptions
-    ↓
-Marketplace / Experts
-    ↓
-Community / Peer Review
-    ↓
-Events
-    ↓
-Optimization
-```
-
-Billing infrastructure should be designed early enough that entitlements are not retrofitted later, but payment optimization should not distract from proving the core product journey.
-
----
-
-## 37. Success Criteria
-
-The application is moving in the right direction when the following become true:
-
-### Product
-
-- entrepreneurs complete the Evaluator;
-- recommendations are accepted;
-- users execute actions;
-- users return;
-- Monitor is used repeatedly;
-- users perceive the platform as useful without human handholding.
-
-### Business
-
-- free acquisition converts to activated businesses;
-- activated businesses convert to paid accounts;
-- paid users remain subscribed;
-- recurring revenue grows;
-- AI cost remains economically sustainable;
-- Marketplace/Expert revenue supplements subscriptions.
-
-### Strategic
-
-The strongest signal of product-market fit is not traffic. It is entrepreneurs repeatedly returning because the platform helps them make the **next important business decision**.
-
----
-
-## 38. Current Technical Baseline
-
-The repository is a fresh Laravel 13 / Filament 5 application.
-
-Current direct PHP dependency constraints include Laravel Framework `^13.17`, Filament `^5.0`, Livewire `^4.1`, Fortify `^1.37.2`, Flux `^2.13.1`, Blaze `^1.0`, Tinker `^3.0`, Chisel `^0.1.0`, and the current development tooling defined in `composer.json`.
-
-The resolved dependency state is tracked by `composer.lock` and must be treated as authoritative for installed PHP package versions.
-
-The project rules in `AGENTS.md` are part of the development contract and must be followed for all implementation work.
-
----
-
-## 39. Decision Log
-
-### 2026-09-10
-
-- Confirmed repository: `deputy-proxy/afacere-online`.
-- Confirmed current application baseline: Laravel 13 / Filament 5.
-- Reframed the application around the refactored business model rather than the previous broader product catalogue.
-- Established **Evaluator Afacere** as the free entry point.
-- Established **Monitor Afacere** as the recurring retention/subscription layer.
-- Established **Action Plan** as the bridge from diagnosis to execution.
-- Established Guides, Opportunities, Marketplace and Consultation as contextual execution layers.
-- Established Funding as a vertical within Opportunities rather than a standalone core product.
-- Established the entrepreneur's **Business** as the central domain aggregate.
-- Established recurring revenue and the €5,000 MRR target as the primary commercial objective.
-- Established action/progress rather than content volume as the primary product philosophy.
-
----
-
-## 40. Next Implementation Step
-
-Start implementation with **Phase 0: Foundation**, followed by the Business domain and Evaluator.
-
-Do not begin by implementing the entire product catalogue. The first objective is to prove the core loop:
-
-> **Create business → evaluate → receive priorities → take action → record progress → return.**
-
-Everything else should grow around that loop.
+PHPStan failures, lint failures and test failures are treated as implementation defects rather than normal development noise. Temporary diagnostic or repair changes may be used during development, but they must not remain as permanent quality compromises.
