@@ -10,6 +10,10 @@ use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use RuntimeException;
 
+/**
+ * @phpstan-type AiInput array<string, mixed>
+ * @phpstan-type AiRules array<string, string>
+ */
 final class AiService
 {
     public function __construct(
@@ -18,6 +22,10 @@ final class AiService
         // Intentionally empty: dependency is supplied by constructor promotion.
     }
 
+    /**
+     * @param AiInput $input
+     * @param AiRules $outputRules
+     */
     public function run(
         AiPrompt $prompt,
         string $model,
