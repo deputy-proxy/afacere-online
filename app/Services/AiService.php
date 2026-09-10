@@ -14,7 +14,9 @@ final class AiService
 {
     public function __construct(
         private readonly AiProvider $provider,
-    ) {}
+    ) {
+        // Intentionally empty: dependency is supplied by constructor promotion.
+    }
 
     /**
      * @param array<string, mixed> $input
