@@ -13,6 +13,12 @@ class CreateBusiness extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return app(CreateBusinessAction::class)->execute(auth()->user(), $data);
+        /** @var array{name:string, description?:string|null, website?:string|null} $attributes */
+        $attributes = [
+            'name' => (string) $data['name'],
+            'description' => isset($data['description']) ? (string) $data['description'] : null,
+        ];
+
+        return app(CreateBusinessAction::class)->execute(auth()->user(), $attributes);
     }
 }
