@@ -17,7 +17,7 @@ class BusinessResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Business';
 
-    protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-office-2';
 
     public static function form(Schema $schema): Schema
     {
