@@ -19,7 +19,7 @@ final class AiService
     }
 
     /**
-     * @param array<string, mixed> $input Input variables for the prompt.
+     * @param array<string, mixed>  $input      Input variables for the prompt.
      * @param array<string, string> $outputRules Validation rules for the output.
      */
     public function run(
