@@ -3,12 +3,13 @@
 namespace App\Actions;
 
 use App\Enums\BusinessStage;
+use App\Events\BusinessStageChanged;
 use App\Models\Business;
 use App\Models\BusinessStageHistory;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Carbon;
 use DomainException;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 final class TransitionBusinessStage
 {
@@ -22,7 +23,7 @@ final class TransitionBusinessStage
                 return $business;
             }
 
-            if (! $this->isMember($business, $actor)) {
+            if (! $business->members()->whereKey($actor->id)->exists()) {
                 throw new DomainException('The actor is not a member of this business.');
             }
 
@@ -41,12 +42,9 @@ final class TransitionBusinessStage
                 'changed_at' => Carbon::now(),
             ]);
 
-            return $business->fresh();
-        });
-    }
+            BusinessStageChanged::dispatch($business, $current->value, $next->value);
 
-    private function isMember(Business $business, User $actor): bool
-    {
-        return $business->members()->whereKey($actor->id)->exists();
+            return $business->fresh() ?? $business;
+        });
     }
 }
