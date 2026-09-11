@@ -22,11 +22,7 @@ final class NotificationService
 
         $eventKey = $data['event_key'] ?? null;
         if (is_string($eventKey) && $eventKey !== '') {
-            $existing = UserNotification::query()
-                ->where('user_id', $user->id)
-                ->where('type', $type)
-                ->where('data->event_key', $eventKey)
-                ->first();
+            $existing = UserNotification::query()->where('user_id', $user->id)->where('type', $type)->where('data->event_key', $eventKey)->first();
             if ($existing !== null) {
                 return $existing;
             }
@@ -44,18 +40,12 @@ final class NotificationService
 
     public function markRead(User $user, int $notificationId): void
     {
-        UserNotification::query()
-            ->whereKey($notificationId)
-            ->where('user_id', $user->id)
-            ->update(['read_at' => now()]);
+        UserNotification::query()->whereKey($notificationId)->where('user_id', $user->id)->update(['read_at' => now()]);
     }
 
     public function markUnread(User $user, int $notificationId): void
     {
-        UserNotification::query()
-            ->whereKey($notificationId)
-            ->where('user_id', $user->id)
-            ->update(['read_at' => null]);
+        UserNotification::query()->whereKey($notificationId)->where('user_id', $user->id)->update(['read_at' => null]);
     }
 
     /** @return array<int, UserNotification> */
@@ -74,16 +64,15 @@ final class NotificationService
 
     public function unreadCount(User $user, ?Business $business = null): int
     {
-        return UserNotification::query()
-            ->where('user_id', $user->id)
-            ->when($business !== null, function ($query) use ($business): void {
-                abort_unless($business->members()->whereKey(request()->user()?->id)->exists(), 403);
-                $query->where(function ($query) use ($business): void {
-                    $query->where('business_id', $business->id)->orWhereNull('business_id');
-                });
-            })
-            ->whereNull('read_at')
-            ->count();
+        $query = UserNotification::query()->where('user_id', $user->id)->whereNull('read_at');
+        if ($business !== null) {
+            abort_unless($business->members()->whereKey($user->id)->exists(), 403);
+            $query->where(function ($query) use ($business): void {
+                $query->where('business_id', $business->id)->orWhereNull('business_id');
+            });
+        }
+
+        return $query->count();
     }
 
     /** @param array<string, mixed> $payload */
