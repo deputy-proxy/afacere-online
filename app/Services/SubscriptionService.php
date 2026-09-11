@@ -21,6 +21,7 @@ final class SubscriptionService
     public function provisionMvpPlans(): void
     {
         $product = Product::query()->firstOrCreate(['key' => 'afacere-online'], ['name' => 'afacere.online']);
+        /** @var array<int, array{key: string, name: string, price_minor: int, entitlements: array<string, string|bool>}> $plans */
         $plans = [
             ['key' => 'free', 'name' => 'Free', 'price_minor' => 0, 'entitlements' => ['business_limit' => '1', 'monitor' => false]],
             ['key' => 'single', 'name' => 'Single Business', 'price_minor' => 2900, 'entitlements' => ['business_limit' => '1', 'monitor' => true]],
@@ -36,20 +37,22 @@ final class SubscriptionService
         if (! $plan->active) {
             throw ValidationException::withMessages(['plan' => 'The selected plan is inactive.']);
         }
-        $key = $idempotencyKey ?? 'subscription-'.$user->id.'-'.$plan->id.'-'.now()->timestamp;
+        $key = $idempotencyKey ?? 'subscription-'.$user->id.'-'.$plan->id.'-'.Carbon::now()->timestamp;
 
         return DB::transaction(function () use ($user, $plan, $key): Subscription {
             $existing = SubscriptionEvent::query()->where('idempotency_key', $key)->first();
             if ($existing !== null) {
                 return $existing->subscription()->firstOrFail();
             }
-            $subscription = Subscription::query()->create(['user_id' => $user->id, 'product_plan_id' => $plan->id, 'status' => 'active', 'starts_at' => now()]);
-            foreach ($plan->entitlements ?? [] as $entitlement => $value) {
+            $subscription = Subscription::query()->create(['user_id' => $user->id, 'product_plan_id' => $plan->id, 'status' => 'active', 'starts_at' => Carbon::now()]);
+            /** @var array<string, string|bool> $entitlements */
+            $entitlements = is_array($plan->entitlements) ? $plan->entitlements : [];
+            foreach ($entitlements as $entitlement => $value) {
                 Entitlement::query()->updateOrCreate(['user_id' => $user->id, 'key' => $entitlement], ['value' => (string) $value, 'expires_at' => null]);
             }
-            SubscriptionEvent::create(['subscription_id' => $subscription->id, 'type' => 'started', 'idempotency_key' => $key, 'payload' => ['plan' => $plan->key], 'occurred_at' => now()]);
+            SubscriptionEvent::create(['subscription_id' => $subscription->id, 'type' => 'started', 'idempotency_key' => $key, 'payload' => ['plan' => $plan->key], 'occurred_at' => Carbon::now()]);
             if ((int) $plan->price_minor > 0) {
-                Invoice::create(['user_id' => $user->id, 'subscription_id' => $subscription->id, 'number' => 'INV-'.strtoupper(substr(hash('sha256', $key), 0, 12)), 'amount_minor' => $plan->price_minor, 'currency' => $plan->currency, 'status' => 'open', 'issued_at' => now(), 'due_at' => now()->addDays(14)]);
+                Invoice::create(['user_id' => $user->id, 'subscription_id' => $subscription->id, 'number' => 'INV-'.strtoupper(substr(hash('sha256', $key), 0, 12)), 'amount_minor' => $plan->price_minor, 'currency' => $plan->currency, 'status' => 'open', 'issued_at' => Carbon::now(), 'due_at' => Carbon::now()->addDays(14)]);
             }
 
             return $subscription;
@@ -61,8 +64,8 @@ final class SubscriptionService
         abort_unless($subscription->user_id === $user->id || $user->isAdmin(), 403);
 
         return DB::transaction(function () use ($user, $subscription, $amountMinor, $idempotencyKey, $providerReference): Payment {
-            $payment = Payment::query()->firstOrCreate(['idempotency_key' => $idempotencyKey], ['user_id' => $user->id, 'subscription_id' => $subscription->id, 'amount_minor' => $amountMinor, 'currency' => 'EUR', 'status' => 'paid', 'provider_reference' => $providerReference, 'paid_at' => now()]);
-            Invoice::query()->where('subscription_id', $subscription->id)->where('status', 'open')->latest()->first()?->update(['status' => 'paid', 'paid_at' => now()]);
+            $payment = Payment::query()->firstOrCreate(['idempotency_key' => $idempotencyKey], ['user_id' => $user->id, 'subscription_id' => $subscription->id, 'amount_minor' => $amountMinor, 'currency' => 'EUR', 'status' => 'paid', 'provider_reference' => $providerReference, 'paid_at' => Carbon::now()]);
+            Invoice::query()->where('subscription_id', $subscription->id)->where('status', 'open')->latest()->first()?->update(['status' => 'paid', 'paid_at' => Carbon::now()]);
 
             return $payment;
         });
