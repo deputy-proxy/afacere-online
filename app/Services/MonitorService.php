@@ -70,10 +70,10 @@ final class MonitorService
         $checkIns = MonitorCheckIn::query()->where('business_id', $business->id)->whereBetween('recorded_at', [$start, $end])->orderBy('recorded_at')->get();
         $latest = $checkIns->last();
 
-        return MonitorSummary::query()->updateOrCreate(['business_id' => $business->id, 'period_start' => $start->toDateString(), 'period_end' => $end->toDateString()], ['summary' => ['check_ins' => $checkIns->count(), 'latest' => $latest?->responses ?? [], 'trend' => $this->trend(array_values($checkIns->all()))]]);
+        return MonitorSummary::query()->updateOrCreate(['business_id' => $business->id, 'period_start' => $start->toDateString(), 'period_end' => $end->toDateString()], ['summary' => ['check_ins' => $checkIns->count(), 'latest' => $latest === null ? [] : $latest->responses, 'trend' => $this->trend(array_values($checkIns->all()))]]);
     }
 
-    /** @param list<MonitorCheckIn> $checkIns */
+    /** @param array<int, MonitorCheckIn> $checkIns */
     /** @return array<string, float> */
     private function trend(array $checkIns): array
     {
