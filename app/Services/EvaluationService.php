@@ -64,7 +64,7 @@ final class EvaluationService
         $questions = $evaluation->version->sections->flatMap->questions;
         $answers = $evaluation->answers->keyBy('question_key');
         foreach ($questions as $question) {
-            if ($question->required && ! $answers->has($question->key)) {
+            if ($question->required && !$answers->has($question->key)) {
                 throw ValidationException::withMessages(['evaluation' => 'Please answer all required questions before completing the evaluation.']);
             }
         }
@@ -72,6 +72,7 @@ final class EvaluationService
         return DB::transaction(function () use ($evaluation): Evaluation {
             $evaluation->update(['status' => EvaluationStatus::Completed, 'completed_at' => now()]);
             $this->diagnose($evaluation->fresh(['version.sections.questions', 'answers']));
+
             return $evaluation->fresh(['version.sections.questions', 'answers', 'findings']);
         });
     }
@@ -97,6 +98,7 @@ final class EvaluationService
                 'context' => ['answered' => $answered, 'total' => $total, 'version' => $evaluation->version->version],
             ]);
         }
+
         return $findings;
     }
 
