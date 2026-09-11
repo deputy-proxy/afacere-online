@@ -6,7 +6,6 @@ namespace App\Livewire\Business;
 
 use App\Actions\TransitionAction;
 use App\Enums\ActionStatus;
-use App\Models\Action;
 use App\Models\ActionPlan as ActionPlanModel;
 use App\Models\Business;
 use App\Models\User;
@@ -39,6 +38,7 @@ final class ActionPlan extends Component
     {
         $business = app(BusinessContextService::class)->current($this->user());
         abort_unless($business !== null, 404);
+
         return $business;
     }
 
@@ -48,6 +48,7 @@ final class ActionPlan extends Component
         if ($this->planId === null) {
             return null;
         }
+
         return ActionPlanModel::query()->whereKey($this->planId)->where('business_id', $this->business()->id)->with('actions.priority', 'actions.recommendation', 'actions.outcome')->first();
     }
 
@@ -61,6 +62,7 @@ final class ActionPlan extends Component
         $action = $this->business()->actionPlans()->whereKey($this->planId)->firstOrFail()->actions()->whereKey($actionId)->firstOrFail();
         $next = ActionStatus::tryFrom($status);
         abort_unless($next !== null, 422);
+
         $transition->execute($action, $next, $this->user());
     }
 
@@ -78,6 +80,7 @@ final class ActionPlan extends Component
     {
         $user = Auth::user();
         abort_unless($user instanceof User, 401);
+
         return $user;
     }
 
