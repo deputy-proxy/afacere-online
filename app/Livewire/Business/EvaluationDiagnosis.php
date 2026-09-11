@@ -38,6 +38,7 @@ final class EvaluationDiagnosis extends Component
     {
         $business = app(BusinessContextService::class)->current($this->user());
         abort_unless($business !== null, 404);
+
         return $business;
     }
 
@@ -45,6 +46,7 @@ final class EvaluationDiagnosis extends Component
     {
         $user = Auth::user();
         abort_unless($user instanceof User, 401);
+
         return $user;
     }
 
