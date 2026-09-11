@@ -64,7 +64,7 @@ final class EvaluationService
         $questions = $evaluation->version->sections->flatMap->questions;
         $answers = $evaluation->answers->keyBy('question_key');
         foreach ($questions as $question) {
-            if ($question->required && !$answers->has($question->key)) {
+            if ($question->required && ! $answers->has($question->key)) {
                 throw ValidationException::withMessages(['evaluation' => 'Please answer all required questions before completing the evaluation.']);
             }
         }
