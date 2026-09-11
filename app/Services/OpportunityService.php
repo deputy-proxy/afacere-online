@@ -19,8 +19,10 @@ final class OpportunityService
     public function evaluate(Business $business, Opportunity $opportunity, ?Carbon $at = null): array
     {
         $at ??= Carbon::now();
+        /** @var mixed $rawCriteria */
+        $rawCriteria = $opportunity->criteria;
         /** @var array<string, mixed> $criteria */
-        $criteria = is_array($opportunity->criteria) ? $opportunity->criteria : [];
+        $criteria = is_array($rawCriteria) ? $rawCriteria : [];
         /** @var array<string, bool> $results */
         $results = [];
         foreach ($criteria as $key => $rule) {
