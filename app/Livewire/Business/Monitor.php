@@ -40,17 +40,33 @@ final class Monitor extends Component
     {
         $business = app(BusinessContextService::class)->current($this->user());
         abort_unless($business !== null, 404);
+
         return $business;
     }
 
     #[Computed]
-    public function configuration(): mixed { return $this->business()->monitorConfiguration()->first(); }
+    public function configuration(): mixed
+    {
+        return $this->business()->monitorConfiguration()->first();
+    }
+
     #[Computed]
-    public function checkIns(): mixed { return $this->business()->monitorCheckIns()->latest('recorded_at')->limit(8)->get(); }
+    public function checkIns(): mixed
+    {
+        return $this->business()->monitorCheckIns()->latest('recorded_at')->limit(8)->get();
+    }
+
     #[Computed]
-    public function alerts(): mixed { return $this->business()->monitorAlerts()->whereNull('resolved_at')->latest('triggered_at')->limit(8)->get(); }
+    public function alerts(): mixed
+    {
+        return $this->business()->monitorAlerts()->whereNull('resolved_at')->latest('triggered_at')->limit(8)->get();
+    }
+
     #[Computed]
-    public function healthIndicators(): mixed { return $this->business()->healthIndicators()->latest('measured_at')->limit(8)->get()->unique('key')->values(); }
+    public function healthIndicators(): mixed
+    {
+        return $this->business()->healthIndicators()->latest('measured_at')->limit(8)->get()->unique('key')->values();
+    }
 
     public function saveConfiguration(MonitorService $service): void
     {
@@ -67,7 +83,12 @@ final class Monitor extends Component
             'customers' => ['required', 'numeric', 'min:0'],
             'confidence' => ['required', 'numeric', 'min:1', 'max:5'],
         ]);
-        $checkIn = $service->checkIn($this->business(), $this->user(), ['revenue' => (float) $this->revenue, 'cash' => (float) $this->cash, 'customers' => (float) $this->customers, 'confidence' => (float) $this->confidence]);
+        $checkIn = $service->checkIn($this->business(), $this->user(), [
+            'revenue' => (float) $this->revenue,
+            'cash' => (float) $this->cash,
+            'customers' => (float) $this->customers,
+            'confidence' => (float) $this->confidence,
+        ]);
         $notifications->recordEvent('monitor.check_in_completed', $this->user(), $this->business(), $checkIn);
         $notifications->notify($this->user(), 'monitor.check_in_completed', 'Monitor updated', 'Your latest business check-in has been recorded.', $this->business(), [
             'event_key' => sprintf('monitor:check-in:%d', $checkIn->id),
@@ -82,8 +103,12 @@ final class Monitor extends Component
     {
         $user = Auth::user();
         abort_unless($user instanceof User, 401);
+
         return $user;
     }
 
-    public function render(): mixed { return view('livewire.business.monitor'); }
+    public function render(): mixed
+    {
+        return view('livewire.business.monitor');
+    }
 }
