@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Models\Business;
 use App\Models\Guide;
 use App\Models\GuideProgress;
+use App\Models\GuideProgressEvent;
 use App\Models\GuideStep;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -43,7 +44,7 @@ final class GuideExecutionService
         $this->authorizeBusiness($business, $user);
         $this->ensurePublished($guide);
 
-        return GuideProgress::query()->firstOrCreate(
+        $progress = GuideProgress::query()->firstOrCreate(
             [
                 'guide_id' => $guide->id,
                 'user_id' => $user->id,
@@ -55,6 +56,12 @@ final class GuideExecutionService
                 'completed_steps' => [],
             ],
         );
+
+        if ($progress->wasRecentlyCreated) {
+            $this->recordEvent($progress, 'started');
+        }
+
+        return $progress;
     }
 
     public function completeStep(Guide $guide, Business $business, User $user, int $stepId): GuideProgress
@@ -72,8 +79,9 @@ final class GuideExecutionService
             $rawCompletedSteps = $progress->getAttribute('completed_steps');
             $completed = collect(is_array($rawCompletedSteps) ? $rawCompletedSteps : [])
                 ->map(static fn ($id): int => (int) $id);
+            $wasCompleted = $completed->contains($step->id);
 
-            if (! $completed->contains($step->id)) {
+            if (! $wasCompleted) {
                 $completed->push($step->id);
             }
 
@@ -88,6 +96,14 @@ final class GuideExecutionService
                 'completed_steps' => $completed->unique()->values()->all(),
                 'completed_at' => $isComplete ? ($progress->completed_at ?? now()) : null,
             ]);
+
+            if (! $wasCompleted) {
+                $this->recordEvent($progress, 'step_completed', $step);
+            }
+
+            if ($isComplete && $progress->wasChanged('completed_at')) {
+                $this->recordEvent($progress, 'completed');
+            }
 
             return $progress->fresh('currentStep');
         });
@@ -105,6 +121,20 @@ final class GuideExecutionService
             ->where('guide_version', (int) $guide->getAttribute('version'))
             ->with('currentStep')
             ->first();
+    }
+
+    private function recordEvent(GuideProgress $progress, string $type, ?GuideStep $step = null): void
+    {
+        GuideProgressEvent::query()->create([
+            'guide_progress_id' => $progress->id,
+            'guide_id' => $progress->guide_id,
+            'business_id' => $progress->business_id,
+            'user_id' => $progress->user_id,
+            'guide_version' => $progress->guide_version,
+            'event_type' => $type,
+            'guide_step_id' => $step?->id,
+            'occurred_at' => now(),
+        ]);
     }
 
     private function ensurePublished(Guide $guide): void

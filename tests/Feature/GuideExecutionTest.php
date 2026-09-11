@@ -67,7 +67,8 @@ it('persists business-scoped progress for the published guide version', function
 
     expect($progress->guide_version)->toBe(1)
         ->and($updated->completed_steps)->toContain($step->id)
-        ->and($updated->completed_at)->not->toBeNull();
+        ->and($updated->completed_at)->not->toBeNull()
+        ->and($progress->events()->pluck('event_type')->all())->toBe(['started', 'step_completed', 'completed']);
 });
 
 it('keeps progress tied to the published guide version', function (): void {
