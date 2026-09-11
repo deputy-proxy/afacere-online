@@ -42,6 +42,12 @@ class Guide extends Model
         return $this->belongsToMany(GuideTag::class, 'guide_tag_assignments');
     }
 
+    /** @return HasMany<GuideStageAssignment, $this> */
+    public function stageAssignments(): HasMany
+    {
+        return $this->hasMany(GuideStageAssignment::class);
+    }
+
     /** @return BelongsToMany<Priority, $this> */
     public function priorities(): BelongsToMany
     {
@@ -52,11 +58,5 @@ class Guide extends Model
     public function actions(): BelongsToMany
     {
         return $this->belongsToMany(Action::class, 'guide_action_assignments');
-    }
-
-    /** @return BelongsToMany<BusinessStageAssignment, $this> */
-    public function stages(): BelongsToMany
-    {
-        return $this->belongsToMany(BusinessStageAssignment::class, 'guide_stage_assignments', 'guide_id', 'stage', 'id', 'stage');
     }
 }
