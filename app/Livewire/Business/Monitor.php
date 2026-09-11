@@ -8,6 +8,7 @@ use App\Models\Business;
 use App\Models\User;
 use App\Services\BusinessContextService;
 use App\Services\MonitorService;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
@@ -17,15 +18,10 @@ use Livewire\Component;
 final class Monitor extends Component
 {
     public bool $enabled = false;
-
     public string $cadence = 'weekly';
-
     public string $revenue = '';
-
     public string $cash = '';
-
     public string $customers = '';
-
     public string $confidence = '';
 
     public function mount(BusinessContextService $businessContext): void
@@ -44,33 +40,17 @@ final class Monitor extends Component
     {
         $business = app(BusinessContextService::class)->current($this->user());
         abort_unless($business !== null, 404);
-
         return $business;
     }
 
     #[Computed]
-    public function configuration(): mixed
-    {
-        return $this->business()->monitorConfiguration()->first();
-    }
-
+    public function configuration(): mixed { return $this->business()->monitorConfiguration()->first(); }
     #[Computed]
-    public function checkIns(): mixed
-    {
-        return $this->business()->monitorCheckIns()->latest('recorded_at')->limit(8)->get();
-    }
-
+    public function checkIns(): mixed { return $this->business()->monitorCheckIns()->latest('recorded_at')->limit(8)->get(); }
     #[Computed]
-    public function alerts(): mixed
-    {
-        return $this->business()->monitorAlerts()->whereNull('resolved_at')->latest('triggered_at')->limit(8)->get();
-    }
-
+    public function alerts(): mixed { return $this->business()->monitorAlerts()->whereNull('resolved_at')->latest('triggered_at')->limit(8)->get(); }
     #[Computed]
-    public function healthIndicators(): mixed
-    {
-        return $this->business()->healthIndicators()->latest('measured_at')->limit(8)->get()->unique('key')->values();
-    }
+    public function healthIndicators(): mixed { return $this->business()->healthIndicators()->latest('measured_at')->limit(8)->get()->unique('key')->values(); }
 
     public function saveConfiguration(MonitorService $service): void
     {
@@ -79,7 +59,7 @@ final class Monitor extends Component
         unset($this->configuration);
     }
 
-    public function checkIn(MonitorService $service): void
+    public function checkIn(MonitorService $service, NotificationService $notifications): void
     {
         $this->validate([
             'revenue' => ['required', 'numeric'],
@@ -87,7 +67,12 @@ final class Monitor extends Component
             'customers' => ['required', 'numeric', 'min:0'],
             'confidence' => ['required', 'numeric', 'min:1', 'max:5'],
         ]);
-        $service->checkIn($this->business(), $this->user(), ['revenue' => (float) $this->revenue, 'cash' => (float) $this->cash, 'customers' => (float) $this->customers, 'confidence' => (float) $this->confidence]);
+        $checkIn = $service->checkIn($this->business(), $this->user(), ['revenue' => (float) $this->revenue, 'cash' => (float) $this->cash, 'customers' => (float) $this->customers, 'confidence' => (float) $this->confidence]);
+        $notifications->recordEvent('monitor.check_in_completed', $this->user(), $this->business(), $checkIn);
+        $notifications->notify($this->user(), 'monitor.check_in_completed', 'Monitor updated', 'Your latest business check-in has been recorded.', $this->business(), [
+            'event_key' => sprintf('monitor:check-in:%d', $checkIn->id),
+            'url' => route('business.monitor'),
+        ]);
         $this->reset('revenue', 'cash', 'customers', 'confidence');
         unset($this->configuration, $this->checkIns, $this->alerts, $this->healthIndicators);
         session()->flash('monitor_status', 'Check-in saved. Your progress history has been updated.');
@@ -97,12 +82,8 @@ final class Monitor extends Component
     {
         $user = Auth::user();
         abort_unless($user instanceof User, 401);
-
         return $user;
     }
 
-    public function render(): mixed
-    {
-        return view('livewire.business.monitor');
-    }
+    public function render(): mixed { return view('livewire.business.monitor'); }
 }
