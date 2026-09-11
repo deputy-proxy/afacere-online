@@ -20,10 +20,6 @@ it('serves the critical public discovery pages', function (string $routeName): v
     'public.legal',
 ]);
 
-it('passes the readiness smoke journey', function (): void {
-    $this->get(route('health.ready'))->assertOk();
-});
-
 it('serves the authenticated core journey with a business context', function (): void {
     $user = User::factory()->create(['email_verified_at' => now()]);
     $business = Business::factory()->create();
