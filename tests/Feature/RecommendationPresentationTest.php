@@ -29,7 +29,7 @@ it('presents recommendation provenance without requiring AI', function (): void 
         'expected_outcome' => 'Increase repeat purchases.',
         'confidence' => 0.82,
         'source' => 'deterministic',
-    ]);
+    ])->and($context['source'])->toBe('deterministic');
 });
 
 it('keeps ranking behind the application-level provider boundary', function (): void {
