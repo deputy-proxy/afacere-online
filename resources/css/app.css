@@ -45,6 +45,22 @@
     ::file-selector-button {
         border-color: var(--color-gray-200, currentColor);
     }
+
+    :focus-visible {
+        outline: 3px solid currentColor;
+        outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            scroll-behavior: auto !important;
+            transition-duration: 0.01ms !important;
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+        }
+    }
 }
 
 [data-flux-field]:not(ui-radio, ui-checkbox) {
