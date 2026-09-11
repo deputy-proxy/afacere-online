@@ -12,8 +12,8 @@ uses(RefreshDatabase::class);
 
 it('searches only published public resources', function (): void {
     $user = User::factory()->create();
-    Guide::query()->create(['title' => 'Sales Guide', 'description' => 'Improve sales', 'published_at' => now()]);
-    Guide::query()->create(['title' => 'Private Guide', 'description' => 'Improve sales', 'published_at' => null]);
+    Guide::query()->create(['title' => 'Sales Guide', 'slug' => 'sales-guide', 'description' => 'Improve sales', 'published_at' => now()]);
+    Guide::query()->create(['title' => 'Private Guide', 'slug' => 'private-guide', 'description' => 'Improve sales', 'published_at' => null]);
     Opportunity::query()->create(['title' => 'Sales Opportunity', 'description' => 'Sales', 'is_published' => true]);
     Opportunity::query()->create(['title' => 'Hidden Opportunity', 'description' => 'Sales', 'is_published' => false]);
     $results = app(UnifiedSearchService::class)->search($user, 'Sales');
