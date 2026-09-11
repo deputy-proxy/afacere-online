@@ -26,12 +26,15 @@ final class GuideService
         }
 
         return DB::transaction(function () use ($guide, $actor): Guide {
+            $version = max(1, (int) $guide->getAttribute('version'));
+
             $guide->update([
                 'status' => 'published',
+                'version' => $version,
                 'published_at' => now(),
             ]);
 
-            $this->snapshot($guide, $actor);
+            $this->snapshot($guide, $actor, $version);
 
             return $guide->fresh() ?? $guide;
         });
@@ -61,7 +64,7 @@ final class GuideService
         return $this->publish($guide, $actor);
     }
 
-    private function snapshot(Guide $guide, User $actor): GuideRevision
+    private function snapshot(Guide $guide, User $actor, int $version): GuideRevision
     {
         $content = [
             'title' => $guide->getAttribute('title'),
@@ -82,7 +85,7 @@ final class GuideService
         ];
 
         return $guide->revisions()->create([
-            'version' => $guide->getAttribute('version'),
+            'version' => $version,
             'created_by' => $actor->id,
             'content' => $content,
             'created_at' => now(),
