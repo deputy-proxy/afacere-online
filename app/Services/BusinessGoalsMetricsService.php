@@ -87,9 +87,6 @@ final class BusinessGoalsMetricsService
         ]);
     }
 
-    /**
-     * @param int|float|string $value
-     */
     public function recordMetricValue(BusinessMetric $metric, User $actor, int|float|string $value, DateTimeInterface $measuredAt, array $context = []): BusinessMetricValue
     {
         Gate::forUser($actor)->authorize('update', $metric->business);
