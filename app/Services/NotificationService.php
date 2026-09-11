@@ -9,6 +9,7 @@ use App\Models\DomainEvent;
 use App\Models\User;
 use App\Models\UserNotification;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 final class NotificationService
@@ -73,6 +74,20 @@ final class NotificationService
         }
 
         return $query->count();
+    }
+
+    /** @return Collection<int, DomainEvent> */
+    public function activity(User $user, ?Business $business = null, int $limit = 20): Collection
+    {
+        $query = DomainEvent::query()->where(function ($query) use ($user): void {
+            $query->where('actor_id', $user->id)->orWhereHas('business.members', fn ($members) => $members->whereKey($user->id));
+        });
+        if ($business !== null) {
+            abort_unless($business->members()->whereKey($user->id)->exists(), 403);
+            $query->where('business_id', $business->id);
+        }
+
+        return $query->latest('occurred_at')->limit($limit)->get();
     }
 
     /** @param array<string, mixed> $payload */
