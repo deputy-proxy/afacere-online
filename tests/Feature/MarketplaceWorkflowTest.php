@@ -10,6 +10,7 @@ use App\Services\MarketplaceServiceLayer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 uses(RefreshDatabase::class);
 
@@ -41,7 +42,7 @@ it('rejects an authenticated user who is not a business member', function (): vo
     $service = MarketplaceService::query()->create(['provider_id' => $provider->id, 'name' => 'SEO', 'is_published' => true]);
 
     expect(fn (): mixed => app(MarketplaceServiceLayer::class)->createLead($outsider, $business, $provider, $service, 'Hello'))
-        ->toThrow(\Symfony\Component\HttpKernel\Exception\HttpException::class);
+        ->toThrow(HttpException::class);
 });
 
 it('rejects unpublished services', function (): void {
