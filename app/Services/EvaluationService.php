@@ -83,6 +83,7 @@ final class EvaluationService
         $user ??= auth()->user();
         abort_unless($user instanceof User, 401);
         $this->ensureEditable($evaluation, $user);
+        $evaluation->load('version.sections.questions', 'answers');
         $questions = $evaluation->version->sections->flatMap->questions;
         $answers = $evaluation->answers->keyBy('question_key');
         foreach ($questions as $question) {
