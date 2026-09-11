@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\BusinessStage;
@@ -24,6 +26,7 @@ class Business extends Model
         return [
             'stage' => BusinessStage::class,
             'profile' => 'array',
+            'context' => 'array',
             'preferences' => 'array',
         ];
     }
@@ -64,5 +67,11 @@ class Business extends Model
     public function evaluations(): HasMany
     {
         return $this->hasMany(Evaluation::class);
+    }
+
+    /** @return HasMany<BusinessDocument, $this> */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(BusinessDocument::class);
     }
 }
