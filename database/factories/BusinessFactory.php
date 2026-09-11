@@ -30,7 +30,6 @@ class BusinessFactory extends Factory
         ];
     }
 
-    /** @return self */
     public function atStage(BusinessStage $stage): self
     {
         return $this->state(fn (): array => ['stage' => $stage]);
