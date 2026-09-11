@@ -3,8 +3,6 @@
 declare(strict_types=1);
 
 use App\Models\Guide;
-use App\Models\GuideSection;
-use App\Models\GuideStep;
 use App\Models\User;
 use App\Services\GuideService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
