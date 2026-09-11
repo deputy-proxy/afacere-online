@@ -13,10 +13,6 @@ use Illuminate\Support\Facades\Gate;
 
 final class RecommendationPresentationService
 {
-    public function __construct(
-        private readonly RecommendationRanker $ranker,
-    ) {}
-
     /** @return Collection<int, Recommendation> */
     public function forBusiness(Business $business, User $user): Collection
     {
@@ -52,6 +48,6 @@ final class RecommendationPresentationService
     {
         Gate::forUser($user)->authorize('view', $business);
 
-        return $this->ranker->rank($business, $user, $candidates);
+        return app(RecommendationRanker::class)->rank($business, $user, $candidates);
     }
 }
