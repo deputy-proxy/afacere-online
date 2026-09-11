@@ -26,14 +26,14 @@ final class DataLifecycleService
                 'slug' => $business->slug,
                 'description' => $business->description,
                 'website' => $business->website,
-                'stage' => $business->stage?->value,
+                'stage' => $business->stage->value,
                 'profile' => $business->profile,
                 'context' => $business->context,
                 'preferences' => $business->preferences,
-                'membership' => [
-                    'role' => $business->pivot->role,
-                    'joined_at' => $business->pivot->joined_at,
-                ],
+                'membership' => DB::table('business_user')
+                    ->where('business_id', $business->id)
+                    ->where('user_id', $user->id)
+                    ->first(['role', 'joined_at']),
             ])->values()->all(),
             'data_requests' => DB::table('data_requests')
                 ->where('user_id', $user->id)

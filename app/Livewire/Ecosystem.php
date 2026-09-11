@@ -14,6 +14,7 @@ use App\Services\BusinessContextService;
 use App\Services\UnifiedSearchService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
@@ -54,7 +55,7 @@ final class Ecosystem extends Component
         return MarketplaceProvider::query()
             ->where('verification_status', 'verified')
             ->whereHas('services', fn (Builder $query): Builder => $query->where('is_published', true))
-            ->with(['services' => fn (Builder $query): Builder => $query->where('is_published', true)->orderBy('name')])
+            ->with('services')
             ->orderBy('name')
             ->limit(6)
             ->get();
@@ -84,9 +85,9 @@ final class Ecosystem extends Component
             ->get();
     }
 
-    /** @return Collection<int, array{type: string, id: int, title: string}> */
+    /** @return BaseCollection<int, array{type: string, id: int, title: string}> */
     #[Computed]
-    public function results(): Collection
+    public function results(): BaseCollection
     {
         if (trim($this->search) === '') {
             return collect();

@@ -1,7 +1,7 @@
-<x-layouts::app :title="'Ecosystem · '.$this->business->name">
+<x-layouts::app :title="'Ecosystem · '.($this->business?->name ?? 'Business')">
     <div class="mx-auto max-w-6xl space-y-8">
         <header class="space-y-2">
-            <p class="text-sm text-zinc-500">{{ $this->business->name }}</p>
+            <p class="text-sm text-zinc-500">{{ $this->business?->name }}</p>
             <h1 class="text-2xl font-semibold">Ecosystem</h1>
             <p class="max-w-3xl text-sm text-zinc-600">Find experts, providers, peer conversations and events that can help with the work your business needs now.</p>
         </header>
@@ -62,12 +62,13 @@
                 @else
                     <ul class="mt-4 space-y-4">
                         @foreach ($this->providers as $provider)
+                            @php($publishedServices = $provider->services->where('is_published', true))
                             <li class="border-t border-zinc-100 pt-4 first:border-0 first:pt-0">
                                 <p class="font-medium">{{ $provider->name }}</p>
                                 @if ($provider->description)
                                     <p class="mt-1 text-sm text-zinc-600">{{ $provider->description }}</p>
                                 @endif
-                                <p class="mt-2 text-xs text-zinc-500">{{ $provider->services->count() }} published {{ str('service')->plural($provider->services->count()) }}</p>
+                                <p class="mt-2 text-xs text-zinc-500">{{ $publishedServices->count() }} published {{ str('service')->plural($publishedServices->count()) }}</p>
                             </li>
                         @endforeach
                     </ul>
