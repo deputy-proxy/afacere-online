@@ -45,8 +45,10 @@ final class SubscriptionService
                 return $existing->subscription()->firstOrFail();
             }
             $subscription = Subscription::query()->create(['user_id' => $user->id, 'product_plan_id' => $plan->id, 'status' => 'active', 'starts_at' => Carbon::now()]);
+            /** @var mixed $rawEntitlements */
+            $rawEntitlements = $plan->entitlements;
             /** @var array<string, string|bool> $entitlements */
-            $entitlements = is_array($plan->entitlements) ? $plan->entitlements : [];
+            $entitlements = is_array($rawEntitlements) ? $rawEntitlements : [];
             foreach ($entitlements as $entitlement => $value) {
                 Entitlement::query()->updateOrCreate(['user_id' => $user->id, 'key' => $entitlement], ['value' => (string) $value, 'expires_at' => null]);
             }
