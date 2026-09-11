@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Livewire\Account\Subscription;
 use App\Livewire\Business\ActionPlan;
 use App\Livewire\Business\Dashboard;
 use App\Livewire\Business\EvaluationDiagnosis;
@@ -15,9 +16,9 @@ use App\Livewire\Business\OpportunityReader;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
-
 Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::livewire('dashboard', Dashboard::class)->name('dashboard');
+    Route::livewire('account/subscription', Subscription::class)->name('account.subscription');
     Route::livewire('business/onboarding', Onboarding::class)->name('business.onboarding');
     Route::livewire('business/evaluation', EvaluationWizard::class)->name('business.evaluation');
     Route::livewire('business/evaluation/diagnosis', EvaluationDiagnosis::class)->name('business.evaluation.diagnosis');
@@ -28,5 +29,4 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::livewire('business/opportunities/{opportunityId}', OpportunityReader::class)->name('business.opportunities.show');
     Route::livewire('business/monitor', Monitor::class)->name('business.monitor');
 });
-
 require __DIR__.'/settings.php';
