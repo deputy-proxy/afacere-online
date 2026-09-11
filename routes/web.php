@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\ReadinessController;
 use App\Livewire\Account\Subscription;
 use App\Livewire\Business\ActionPlan;
 use App\Livewire\Business\Dashboard;
@@ -23,6 +24,7 @@ Route::view('/about', 'public.about')->name('public.about');
 Route::view('/faq', 'public.faq')->name('public.faq');
 Route::view('/contact', 'public.contact')->name('public.contact');
 Route::view('/legal', 'public.legal')->name('public.legal');
+Route::get('/health/ready', ReadinessController::class)->name('health.ready');
 
 Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::livewire('dashboard', Dashboard::class)->name('dashboard');
