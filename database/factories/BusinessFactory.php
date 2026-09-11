@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Enums\BusinessStage;
@@ -23,7 +25,14 @@ class BusinessFactory extends Factory
             'website' => fake()->optional()->url(),
             'stage' => BusinessStage::Idea,
             'profile' => [],
+            'context' => [],
             'preferences' => [],
         ];
+    }
+
+    /** @return self */
+    public function atStage(BusinessStage $stage): self
+    {
+        return $this->state(fn (): array => ['stage' => $stage]);
     }
 }
