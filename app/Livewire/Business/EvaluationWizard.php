@@ -107,7 +107,7 @@ final class EvaluationWizard extends Component
     {
         $answered = $evaluation->answers->pluck('question_key')->all();
         foreach ($evaluation->version->sections as $index => $section) {
-            if ($section->questions->contains(fn ($question): bool => !in_array($question->key, $answered, true))) {
+            if ($section->questions->contains(fn ($question): bool => ! in_array($question->key, $answered, true))) {
                 return $index;
             }
         }
