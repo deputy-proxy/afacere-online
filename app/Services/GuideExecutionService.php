@@ -68,8 +68,10 @@ final class GuideExecutionService
             ->firstOrFail();
 
         return DB::transaction(function () use ($guide, $business, $user, $step): GuideProgress {
-            $progress = $this->start($guide, $business, $user)->fresh();
-            $completed = collect($progress->completed_steps ?? [])->map(static fn ($id): int => (int) $id);
+            $progress = $this->start($guide, $business, $user);
+            $rawCompletedSteps = $progress->getAttribute('completed_steps');
+            $completed = collect(is_array($rawCompletedSteps) ? $rawCompletedSteps : [])
+                ->map(static fn ($id): int => (int) $id);
 
             if (! $completed->contains($step->id)) {
                 $completed->push($step->id);
