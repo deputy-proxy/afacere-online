@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 uses(RefreshDatabase::class);
 
 it('produces canonical funnel counts from authoritative records', function (): void {
-    DB::table('businesses')->insert(['name' => 'B', 'stage' => 'idea', 'created_at' => now(), 'updated_at' => now()]);
+    DB::table('businesses')->insert(['name' => 'B', 'stage' => 'idea', 'slug' => 'b', 'created_at' => now(), 'updated_at' => now()]);
     $counts = app(ProductAnalyticsService::class)->funnelCounts();
     expect($counts['businesses'])->toBe(1.0);
 });
