@@ -18,7 +18,9 @@ use Livewire\Component;
 final class EvaluationWizard extends Component
 {
     public ?int $evaluationId = null;
+
     public int $sectionIndex = 0;
+
     public string $answer = '';
 
     public function mount(BusinessContextService $businessContext, EvaluationService $evaluationService): void
@@ -47,6 +49,7 @@ final class EvaluationWizard extends Component
     {
         $business = app(BusinessContextService::class)->current($this->user());
         abort_unless($business !== null, 404);
+
         return $business;
     }
 
@@ -70,6 +73,7 @@ final class EvaluationWizard extends Component
             $this->sectionIndex++;
             $this->answer = '';
             $this->loadCurrentAnswer($evaluation->fresh(['version.sections.questions', 'answers']));
+
             return;
         }
 
@@ -103,10 +107,11 @@ final class EvaluationWizard extends Component
     {
         $answered = $evaluation->answers->pluck('question_key')->all();
         foreach ($evaluation->version->sections as $index => $section) {
-            if ($section->questions->contains(fn ($question): bool => ! in_array($question->key, $answered, true))) {
+            if ($section->questions->contains(fn ($question): bool => !in_array($question->key, $answered, true))) {
                 return $index;
             }
         }
+
         return max(0, $evaluation->version->sections->count() - 1);
     }
 
@@ -123,6 +128,7 @@ final class EvaluationWizard extends Component
     {
         $user = Auth::user();
         abort_unless($user instanceof User, 401);
+
         return $user;
     }
 
