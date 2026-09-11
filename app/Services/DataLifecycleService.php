@@ -30,7 +30,7 @@ final class DataLifecycleService
                 'profile' => $business->profile,
                 'context' => $business->context,
                 'preferences' => $business->preferences,
-                'membership' => DB::table('business_user')
+                'membership' => DB::table('business_members')
                     ->where('business_id', $business->id)
                     ->where('user_id', $user->id)
                     ->first(['role', 'joined_at']),
