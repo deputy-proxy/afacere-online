@@ -48,8 +48,9 @@ it('only exposes published guides through the entrepreneur catalogue', function 
     $published = publishedGuide($user);
 
     expect(app(GuideExecutionService::class)->published()->pluck('id')->all())
-        ->toBe([$published->id])
-        ->and($draft->status)->toBe('draft');
+        ->toBe([$published->id]);
+
+    expect($draft->fresh()->getAttribute('status'))->toBeNull();
 });
 
 it('persists business-scoped progress for the published guide version', function (): void {
