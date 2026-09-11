@@ -9,6 +9,7 @@ use App\Models\Evaluation;
 use App\Models\User;
 use App\Services\BusinessContextService;
 use App\Services\EvaluationService;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
@@ -27,7 +28,6 @@ final class EvaluationWizard extends Component
     {
         $business = $businessContext->current($this->user());
         abort_unless($business !== null, 404);
-
         $evaluation = $evaluationService->startOrResume($business);
         $this->evaluationId = $evaluation->id;
         $this->sectionIndex = $this->firstIncompleteSection($evaluation);
@@ -64,7 +64,6 @@ final class EvaluationWizard extends Component
         $evaluation = $this->evaluation();
         $section = $this->section();
         abort_unless($evaluation !== null && $section !== null, 404);
-
         $question = $section->questions->first();
         abort_unless($question !== null, 422);
         $evaluationService->saveAnswer($evaluation, $question->key, $this->answer);
@@ -90,16 +89,21 @@ final class EvaluationWizard extends Component
         $this->loadCurrentAnswer($this->evaluation());
     }
 
-    public function complete(EvaluationService $evaluationService): void
+    public function complete(EvaluationService $evaluationService, NotificationService $notifications): void
     {
         $evaluation = $this->evaluation();
         $section = $this->section();
         abort_unless($evaluation !== null && $section !== null, 404);
-
         $question = $section->questions->first();
         abort_unless($question !== null, 422);
         $evaluationService->saveAnswer($evaluation, $question->key, $this->answer);
-        $evaluationService->complete($evaluation);
+        $completed = $evaluationService->complete($evaluation);
+
+        $notifications->recordEvent('evaluation.completed', $this->user(), $this->business(), $completed, ['version' => $completed->evaluation_version_id]);
+        $notifications->notify($this->user(), 'evaluation.completed', 'Evaluation completed', 'Your diagnosis is ready to review.', $this->business(), [
+            'event_key' => sprintf('evaluation:%d:completed', $completed->id),
+            'url' => route('business.evaluation.diagnosis'),
+        ]);
         $this->redirectRoute('business.evaluation.diagnosis');
     }
 
@@ -118,13 +122,9 @@ final class EvaluationWizard extends Component
     private function loadCurrentAnswer(?Evaluation $evaluation): void
     {
         $question = $this->section()?->questions->first();
-        $stored = $question !== null && $evaluation !== null
-            ? $evaluation->answers->firstWhere('question_key', $question->key)?->getRawOriginal('value')
-            : null;
+        $stored = $question !== null && $evaluation !== null ? $evaluation->answers->firstWhere('question_key', $question->key)?->getRawOriginal('value') : null;
         $decoded = is_string($stored) ? json_decode($stored, true) : null;
-        $this->answer = is_array($decoded) && isset($decoded['answer']) && is_scalar($decoded['answer'])
-            ? (string) $decoded['answer']
-            : '';
+        $this->answer = is_array($decoded) && isset($decoded['answer']) && is_scalar($decoded['answer']) ? (string) $decoded['answer'] : '';
     }
 
     private function user(): User
