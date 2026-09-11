@@ -5,18 +5,25 @@ declare(strict_types=1);
 use App\Models\Business;
 use App\Models\Opportunity;
 use App\Models\OpportunityEvent;
+use App\Models\OpportunityType;
 use App\Models\User;
 use App\Services\OpportunityMatchingService;
+use DateTimeInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 uses(RefreshDatabase::class);
 
-function opportunity(array $criteria = [], ?Carbon $validUntil = null): Opportunity
+function opportunity(array $criteria = [], ?DateTimeInterface $validUntil = null): Opportunity
 {
+    $type = OpportunityType::query()->firstOrCreate(
+        ['key' => 'funding'],
+        ['name' => 'Funding'],
+    );
+
     return Opportunity::query()->create([
+        'opportunity_type_id' => $type->id,
         'title' => 'Growth Grant',
         'description' => 'Support for qualifying businesses.',
         'criteria' => $criteria,
