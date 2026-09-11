@@ -40,6 +40,7 @@ final class Dashboard extends Component
         return $this->user()->businesses()->whereKey($this->businessId)->first();
     }
 
+    /** @return array<int, Business> */
     #[Computed]
     public function businesses(): array
     {
