@@ -104,6 +104,7 @@ final class OpportunityMatchingService
         );
     }
 
+    /** @param array<string, mixed> $rule */
     private function check(mixed $actual, array $rule): bool
     {
         $operator = $rule['operator'] ?? 'equals';
@@ -120,6 +121,7 @@ final class OpportunityMatchingService
         };
     }
 
+    /** @param array<string, mixed> $context */
     private function recordOncePerDay(Opportunity $opportunity, Business $business, User $user, string $type, array $context = []): void
     {
         $exists = OpportunityEvent::query()
