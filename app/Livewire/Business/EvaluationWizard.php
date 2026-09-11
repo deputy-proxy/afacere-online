@@ -59,7 +59,7 @@ final class EvaluationWizard extends Component
         return $this->evaluation()?->version->sections->values()->get($this->sectionIndex);
     }
 
-    public function saveAndNext(EvaluationService $evaluationService): void
+    public function saveAndNext(EvaluationService $evaluationService, NotificationService $notifications): void
     {
         $evaluation = $this->evaluation();
         $section = $this->section();
@@ -76,7 +76,7 @@ final class EvaluationWizard extends Component
             return;
         }
 
-        $this->complete($evaluationService);
+        $this->complete($evaluationService, $notifications);
     }
 
     public function previous(): void
