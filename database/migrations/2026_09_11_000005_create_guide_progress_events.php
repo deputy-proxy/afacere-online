@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreignId('guide_step_id')->nullable()->constrained()->nullOnDelete();
             $table->timestamp('occurred_at');
             $table->timestamps();
-            $table->index(['business_id', 'guide_id', 'event_type', 'occurred_at']);
+            $table->index(['business_id', 'guide_id', 'event_type', 'occurred_at'], 'guide_progress_events_bus_gui_eve_occ_index_index');
         });
     }
 
