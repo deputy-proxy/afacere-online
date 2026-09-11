@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\ActionPlan;
 use App\Models\Business;
+use App\Models\Priority;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -16,14 +17,20 @@ final class ActionPlanService
     {
         abort_unless($business->members()->whereKey($user->id)->exists(), 403);
 
-        $priorities = $business->priorities()->where('status', 'active')->orderBy('position')->get();
+        $priorities = Priority::query()
+            ->where('business_id', $business->id)
+            ->where('status', 'active')
+            ->orderBy('position')
+            ->get();
+
         if ($priorities->isEmpty()) {
             throw ValidationException::withMessages(['priorities' => 'Choose at least one active priority before creating an Action Plan.']);
         }
 
         return DB::transaction(function () use ($business, $priorities): ActionPlan {
-            $version = ((int) $business->actionPlans()->max('version')) + 1;
-            $plan = $business->actionPlans()->create([
+            $version = ((int) ActionPlan::query()->where('business_id', $business->id)->max('version')) + 1;
+            $plan = ActionPlan::query()->create([
+                'business_id' => $business->id,
                 'version' => $version,
                 'status' => 'active',
                 'activated_at' => now(),
@@ -36,7 +43,7 @@ final class ActionPlanService
                     'recommendation_id' => $priority->recommendation_id,
                     'position' => $index + 1,
                     'title' => $priority->title,
-                    'description' => $recommendation?->recommended_action ?? $priority->reason,
+                    'description' => $recommendation->recommended_action ?? $priority->reason,
                     'status' => 'recommended',
                 ]);
             }
