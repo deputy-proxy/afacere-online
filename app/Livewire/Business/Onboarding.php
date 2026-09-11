@@ -6,6 +6,7 @@ namespace App\Livewire\Business;
 
 use App\Models\User;
 use App\Services\BusinessContextService;
+use App\Services\SubscriptionService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -24,12 +25,18 @@ final class Onboarding extends Component
         }
     }
 
-    public function createBusiness(BusinessContextService $businessContext): void
+    public function createBusiness(BusinessContextService $businessContext, SubscriptionService $subscriptions): void
     {
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:2000'],
         ]);
+
+        abort_unless(
+            $subscriptions->canCreateBusiness($this->user()),
+            403,
+            'Your current plan does not allow another business.',
+        );
 
         $businessContext->create(
             $this->user(),
@@ -43,7 +50,6 @@ final class Onboarding extends Component
     private function user(): User
     {
         $user = Auth::user();
-
         abort_unless($user instanceof User, 401);
 
         return $user;
