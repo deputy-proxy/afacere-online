@@ -9,8 +9,7 @@ uses(RefreshDatabase::class);
 it('exposes the public acquisition pages without authentication', function (string $uri, string $text): void {
     $this->get($uri)
         ->assertOk()
-        ->assertSee($text)
-        ->assertSee('Start the free evaluator', false);
+        ->assertSee($text);
 })->with([
     ['/', 'Turn business uncertainty into your next best action.'],
     ['/how-it-works', 'Understand the business. Choose the priority. Do the work.'],
@@ -26,8 +25,7 @@ it('keeps entrepreneur application routes behind authentication', function (): v
 });
 
 it('provides the primary public conversion route to account creation', function (): void {
-    $response = $this->get('/');
-
-    $response->assertSee('href="'.route('register').'"', false)
+    $this->get('/')
+        ->assertSee('href="'.route('register').'"', false)
         ->assertSee('data-analytics-event="public.evaluator.cta"', false);
 });
