@@ -48,7 +48,10 @@ final class GuideReader extends Component
     #[Computed]
     public function completedStepIds(): array
     {
-        return collect($this->progress()?->completed_steps ?? [])
+        $progress = $this->progress();
+        $rawCompletedSteps = $progress?->getAttribute('completed_steps');
+
+        return collect(is_array($rawCompletedSteps) ? $rawCompletedSteps : [])
             ->map(static fn ($id): int => (int) $id)
             ->all();
     }
