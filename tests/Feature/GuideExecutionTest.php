@@ -70,6 +70,24 @@ it('persists business-scoped progress for the published guide version', function
         ->and($updated->completed_at)->not->toBeNull();
 });
 
+it('keeps progress tied to the published guide version', function (): void {
+    $user = User::factory()->create();
+    $business = Business::factory()->create();
+    $business->members()->attach($user, ['role' => 'owner', 'joined_at' => now()]);
+    $guide = publishedGuide($user, 'versioned-guide');
+    $service = app(GuideExecutionService::class);
+    $step = $guide->sections->first()->steps->first();
+
+    $service->completeStep($guide, $business, $user, $step->id);
+    $guide->update(['version' => 2]);
+
+    $newProgress = $service->start($guide->fresh(), $business, $user);
+
+    expect($newProgress->guide_version)->toBe(2)
+        ->and($newProgress->completed_steps)->toBe([])
+        ->and($guide->progress()->where('business_id', $business->id)->count())->toBe(1);
+});
+
 it('rejects guide execution for a non-member business', function (): void {
     $author = User::factory()->create();
     $member = User::factory()->create();
