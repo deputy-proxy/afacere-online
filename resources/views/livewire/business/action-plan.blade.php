@@ -3,7 +3,7 @@
         <div>
             <p class="text-sm text-zinc-500">{{ $this->business->name }}</p>
             <h1 class="text-2xl font-semibold">Action Plan</h1>
-            <p class="mt-1 text-sm text-zinc-600">Turn confirmed priorities into work you can actually complete. Humanity survives another checklist.</p>
+            <p class="mt-1 text-sm text-zinc-600">Turn confirmed priorities into work you can actually complete.</p>
         </div>
 
         @if ($this->plan)
@@ -23,13 +23,13 @@
 
                         <div class="mt-4 flex flex-wrap gap-2">
                             @if ($action->status === \App\Enums\ActionStatus::Recommended)
-                                <button wire:click="transition({{ $action->id }}, 'accepted')" class="rounded-lg bg-zinc-900 px-3 py-2 text-xs text-white">Accept</button>
-                                <button wire:click="transition({{ $action->id }}, 'skipped')" class="rounded-lg border px-3 py-2 text-xs">Skip</button>
+                                <button wire:click="updateStatus({{ $action->id }}, 'accepted')" class="rounded-lg bg-zinc-900 px-3 py-2 text-xs text-white">Accept</button>
+                                <button wire:click="updateStatus({{ $action->id }}, 'skipped')" class="rounded-lg border px-3 py-2 text-xs">Skip</button>
                             @elseif ($action->status === \App\Enums\ActionStatus::Accepted)
-                                <button wire:click="transition({{ $action->id }}, 'active')" class="rounded-lg bg-zinc-900 px-3 py-2 text-xs text-white">Start</button>
-                                <button wire:click="transition({{ $action->id }}, 'blocked')" class="rounded-lg border px-3 py-2 text-xs">Block</button>
+                                <button wire:click="updateStatus({{ $action->id }}, 'active')" class="rounded-lg bg-zinc-900 px-3 py-2 text-xs text-white">Start</button>
+                                <button wire:click="updateStatus({{ $action->id }}, 'blocked')" class="rounded-lg border px-3 py-2 text-xs">Block</button>
                             @elseif ($action->status === \App\Enums\ActionStatus::Active)
-                                <button wire:click="transition({{ $action->id }}, 'blocked')" class="rounded-lg border px-3 py-2 text-xs">Block</button>
+                                <button wire:click="updateStatus({{ $action->id }}, 'blocked')" class="rounded-lg border px-3 py-2 text-xs">Block</button>
                                 <div class="basis-full space-y-2 pt-2">
                                     <input wire:model="outcome" placeholder="What happened?" class="w-full rounded-lg border-zinc-300 text-sm">
                                     <input wire:model="evidence" placeholder="Evidence or reference (optional)" class="w-full rounded-lg border-zinc-300 text-sm">
