@@ -10,9 +10,21 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class AiPrompt extends Model
 {
     protected $guarded = ['id'];
-    protected function casts(): array { return ['active' => 'boolean']; }
+
+    protected function casts(): array
+    {
+        return ['active' => 'boolean'];
+    }
+
     /** @return HasMany<AiRun, $this> */
-    public function runs(): HasMany { return $this->hasMany(AiRun::class); }
+    public function runs(): HasMany
+    {
+        return $this->hasMany(AiRun::class);
+    }
+
     /** @return HasMany<AiPromptVersion, $this> */
-    public function versions(): HasMany { return $this->hasMany(AiPromptVersion::class); }
+    public function versions(): HasMany
+    {
+        return $this->hasMany(AiPromptVersion::class);
+    }
 }

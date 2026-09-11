@@ -10,8 +10,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class AiFeedback extends Model
 {
     protected $guarded = ['id'];
+
     /** @return BelongsTo<AiRun, $this> */
-    public function run(): BelongsTo { return $this->belongsTo(AiRun::class, 'ai_run_id'); }
+    public function run(): BelongsTo
+    {
+        return $this->belongsTo(AiRun::class, 'ai_run_id');
+    }
+
     /** @return BelongsTo<User, $this> */
-    public function user(): BelongsTo { return $this->belongsTo(User::class); }
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

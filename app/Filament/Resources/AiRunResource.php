@@ -16,10 +16,28 @@ use UnitEnum;
 class AiRunResource extends Resource
 {
     protected static ?string $model = AiRun::class;
+
     protected static string|UnitEnum|null $navigationGroup = 'AI';
+
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cpu-chip';
-    public static function canAccess(): bool { return auth()->user()?->isAdmin() ?? false; }
-    public static function form(Schema $schema): Schema { return $schema; }
-    public static function table(Table $table): Table { return $table->columns([TextColumn::make('business.name')->label('Business'), TextColumn::make('provider'), TextColumn::make('model'), TextColumn::make('status')->badge(), TextColumn::make('cost'), TextColumn::make('created_at')->dateTime()->sortable()]); }
-    public static function getPages(): array { return ['index' => Pages\ListAiRuns::route('/')]; }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->isAdmin() ?? false;
+    }
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema;
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table->columns([TextColumn::make('business.name')->label('Business'), TextColumn::make('provider'), TextColumn::make('model'), TextColumn::make('status')->badge(), TextColumn::make('cost'), TextColumn::make('created_at')->dateTime()->sortable()]);
+    }
+
+    public static function getPages(): array
+    {
+        return ['index' => Pages\ListAiRuns::route('/')];
+    }
 }

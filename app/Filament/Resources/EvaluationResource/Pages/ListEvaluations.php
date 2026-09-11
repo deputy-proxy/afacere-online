@@ -1,7 +1,13 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Filament\Resources\EvaluationResource\Pages;
+
 use App\Filament\Resources\EvaluationResource;
 use Filament\Resources\Pages\ListRecords;
-class ListEvaluations extends ListRecords { protected static string $resource = EvaluationResource::class; }
+
+class ListEvaluations extends ListRecords
+{
+    protected static string $resource = EvaluationResource::class;
+}

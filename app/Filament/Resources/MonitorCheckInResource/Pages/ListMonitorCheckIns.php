@@ -7,4 +7,7 @@ namespace App\Filament\Resources\MonitorCheckInResource\Pages;
 use App\Filament\Resources\MonitorCheckInResource;
 use Filament\Resources\Pages\ListRecords;
 
-class ListMonitorCheckIns extends ListRecords { protected static string $resource = MonitorCheckInResource::class; }
+class ListMonitorCheckIns extends ListRecords
+{
+    protected static string $resource = MonitorCheckInResource::class;
+}

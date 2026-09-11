@@ -29,6 +29,7 @@ final class OpportunityService
         }
         $eligible = $opportunity->isCurrent($at) && ! in_array(false, $results, true);
         $score = $results === [] ? ($eligible ? 1.0 : 0.0) : round(count(array_filter($results)) / count($results), 3);
+
         return ['eligible' => $eligible, 'score' => $score, 'results' => $results];
     }
 
@@ -39,6 +40,7 @@ final class OpportunityService
         if (! $evaluation['eligible']) {
             throw ValidationException::withMessages(['opportunity' => 'Business does not meet the opportunity criteria.']);
         }
+
         return OpportunityMatch::query()->updateOrCreate(
             ['business_id' => $business->id, 'opportunity_id' => $opportunity->id],
             ['score' => $evaluation['score'], 'criteria_results' => $evaluation['results'], 'matched_at' => now()],
@@ -49,6 +51,7 @@ final class OpportunityService
     {
         abort_unless($user->isAdmin() || $business->members()->whereKey($user->id)->exists(), 403);
         $this->evaluate($business, $opportunity);
+
         return DB::transaction(fn (): OpportunityApplication => OpportunityApplication::query()->updateOrCreate(
             ['business_id' => $business->id, 'opportunity_id' => $opportunity->id],
             ['user_id' => $user->id, 'status' => 'planned'],

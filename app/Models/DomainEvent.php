@@ -10,9 +10,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class DomainEvent extends Model
 {
     protected $guarded = ['id'];
-    protected function casts(): array { return ['payload' => 'array', 'occurred_at' => 'datetime']; }
+
+    protected function casts(): array
+    {
+        return ['payload' => 'array', 'occurred_at' => 'datetime'];
+    }
+
     /** @return BelongsTo<User, $this> */
-    public function actor(): BelongsTo { return $this->belongsTo(User::class, 'actor_id'); }
+    public function actor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'actor_id');
+    }
+
     /** @return BelongsTo<Business, $this> */
-    public function business(): BelongsTo { return $this->belongsTo(Business::class); }
+    public function business(): BelongsTo
+    {
+        return $this->belongsTo(Business::class);
+    }
 }

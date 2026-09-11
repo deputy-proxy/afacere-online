@@ -24,6 +24,7 @@ final class AiGovernanceService
             $prompt->versions()->update(['active' => false]);
             $revision = $prompt->versions()->create(['version' => $version, 'template' => $template, 'output_schema' => $outputSchema, 'active' => true]);
             $prompt->update(['template' => $template, 'version' => $version]);
+
             return $revision;
         });
     }
@@ -34,6 +35,7 @@ final class AiGovernanceService
         if ($rating !== null && ($rating < 1 || $rating > 5)) {
             throw ValidationException::withMessages(['rating' => 'Rating must be between 1 and 5.']);
         }
+
         return AiFeedback::create(['ai_run_id' => $run->id, 'user_id' => $user->id, 'rating' => $rating, 'feedback' => $feedback]);
     }
 

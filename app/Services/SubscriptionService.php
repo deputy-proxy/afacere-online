@@ -37,6 +37,7 @@ final class SubscriptionService
             throw ValidationException::withMessages(['plan' => 'The selected plan is inactive.']);
         }
         $key = $idempotencyKey ?? 'subscription-'.$user->id.'-'.$plan->id.'-'.now()->timestamp;
+
         return DB::transaction(function () use ($user, $plan, $key): Subscription {
             $existing = SubscriptionEvent::query()->where('idempotency_key', $key)->first();
             if ($existing !== null) {
@@ -50,6 +51,7 @@ final class SubscriptionService
             if ((int) $plan->price_minor > 0) {
                 Invoice::create(['user_id' => $user->id, 'subscription_id' => $subscription->id, 'number' => 'INV-'.strtoupper(substr(hash('sha256', $key), 0, 12)), 'amount_minor' => $plan->price_minor, 'currency' => $plan->currency, 'status' => 'open', 'issued_at' => now(), 'due_at' => now()->addDays(14)]);
             }
+
             return $subscription;
         });
     }
@@ -57,9 +59,11 @@ final class SubscriptionService
     public function recordPayment(User $user, Subscription $subscription, int $amountMinor, string $idempotencyKey, ?string $providerReference = null): Payment
     {
         abort_unless($subscription->user_id === $user->id || $user->isAdmin(), 403);
+
         return DB::transaction(function () use ($user, $subscription, $amountMinor, $idempotencyKey, $providerReference): Payment {
             $payment = Payment::query()->firstOrCreate(['idempotency_key' => $idempotencyKey], ['user_id' => $user->id, 'subscription_id' => $subscription->id, 'amount_minor' => $amountMinor, 'currency' => 'EUR', 'status' => 'paid', 'provider_reference' => $providerReference, 'paid_at' => now()]);
             Invoice::query()->where('subscription_id', $subscription->id)->where('status', 'open')->latest()->first()?->update(['status' => 'paid', 'paid_at' => now()]);
+
             return $payment;
         });
     }
@@ -68,6 +72,7 @@ final class SubscriptionService
     {
         abort_unless($actor->isAdmin() || $subscription->user_id === $actor->id, 403);
         $subscription->update(['status' => 'cancelled', 'ends_at' => Carbon::now()]);
+
         return $subscription->fresh() ?? $subscription;
     }
 }

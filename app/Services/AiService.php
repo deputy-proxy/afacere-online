@@ -6,9 +6,9 @@ namespace App\Services;
 
 use App\Contracts\AiProvider;
 use App\Models\AiPrompt;
+use App\Models\AiRecommendation;
 use App\Models\AiRun;
 use App\Models\AiUsageRecord;
-use App\Models\AiRecommendation;
 use App\Models\Business;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
@@ -36,6 +36,7 @@ final class AiService
             $run->update(['status' => 'failed', 'error' => $exception->getMessage()]);
             throw $exception;
         }
+
         return $run->fresh() ?? $run;
     }
 }

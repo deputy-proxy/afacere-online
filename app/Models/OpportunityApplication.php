@@ -17,9 +17,20 @@ class OpportunityApplication extends Model
     }
 
     /** @return BelongsTo<Business, $this> */
-    public function business(): BelongsTo { return $this->belongsTo(Business::class); }
+    public function business(): BelongsTo
+    {
+        return $this->belongsTo(Business::class);
+    }
+
     /** @return BelongsTo<Opportunity, $this> */
-    public function opportunity(): BelongsTo { return $this->belongsTo(Opportunity::class); }
+    public function opportunity(): BelongsTo
+    {
+        return $this->belongsTo(Opportunity::class);
+    }
+
     /** @return BelongsTo<User, $this> */
-    public function user(): BelongsTo { return $this->belongsTo(User::class); }
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

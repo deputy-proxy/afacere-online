@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\AnalyticsConversion;
-use App\Models\AnalyticsSnapshot;
 use App\Models\AnalyticsEvent;
+use App\Models\AnalyticsSnapshot;
 use App\Models\Business;
 use App\Models\User;
 use Illuminate\Support\Carbon;
@@ -25,6 +25,7 @@ final class AnalyticsService
     public function conversion(string $funnel, string $step, ?User $user = null, ?Business $business = null, ?string $idempotencyKey = null): AnalyticsConversion
     {
         $key = $idempotencyKey ?? hash('sha256', implode(':', [$funnel, $step, $user?->id ?? 0, $business?->id ?? 0]));
+
         return AnalyticsConversion::query()->firstOrCreate(['idempotency_key' => $key], ['user_id' => $user?->id, 'business_id' => $business?->id, 'funnel' => $funnel, 'step' => $step, 'occurred_at' => now()]);
     }
 
@@ -32,6 +33,7 @@ final class AnalyticsService
     {
         $events = AnalyticsEvent::query()->whereBetween('occurred_at', [$start, $end])->get();
         $counts = $events->groupBy('name')->map->count()->all();
+
         return AnalyticsSnapshot::query()->updateOrCreate(['key' => $key, 'period_start' => $start->toDateString(), 'period_end' => $end->toDateString()], ['payload' => ['events' => $counts, 'total' => $events->count()]]);
     }
 

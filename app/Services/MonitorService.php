@@ -21,6 +21,7 @@ final class MonitorService
         abort_unless($user->isAdmin() || $business->members()->whereKey($user->id)->wherePivotIn('role', ['owner', 'admin'])->exists(), 403);
         abort_unless($user->isAdmin() || app(EntitlementService::class)->allows($user, 'monitor'), 403);
         abort_unless(in_array($cadence, ['daily', 'weekly', 'monthly'], true), 422);
+
         return MonitorConfiguration::query()->updateOrCreate(['business_id' => $business->id], ['enabled' => $enabled, 'cadence' => $cadence, 'next_check_in_at' => $this->next($cadence)]);
     }
 
@@ -30,10 +31,12 @@ final class MonitorService
         abort_unless($user->isAdmin() || $business->members()->whereKey($user->id)->exists(), 403);
         $configuration = $business->monitorConfiguration()->first();
         abort_unless($configuration?->enabled === true, 422);
+
         return DB::transaction(function () use ($business, $user, $responses, $configuration): MonitorCheckIn {
             $checkIn = MonitorCheckIn::create(['business_id' => $business->id, 'user_id' => $user->id, 'responses' => $responses, 'recorded_at' => now()]);
             $configuration->update(['next_check_in_at' => $this->next($configuration->cadence)]);
             $this->evaluateThresholds($business);
+
             return $checkIn;
         });
     }
@@ -54,16 +57,21 @@ final class MonitorService
     {
         abort_unless($business->exists, 404);
         $checkIns = MonitorCheckIn::query()->where('business_id', $business->id)->whereBetween('recorded_at', [$start, $end])->orderBy('recorded_at')->get();
+
         return MonitorSummary::query()->updateOrCreate(['business_id' => $business->id, 'period_start' => $start->toDateString(), 'period_end' => $end->toDateString()], ['summary' => ['check_ins' => $checkIns->count(), 'latest' => $checkIns->last()?->responses ?? []]]);
     }
 
     private function next(string $cadence): Carbon
     {
-        return match ($cadence) { 'daily' => now()->addDay(), 'monthly' => now()->addMonth(), default => now()->addWeek() };
+        return match ($cadence) {
+            'daily' => now()->addDay(), 'monthly' => now()->addMonth(), default => now()->addWeek()
+        };
     }
 
     private function passes(float $value, string $operator, float $threshold): bool
     {
-        return match ($operator) { '>' => $value > $threshold, '>=' => $value >= $threshold, '<' => $value < $threshold, '<=' => $value <= $threshold, '=' => $value === $threshold, default => false };
+        return match ($operator) {
+            '>' => $value > $threshold, '>=' => $value >= $threshold, '<' => $value < $threshold, '<=' => $value <= $threshold, '=' => $value === $threshold, default => false
+        };
     }
 }
