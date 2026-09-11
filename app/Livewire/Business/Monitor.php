@@ -8,6 +8,7 @@ use App\Models\Business;
 use App\Models\User;
 use App\Services\BusinessContextService;
 use App\Services\MonitorService;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
@@ -79,7 +80,7 @@ final class Monitor extends Component
         unset($this->configuration);
     }
 
-    public function checkIn(MonitorService $service): void
+    public function checkIn(MonitorService $service, NotificationService $notifications): void
     {
         $this->validate([
             'revenue' => ['required', 'numeric'],
@@ -87,7 +88,17 @@ final class Monitor extends Component
             'customers' => ['required', 'numeric', 'min:0'],
             'confidence' => ['required', 'numeric', 'min:1', 'max:5'],
         ]);
-        $service->checkIn($this->business(), $this->user(), ['revenue' => (float) $this->revenue, 'cash' => (float) $this->cash, 'customers' => (float) $this->customers, 'confidence' => (float) $this->confidence]);
+        $checkIn = $service->checkIn($this->business(), $this->user(), [
+            'revenue' => (float) $this->revenue,
+            'cash' => (float) $this->cash,
+            'customers' => (float) $this->customers,
+            'confidence' => (float) $this->confidence,
+        ]);
+        $notifications->recordEvent('monitor.check_in_completed', $this->user(), $this->business(), $checkIn);
+        $notifications->notify($this->user(), 'monitor.check_in_completed', 'Monitor updated', 'Your latest business check-in has been recorded.', $this->business(), [
+            'event_key' => sprintf('monitor:check-in:%d', $checkIn->id),
+            'url' => route('business.monitor'),
+        ]);
         $this->reset('revenue', 'cash', 'customers', 'confidence');
         unset($this->configuration, $this->checkIns, $this->alerts, $this->healthIndicators);
         session()->flash('monitor_status', 'Check-in saved. Your progress history has been updated.');

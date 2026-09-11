@@ -79,7 +79,22 @@ final class SubscriptionService
             }
         }
 
-        return $subscription->load('plan');
+        $subscription = $subscription->load('plan');
+        $notifications = app(NotificationService::class);
+        $notifications->recordEvent('subscription.changed', $user, null, $subscription, ['plan' => $plan->getAttribute('key')]);
+        $notifications->notify(
+            $user,
+            'subscription.changed',
+            'Plan updated',
+            sprintf('Your plan is now %s.', $plan->getAttribute('name')),
+            null,
+            [
+                'event_key' => sprintf('subscription:%d', $subscription->id),
+                'url' => route('account.subscription'),
+            ],
+        );
+
+        return $subscription;
     }
 
     public function businessLimit(User $user): ?int

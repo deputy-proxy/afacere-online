@@ -10,6 +10,7 @@ use App\Livewire\Business\EvaluationWizard;
 use App\Livewire\Business\GuideReader;
 use App\Livewire\Business\Guides;
 use App\Livewire\Business\Monitor;
+use App\Livewire\Business\Notifications;
 use App\Livewire\Business\Onboarding;
 use App\Livewire\Business\Opportunities;
 use App\Livewire\Business\OpportunityReader;
@@ -25,6 +26,7 @@ Route::view('/legal', 'public.legal')->name('public.legal');
 
 Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::livewire('dashboard', Dashboard::class)->name('dashboard');
+    Route::livewire('notifications', Notifications::class)->name('business.notifications');
     Route::livewire('account/subscription', Subscription::class)->name('account.subscription');
     Route::livewire('business/onboarding', Onboarding::class)->name('business.onboarding');
     Route::livewire('business/evaluation', EvaluationWizard::class)->name('business.evaluation');
