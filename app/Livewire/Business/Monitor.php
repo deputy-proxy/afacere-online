@@ -17,10 +17,15 @@ use Livewire\Component;
 final class Monitor extends Component
 {
     public bool $enabled = false;
+
     public string $cadence = 'weekly';
+
     public string $revenue = '';
+
     public string $cash = '';
+
     public string $customers = '';
+
     public string $confidence = '';
 
     public function mount(BusinessContextService $businessContext): void
