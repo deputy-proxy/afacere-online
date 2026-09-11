@@ -13,7 +13,9 @@ use Illuminate\Support\Facades\Gate;
 
 final class RecommendationPresentationService
 {
-    public function __construct(private readonly RecommendationRanker $ranker) {}
+    public function __construct(
+        private readonly RecommendationRanker $ranker,
+    ) {}
 
     /** @return Collection<int, Recommendation> */
     public function forBusiness(Business $business, User $user): Collection
