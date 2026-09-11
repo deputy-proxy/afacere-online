@@ -16,16 +16,19 @@ use RuntimeException;
 
 final class AiService
 {
-    public function __construct(private readonly AiProvider $provider)
+    private readonly AiProvider $provider;
+
+    public function __construct(AiProvider $provider)
     {
+        $this->provider = $provider;
     }
 
-    /**
-     * @param array<string, mixed>  $input
-     * @param array<string, string>  $outputRules
-     */
     public function run(AiPrompt $prompt, string $model, array $input, ?User $user = null, ?Business $business = null, array $outputRules = []): AiRun
     {
+        /** @var array<string, mixed> $typedInput */
+        $typedInput = $input;
+        /** @var array<string, string> $typedOutputRules */
+        $typedOutputRules = $outputRules;
         $run = AiRun::create([
             'user_id' => $user?->id,
             'business_id' => $business?->id,
@@ -33,13 +36,13 @@ final class AiService
             'provider' => $this->provider::class,
             'model' => $model,
             'status' => 'running',
-            'input' => $input,
+            'input' => $typedInput,
         ]);
 
         try {
-            $result = $this->provider->generate($model, $prompt->template, $input);
-            if ($outputRules !== []) {
-                Validator::make($result->output, $outputRules)->validate();
+            $result = $this->provider->generate($model, $prompt->template, $typedInput);
+            if ($typedOutputRules !== []) {
+                Validator::make($result->output, $typedOutputRules)->validate();
             }
 
             $run->update([
