@@ -17,6 +17,7 @@ use App\Livewire\Business\Notifications;
 use App\Livewire\Business\Onboarding;
 use App\Livewire\Business\Opportunities;
 use App\Livewire\Business\OpportunityReader;
+use App\Livewire\Ecosystem;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
@@ -43,6 +44,7 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::livewire('business/opportunities', Opportunities::class)->name('business.opportunities');
     Route::livewire('business/opportunities/{opportunityId}', OpportunityReader::class)->name('business.opportunities.show');
     Route::livewire('business/monitor', Monitor::class)->name('business.monitor');
+    Route::livewire('ecosystem', Ecosystem::class)->name('business.ecosystem');
 });
 
 Route::middleware(['auth', 'verified', 'admin'])->prefix('internal/support')->name('internal.support.')->group(function (): void {
