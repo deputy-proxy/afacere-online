@@ -109,44 +109,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('payments', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('subscription_id')->nullable()->constrained()->nullOnDelete();
-            $table->unsignedInteger('amount_minor');
-            $table->char('currency', 3)->default('EUR');
-            $table->string('status', 30);
-            $table->string('provider', 40)->nullable();
-            $table->string('provider_reference')->nullable();
-            $table->string('idempotency_key')->unique();
-            $table->timestamp('paid_at')->nullable();
-            $table->timestamps();
-        });
-
-        Schema::create('invoices', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('subscription_id')->nullable()->constrained()->nullOnDelete();
-            $table->string('number')->unique();
-            $table->unsignedInteger('amount_minor');
-            $table->char('currency', 3)->default('EUR');
-            $table->string('status', 30)->default('open');
-            $table->timestamp('issued_at');
-            $table->timestamp('due_at')->nullable();
-            $table->timestamp('paid_at')->nullable();
-            $table->timestamps();
-        });
-
-        Schema::create('subscription_events', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('subscription_id')->constrained()->cascadeOnDelete();
-            $table->string('type', 50);
-            $table->string('idempotency_key')->unique();
-            $table->json('payload')->nullable();
-            $table->timestamp('occurred_at');
-            $table->timestamps();
-        });
-
         Schema::create('domain_events', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('actor_id')->nullable()->constrained('users')->nullOnDelete();
@@ -201,9 +163,6 @@ return new class extends Migration
         Schema::dropIfExists('analytics_conversions');
         Schema::dropIfExists('user_notifications');
         Schema::dropIfExists('domain_events');
-        Schema::dropIfExists('subscription_events');
-        Schema::dropIfExists('invoices');
-        Schema::dropIfExists('payments');
         Schema::dropIfExists('ai_usage_records');
         Schema::dropIfExists('ai_feedback');
         Schema::dropIfExists('ai_recommendations');
