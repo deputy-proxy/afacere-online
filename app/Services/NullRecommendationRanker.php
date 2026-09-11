@@ -11,9 +11,9 @@ use App\Models\User;
 final class NullRecommendationRanker implements RecommendationRanker
 {
     /**
-     * @phpstan-param array<int, array<string, mixed>> $candidates
+     * @param  array<int, array<string, mixed>> $candidates
      *
-     * @phpstan-return array<int, array<string, mixed>>
+     * @return array<int, array<string, mixed>>
      */
     public function rank(Business $business, User $user, array $candidates): array
     {
