@@ -10,13 +10,29 @@ use App\Models\Evaluation;
 use App\Models\EvaluationAnswer;
 use App\Models\EvaluationFinding;
 use App\Models\EvaluationVersion;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 final class EvaluationService
 {
-    public function startOrResume(Business $business): Evaluation
+    public function create(Business $business, EvaluationVersion $version, User $user): Evaluation
     {
+        abort_unless($user->businesses()->whereKey($business->id)->exists(), 403);
+
+        return $business->evaluations()->create([
+            'evaluation_version_id' => $version->id,
+            'status' => EvaluationStatus::InProgress,
+            'started_at' => now(),
+        ]);
+    }
+
+    public function startOrResume(Business $business, ?User $user = null): Evaluation
+    {
+        $user ??= auth()->user();
+        abort_unless($user instanceof User, 401);
+        abort_unless($user->businesses()->whereKey($business->id)->exists(), 403);
+
         $existing = $business->evaluations()->whereIn('status', [EvaluationStatus::Draft->value, EvaluationStatus::InProgress->value])->latest('id')->first();
         if ($existing !== null) {
             return $existing->load('version.sections.questions', 'answers');
@@ -27,18 +43,14 @@ final class EvaluationService
             throw ValidationException::withMessages(['evaluation' => 'No active evaluation is available yet.']);
         }
 
-        $evaluation = $business->evaluations()->create([
-            'evaluation_version_id' => $version->id,
-            'status' => EvaluationStatus::InProgress,
-            'started_at' => now(),
-        ]);
-
-        return $evaluation->load('version.sections.questions', 'answers');
+        return $this->create($business, $version, $user)->load('version.sections.questions', 'answers');
     }
 
-    public function saveAnswer(Evaluation $evaluation, string $questionKey, mixed $value): EvaluationAnswer
+    public function saveAnswer(Evaluation $evaluation, string $questionKey, mixed $value, ?User $user = null): EvaluationAnswer
     {
-        $this->ensureEditable($evaluation);
+        $user ??= auth()->user();
+        abort_unless($user instanceof User, 401);
+        $this->ensureEditable($evaluation, $user);
         $question = $evaluation->version->sections->flatMap->questions->firstWhere('key', $questionKey);
         if ($question === null) {
             throw ValidationException::withMessages(['answer' => 'The selected question does not belong to this evaluation version.']);
@@ -54,13 +66,23 @@ final class EvaluationService
 
         return $evaluation->answers()->updateOrCreate(
             ['question_key' => $questionKey],
-            ['value' => ['answer' => $value]],
+            ['value' => $value],
         );
     }
 
-    public function complete(Evaluation $evaluation): Evaluation
+    /** @param array<string, mixed> $answers */
+    public function saveAnswers(Evaluation $evaluation, User $user, array $answers): void
     {
-        $this->ensureEditable($evaluation);
+        foreach ($answers as $questionKey => $value) {
+            $this->saveAnswer($evaluation, $questionKey, $value, $user);
+        }
+    }
+
+    public function complete(Evaluation $evaluation, ?User $user = null): Evaluation
+    {
+        $user ??= auth()->user();
+        abort_unless($user instanceof User, 401);
+        $this->ensureEditable($evaluation, $user);
         $questions = $evaluation->version->sections->flatMap->questions;
         $answers = $evaluation->answers->keyBy('question_key');
         foreach ($questions as $question) {
@@ -102,8 +124,9 @@ final class EvaluationService
         return $findings;
     }
 
-    private function ensureEditable(Evaluation $evaluation): void
+    private function ensureEditable(Evaluation $evaluation, User $user): void
     {
+        abort_unless($evaluation->business()->whereHas('members', fn ($query) => $query->whereKey($user->id))->exists(), 403);
         $status = $evaluation->getRawOriginal('status');
         if (is_string($status) && in_array($status, [EvaluationStatus::Completed->value, EvaluationStatus::Archived->value], true)) {
             throw ValidationException::withMessages(['evaluation' => 'This evaluation can no longer be changed.']);
