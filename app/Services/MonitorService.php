@@ -72,7 +72,8 @@ final class MonitorService
         return MonitorSummary::query()->updateOrCreate(['business_id' => $business->id, 'period_start' => $start->toDateString(), 'period_end' => $end->toDateString()], ['summary' => ['check_ins' => $checkIns->count(), 'latest' => $latest?->responses ?? [], 'trend' => $this->trend(array_values($checkIns->all()))]]);
     }
 
-    /** @param list<MonitorCheckIn> $checkIns @return array<string, float> */
+    /** @param list<MonitorCheckIn> $checkIns */
+    /** @return array<string, float> */
     private function trend(array $checkIns): array
     {
         if (count($checkIns) < 2) {
