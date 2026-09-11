@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ActionStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -39,6 +40,12 @@ class Action extends Model
     public function recommendation(): BelongsTo
     {
         return $this->belongsTo(Recommendation::class);
+    }
+
+    /** @return BelongsToMany<Guide, $this> */
+    public function guides(): BelongsToMany
+    {
+        return $this->belongsToMany(Guide::class, 'guide_action_assignments');
     }
 
     /** @return HasOne<ActionOutcome, $this> */

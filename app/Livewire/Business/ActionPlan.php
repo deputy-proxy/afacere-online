@@ -50,7 +50,7 @@ final class ActionPlan extends Component
             return null;
         }
 
-        return ActionPlanModel::query()->whereKey($this->planId)->where('business_id', $this->business()->id)->with('actions.priority', 'actions.recommendation', 'actions.outcome')->first();
+        return ActionPlanModel::query()->whereKey($this->planId)->where('business_id', $this->business()->id)->with('actions.priority', 'actions.recommendation', 'actions.outcome', 'actions.guides')->first();
     }
 
     public function createPlan(ActionPlanService $service): void

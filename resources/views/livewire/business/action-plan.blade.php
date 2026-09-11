@@ -21,6 +21,19 @@
                             <span class="rounded-full bg-zinc-100 px-3 py-1 text-xs uppercase">{{ $action->status->value }}</span>
                         </div>
 
+                        @if ($action->guides->isNotEmpty())
+                            <div class="mt-4 border-t pt-4">
+                                <p class="text-xs font-medium uppercase tracking-wide text-zinc-500">Execution guides</p>
+                                <div class="mt-2 flex flex-wrap gap-2">
+                                    @foreach ($action->guides as $guide)
+                                        @if ($guide->status === 'published')
+                                            <a href="{{ route('business.guides.show', $guide->slug) }}" wire:navigate class="rounded-lg border px-3 py-2 text-xs hover:border-zinc-400">{{ $guide->title }} →</a>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
                         <div class="mt-4 flex flex-wrap gap-2">
                             @if ($action->status === \App\Enums\ActionStatus::Recommended)
                                 <button wire:click="updateStatus({{ $action->id }}, 'accepted')" class="rounded-lg bg-zinc-900 px-3 py-2 text-xs text-white">Accept</button>
