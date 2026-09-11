@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\GuideExecutionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 uses(RefreshDatabase::class);
 
@@ -74,7 +75,7 @@ it('rejects guide execution for a non-member business', function (): void {
     $guide = publishedGuide($author);
 
     expect(fn () => app(GuideExecutionService::class)->start($guide, $business, $member))
-        ->toThrow(\Symfony\Component\HttpKernel\Exception\HttpException::class);
+        ->toThrow(HttpException::class);
 });
 
 it('does not allow progress against an unpublished guide', function (): void {
