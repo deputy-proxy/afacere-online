@@ -1,0 +1,117 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Livewire\Business;
+
+use App\Models\Business;
+use App\Models\User;
+use App\Services\BusinessContextService;
+use App\Services\MonitorService;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Computed;
+use Livewire\Attributes\Title;
+use Livewire\Component;
+
+#[Title('Monitor')]
+final class Monitor extends Component
+{
+    public bool $enabled = false;
+
+    public string $cadence = 'weekly';
+
+    public string $revenue = '';
+
+    public string $cash = '';
+
+    public string $customers = '';
+
+    public string $confidence = '';
+
+    public function mount(BusinessContextService $businessContext): void
+    {
+        $business = $businessContext->current($this->user());
+        abort_unless($business !== null, 404);
+
+        $configuration = $business->monitorConfiguration()->first();
+        if ($configuration !== null) {
+            $this->enabled = $configuration->enabled;
+            $this->cadence = $configuration->cadence;
+        }
+    }
+
+    #[Computed]
+    public function business(): Business
+    {
+        $business = app(BusinessContextService::class)->current($this->user());
+        abort_unless($business !== null, 404);
+
+        return $business;
+    }
+
+    #[Computed]
+    public function configuration(): mixed
+    {
+        return $this->business()->monitorConfiguration()->first();
+    }
+
+    #[Computed]
+    public function checkIns(): mixed
+    {
+        return $this->business()->monitorCheckIns()->latest('recorded_at')->limit(8)->get();
+    }
+
+    #[Computed]
+    public function alerts(): mixed
+    {
+        return $this->business()->monitorAlerts()->whereNull('resolved_at')->latest('triggered_at')->limit(8)->get();
+    }
+
+    #[Computed]
+    public function healthIndicators(): mixed
+    {
+        return $this->business()->healthIndicators()->latest('measured_at')->limit(8)->get()->unique('key')->values();
+    }
+
+    public function saveConfiguration(MonitorService $service): void
+    {
+        $this->validate(['cadence' => ['required', 'in:daily,weekly,monthly']]);
+        $service->configure($this->business(), $this->user(), $this->enabled, $this->cadence);
+        unset($this->configuration);
+    }
+
+    public function checkIn(MonitorService $service): void
+    {
+        $this->validate([
+            'revenue' => ['required', 'numeric'],
+            'cash' => ['required', 'numeric', 'min:1', 'max:5'],
+            'customers' => ['required', 'numeric', 'min:0'],
+            'confidence' => ['required', 'numeric', 'min:1', 'max:5'],
+        ]);
+
+        $service->checkIn($this->business(), $this->user(), [
+            'revenue' => (float) $this->revenue,
+            'cash' => (float) $this->cash,
+            'customers' => (float) $this->customers,
+            'confidence' => (float) $this->confidence,
+        ]);
+
+        $this->reset('revenue', 'cash', 'customers', 'confidence');
+        unset($this->configuration, $this->checkIns, $this->alerts, $this->healthIndicators);
+        session()->flash('monitor_status', 'Check-in saved. Your progress history has been updated.');
+    }
+
+    private function user(): User
+    {
+        $user = Auth::user();
+        abort_unless($user instanceof User, 401);
+
+        return $user;
+    }
+
+    public function render(): mixed
+    {
+        return view('livewire.business.monitor');
+    }
+}
