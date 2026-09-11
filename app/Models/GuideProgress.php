@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class GuideProgress extends Model
 {
@@ -42,5 +43,11 @@ class GuideProgress extends Model
     public function currentStep(): BelongsTo
     {
         return $this->belongsTo(GuideStep::class, 'current_step_id');
+    }
+
+    /** @return HasMany<GuideProgressEvent, $this> */
+    public function events(): HasMany
+    {
+        return $this->hasMany(GuideProgressEvent::class)->orderBy('occurred_at');
     }
 }
