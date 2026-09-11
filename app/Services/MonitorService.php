@@ -74,7 +74,7 @@ final class MonitorService
     }
 
     /**
-     * @param array<int, MonitorCheckIn> $checkIns
+     * @param  array<int, MonitorCheckIn>  $checkIns
      * @return array<string, float>
      */
     private function trend(array $checkIns): array
