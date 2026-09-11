@@ -27,21 +27,20 @@ final class Recommendations extends Component
     #[Computed]
     public function business(): ?Business
     {
-        return $this->businessId === null
-            ? null
-            : $this->user()->businesses()->whereKey($this->businessId)->first();
+        return $this->currentBusiness();
     }
 
     /** @return array<int, Recommendation> */
     #[Computed]
     public function recommendations(): array
     {
-        if ($this->business === null) {
+        $business = $this->currentBusiness();
+        if ($business === null) {
             return [];
         }
 
         return app(RecommendationPresentationService::class)
-            ->forBusiness($this->business, $this->user())
+            ->forBusiness($business, $this->user())
             ->all();
     }
 
@@ -61,13 +60,21 @@ final class Recommendations extends Component
 
     private function recommendation(int $id): Recommendation
     {
-        abort_unless($this->business !== null, 404);
+        $business = $this->currentBusiness();
+        abort_unless($business !== null, 404);
 
         return Recommendation::query()
             ->whereKey($id)
-            ->where('business_id', $this->business->id)
+            ->where('business_id', $business->id)
             ->where('status', 'suggested')
             ->firstOrFail();
+    }
+
+    private function currentBusiness(): ?Business
+    {
+        return $this->businessId === null
+            ? null
+            : $this->user()->businesses()->whereKey($this->businessId)->first();
     }
 
     private function user(): User
