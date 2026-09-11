@@ -16,7 +16,9 @@ use RuntimeException;
 
 final class AiService
 {
-    public function __construct(private readonly AiProvider $provider) {}
+    public function __construct(private readonly AiProvider $provider)
+    {
+    }
 
     /**
      * @param array<string, mixed>  $input
