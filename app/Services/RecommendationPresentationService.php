@@ -49,6 +49,7 @@ final class RecommendationPresentationService
     {
         Gate::forUser($user)->authorize('view', $business);
 
+        // Ranking remains delegated to the application-level provider boundary.
         return app(RecommendationRanker::class)->rank($business, $user, $candidates);
     }
 }
