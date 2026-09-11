@@ -8,14 +8,23 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('passes the public and readiness smoke journeys', function (): void {
-    $this->get(route('home'))->assertOk();
-    $this->get(route('public.how-it-works'))->assertOk();
-    $this->get(route('public.pricing'))->assertOk();
+it('serves the critical public discovery pages', function (string $routeName): void {
+    $this->get(route($routeName))->assertSuccessful();
+})->with([
+    'home',
+    'public.how-it-works',
+    'public.pricing',
+    'public.about',
+    'public.faq',
+    'public.contact',
+    'public.legal',
+]);
+
+it('passes the readiness smoke journey', function (): void {
     $this->get(route('health.ready'))->assertOk();
 });
 
-it('passes the authenticated core journey with a business context', function (): void {
+it('serves the authenticated core journey with a business context', function (): void {
     $user = User::factory()->create(['email_verified_at' => now()]);
     $business = Business::factory()->create();
     $business->members()->attach($user->id, ['role' => 'owner', 'joined_at' => now()]);
