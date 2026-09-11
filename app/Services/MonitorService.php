@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\AnalyticsEvent;
 use App\Models\Business;
 use App\Models\HealthIndicator;
 use App\Models\MonitorAlert;
@@ -23,13 +22,8 @@ final class MonitorService
         $this->authorizeManager($business, $user);
         abort_unless($user->isAdmin() || app(EntitlementService::class)->allows($user, 'monitor'), 403);
         abort_unless(in_array($cadence, ['daily', 'weekly', 'monthly'], true), 422);
-
-        $configuration = MonitorConfiguration::query()->updateOrCreate(
-            ['business_id' => $business->id],
-            ['enabled' => $enabled, 'cadence' => $cadence, 'next_check_in_at' => $enabled ? $this->next($cadence) : null],
-        );
-        $this->track($business, $user, 'monitor_configured', ['enabled' => $enabled, 'cadence' => $cadence]);
-
+        $configuration = MonitorConfiguration::query()->updateOrCreate(['business_id' => $business->id], ['enabled' => $enabled, 'cadence' => $cadence, 'next_check_in_at' => $enabled ? $this->next($cadence) : null]);
+        $this->track($business, $user, 'monitor.configured', ['enabled' => $enabled, 'cadence' => $cadence]);
         return $configuration;
     }
 
@@ -40,14 +34,12 @@ final class MonitorService
         abort_unless($user->isAdmin() || app(EntitlementService::class)->allows($user, 'monitor'), 403);
         $configuration = $business->monitorConfiguration()->first();
         abort_unless($configuration?->enabled === true, 422);
-
         return DB::transaction(function () use ($business, $user, $responses, $configuration): MonitorCheckIn {
             $checkIn = MonitorCheckIn::create(['business_id' => $business->id, 'user_id' => $user->id, 'responses' => $responses, 'recorded_at' => Carbon::now()]);
             $configuration->update(['next_check_in_at' => $this->next($configuration->cadence)]);
             $this->recordHealthIndicators($business, $responses);
             $this->evaluateThresholds($business);
-            $this->track($business, $user, 'monitor_check_in_completed', ['check_in_id' => $checkIn->id]);
-
+            $this->track($business, $user, 'monitor.check_in_completed', ['check_in_id' => $checkIn->id]);
             return $checkIn;
         });
     }
@@ -71,11 +63,7 @@ final class MonitorService
     {
         $checkIns = MonitorCheckIn::query()->where('business_id', $business->id)->whereBetween('recorded_at', [$start, $end])->orderBy('recorded_at')->get();
         $latest = $checkIns->last();
-
-        return MonitorSummary::query()->updateOrCreate(
-            ['business_id' => $business->id, 'period_start' => $start->toDateString(), 'period_end' => $end->toDateString()],
-            ['summary' => ['check_ins' => $checkIns->count(), 'latest' => $latest?->responses ?? [], 'trend' => $this->trend($checkIns->all())]],
-        );
+        return MonitorSummary::query()->updateOrCreate(['business_id' => $business->id, 'period_start' => $start->toDateString(), 'period_end' => $end->toDateString()], ['summary' => ['check_ins' => $checkIns->count(), 'latest' => $latest?->responses ?? [], 'trend' => $this->trend($checkIns->all())]]);
     }
 
     /** @param list<MonitorCheckIn> $checkIns */
@@ -146,8 +134,8 @@ final class MonitorService
     }
 
     /** @param array<string, mixed> $payload */
-    private function track(Business $business, User $user, string $event, array $payload): void
+    private function track(Business $business, User $user, string $type, array $payload): void
     {
-        AnalyticsEvent::create(['business_id' => $business->id, 'user_id' => $user->id, 'event' => $event, 'payload' => $payload, 'occurred_at' => Carbon::now()]);
+        DB::table('domain_events')->insert(['actor_id' => $user->id, 'business_id' => $business->id, 'type' => $type, 'subject_type' => Business::class, 'subject_id' => $business->id, 'payload' => json_encode($payload, JSON_THROW_ON_ERROR), 'occurred_at' => Carbon::now(), 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()]);
     }
 }
