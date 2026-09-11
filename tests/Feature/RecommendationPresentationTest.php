@@ -33,7 +33,8 @@ it('validates and presents recommendation provenance without requiring AI', func
 });
 
 it('keeps ranking behind the application-level provider boundary', function (): void {
-    $ranker = new class implements RecommendationRanker {
+    $ranker = new class implements RecommendationRanker
+    {
         public function rank(Business $business, User $user, array $candidates): array
         {
             return array_reverse($candidates);
