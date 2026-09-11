@@ -37,5 +37,7 @@
                 <p class="mt-2 text-lg font-medium">{{ __('See current matches') }} →</p>
             </a>
         </div>
+
+        <livewire:business.recommendations />
     @endif
 </div>
