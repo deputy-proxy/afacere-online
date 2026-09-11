@@ -55,6 +55,7 @@ final class MonitorService
             if ($value === null) {
                 continue;
             }
+
             if ($this->passes((float) $value, $threshold->operator, (float) $threshold->threshold)) {
                 if (MonitorAlert::query()->where('business_id', $business->id)->where('monitor_threshold_id', $threshold->id)->whereNull('resolved_at')->exists()) {
                     continue;
