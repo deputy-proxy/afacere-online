@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\AdminSupportController;
 use App\Http\Controllers\DataLifecycleController;
 use App\Http\Controllers\ReadinessController;
 use App\Livewire\Account\Subscription;
@@ -42,6 +43,11 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::livewire('business/opportunities', Opportunities::class)->name('business.opportunities');
     Route::livewire('business/opportunities/{opportunityId}', OpportunityReader::class)->name('business.opportunities.show');
     Route::livewire('business/monitor', Monitor::class)->name('business.monitor');
+});
+
+Route::middleware(['auth', 'verified', 'admin'])->prefix('internal/support')->name('internal.support.')->group(function (): void {
+    Route::get('users/{user}', [AdminSupportController::class, 'summary'])->name('users.summary');
+    Route::post('users/{user}/password-recovery', [AdminSupportController::class, 'passwordRecovery'])->name('users.password-recovery');
 });
 
 require __DIR__.'/settings.php';
