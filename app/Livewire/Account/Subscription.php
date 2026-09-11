@@ -15,16 +15,28 @@ use Livewire\Component;
 #[Title('Account & subscription')]
 final class Subscription extends Component
 {
-    public function plans(SubscriptionService $service): mixed { return $service->plans(); }
+    public function plans(SubscriptionService $service): mixed
+    {
+        return $service->plans();
+    }
 
     #[Computed]
-    public function current(): mixed { return app(SubscriptionService::class)->current($this->user()); }
+    public function current(): mixed
+    {
+        return app(SubscriptionService::class)->current($this->user());
+    }
 
     #[Computed]
-    public function businessLimit(): ?int { return app(SubscriptionService::class)->businessLimit($this->user()); }
+    public function businessLimit(): ?int
+    {
+        return app(SubscriptionService::class)->businessLimit($this->user());
+    }
 
     #[Computed]
-    public function businessCount(): int { return $this->user()->businesses()->count(); }
+    public function businessCount(): int
+    {
+        return $this->user()->businesses()->count();
+    }
 
     public function selectPlan(int $planId, SubscriptionService $service): void
     {
@@ -38,8 +50,14 @@ final class Subscription extends Component
     {
         $user = Auth::user();
         abort_unless($user instanceof User, 401);
+
         return $user;
     }
 
-    public function render(): mixed { return view('livewire.account.subscription', ['plans' => $this->plans(app(SubscriptionService::class))]); }
+    public function render(): mixed
+    {
+        return view('livewire.account.subscription', [
+            'plans' => $this->plans(app(SubscriptionService::class)),
+        ]);
+    }
 }
