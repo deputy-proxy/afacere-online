@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\AdminSupportController;
+use App\Http\Controllers\DataLifecycleController;
+use App\Http\Controllers\ReadinessController;
 use App\Livewire\Account\Subscription;
 use App\Livewire\Business\ActionPlan;
 use App\Livewire\Business\Dashboard;
@@ -23,8 +26,11 @@ Route::view('/about', 'public.about')->name('public.about');
 Route::view('/faq', 'public.faq')->name('public.faq');
 Route::view('/contact', 'public.contact')->name('public.contact');
 Route::view('/legal', 'public.legal')->name('public.legal');
+Route::get('/health/ready', ReadinessController::class)->name('health.ready');
 
 Route::middleware(['auth', 'verified'])->group(function (): void {
+    Route::get('account/data/export', [DataLifecycleController::class, 'export'])->name('account.data.export');
+    Route::post('account/data/deletion', [DataLifecycleController::class, 'requestDeletion'])->name('account.data.deletion');
     Route::livewire('dashboard', Dashboard::class)->name('dashboard');
     Route::livewire('notifications', Notifications::class)->name('business.notifications');
     Route::livewire('account/subscription', Subscription::class)->name('account.subscription');
@@ -37,6 +43,11 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::livewire('business/opportunities', Opportunities::class)->name('business.opportunities');
     Route::livewire('business/opportunities/{opportunityId}', OpportunityReader::class)->name('business.opportunities.show');
     Route::livewire('business/monitor', Monitor::class)->name('business.monitor');
+});
+
+Route::middleware(['auth', 'verified', 'admin'])->prefix('internal/support')->name('internal.support.')->group(function (): void {
+    Route::get('users/{user}', [AdminSupportController::class, 'summary'])->name('users.summary');
+    Route::post('users/{user}/password-recovery', [AdminSupportController::class, 'passwordRecovery'])->name('users.password-recovery');
 });
 
 require __DIR__.'/settings.php';
