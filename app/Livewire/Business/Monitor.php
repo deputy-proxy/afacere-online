@@ -8,7 +8,6 @@ use App\Models\Business;
 use App\Models\User;
 use App\Services\BusinessContextService;
 use App\Services\MonitorService;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
@@ -18,22 +17,16 @@ use Livewire\Component;
 final class Monitor extends Component
 {
     public bool $enabled = false;
-
     public string $cadence = 'weekly';
-
     public string $revenue = '';
-
     public string $cash = '';
-
     public string $customers = '';
-
     public string $confidence = '';
 
     public function mount(BusinessContextService $businessContext): void
     {
         $business = $businessContext->current($this->user());
         abort_unless($business !== null, 404);
-
         $configuration = $business->monitorConfiguration()->first();
         if ($configuration !== null) {
             $this->enabled = $configuration->enabled;
@@ -46,7 +39,6 @@ final class Monitor extends Component
     {
         $business = app(BusinessContextService::class)->current($this->user());
         abort_unless($business !== null, 404);
-
         return $business;
     }
 
@@ -89,14 +81,7 @@ final class Monitor extends Component
             'customers' => ['required', 'numeric', 'min:0'],
             'confidence' => ['required', 'numeric', 'min:1', 'max:5'],
         ]);
-
-        $service->checkIn($this->business(), $this->user(), [
-            'revenue' => (float) $this->revenue,
-            'cash' => (float) $this->cash,
-            'customers' => (float) $this->customers,
-            'confidence' => (float) $this->confidence,
-        ]);
-
+        $service->checkIn($this->business(), $this->user(), ['revenue' => (float) $this->revenue, 'cash' => (float) $this->cash, 'customers' => (float) $this->customers, 'confidence' => (float) $this->confidence]);
         $this->reset('revenue', 'cash', 'customers', 'confidence');
         unset($this->configuration, $this->checkIns, $this->alerts, $this->healthIndicators);
         session()->flash('monitor_status', 'Check-in saved. Your progress history has been updated.');
@@ -106,7 +91,6 @@ final class Monitor extends Component
     {
         $user = Auth::user();
         abort_unless($user instanceof User, 401);
-
         return $user;
     }
 
