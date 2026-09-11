@@ -19,7 +19,7 @@ use Illuminate\Validation\ValidationException;
 final class BusinessGoalsMetricsService
 {
     /**
-     * @param array{type: string, title: string, description?: string|null, target: int|float|string, unit?: string|null, deadline?: DateTimeInterface|string|null, status?: BusinessGoalStatus|string, stage?: BusinessStage|string|null} $attributes
+     * @param  array{type: string, title: string, description?: string|null, target: int|float|string, unit?: string|null, deadline?: DateTimeInterface|string|null, status?: BusinessGoalStatus|string, stage?: BusinessStage|string|null}  $attributes
      */
     public function createGoal(Business $business, User $actor, array $attributes): BusinessGoal
     {
@@ -45,7 +45,9 @@ final class BusinessGoalsMetricsService
         throw ValidationException::withMessages(['target' => 'A measurable goal requires a numeric target.']);
     }
 
-    /** @param array{status?: BusinessGoalStatus|string, target?: int|float|string, deadline?: DateTimeInterface|string|null, title?: string, description?: string|null, unit?: string|null, stage?: BusinessStage|string|null} $attributes */
+    /**
+     * @param  array{status?: BusinessGoalStatus|string, target?: int|float|string, deadline?: DateTimeInterface|string|null, title?: string, description?: string|null, unit?: string|null, stage?: BusinessStage|string|null}  $attributes
+     */
     public function updateGoal(BusinessGoal $goal, User $actor, array $attributes): BusinessGoal
     {
         $business = $goal->business;
@@ -69,7 +71,7 @@ final class BusinessGoalsMetricsService
     }
 
     /**
-     * @param array{key: string, name: string, unit?: string|null, aggregation?: BusinessMetricAggregation|string, stage?: BusinessStage|string|null} $attributes
+     * @param  array{key: string, name: string, unit?: string|null, aggregation?: BusinessMetricAggregation|string, stage?: BusinessStage|string|null}  $attributes
      */
     public function createMetric(Business $business, User $actor, array $attributes): BusinessMetric
     {
