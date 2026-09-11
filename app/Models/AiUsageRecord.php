@@ -6,15 +6,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class AiRun extends Model
+class AiUsageRecord extends Model
 {
     protected $guarded = ['id'];
 
     protected function casts(): array
     {
-        return ['input' => 'array', 'output' => 'array', 'cost' => 'decimal:6'];
+        return ['cost' => 'decimal:6'];
+    }
+
+    /** @return BelongsTo<AiRun, $this> */
+    public function run(): BelongsTo
+    {
+        return $this->belongsTo(AiRun::class, 'ai_run_id');
     }
 
     /** @return BelongsTo<User, $this> */
@@ -27,17 +32,5 @@ class AiRun extends Model
     public function business(): BelongsTo
     {
         return $this->belongsTo(Business::class);
-    }
-
-    /** @return BelongsTo<AiPrompt, $this> */
-    public function prompt(): BelongsTo
-    {
-        return $this->belongsTo(AiPrompt::class, 'ai_prompt_id');
-    }
-
-    /** @return HasOne<AiRecommendation, $this> */
-    public function aiRecommendation(): HasOne
-    {
-        return $this->hasOne(AiRecommendation::class);
     }
 }

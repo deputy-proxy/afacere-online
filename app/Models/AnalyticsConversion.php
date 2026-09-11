@@ -6,15 +6,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class AiRun extends Model
+class AnalyticsConversion extends Model
 {
     protected $guarded = ['id'];
 
     protected function casts(): array
     {
-        return ['input' => 'array', 'output' => 'array', 'cost' => 'decimal:6'];
+        return ['occurred_at' => 'datetime'];
     }
 
     /** @return BelongsTo<User, $this> */
@@ -27,17 +26,5 @@ class AiRun extends Model
     public function business(): BelongsTo
     {
         return $this->belongsTo(Business::class);
-    }
-
-    /** @return BelongsTo<AiPrompt, $this> */
-    public function prompt(): BelongsTo
-    {
-        return $this->belongsTo(AiPrompt::class, 'ai_prompt_id');
-    }
-
-    /** @return HasOne<AiRecommendation, $this> */
-    public function aiRecommendation(): HasOne
-    {
-        return $this->hasOne(AiRecommendation::class);
     }
 }

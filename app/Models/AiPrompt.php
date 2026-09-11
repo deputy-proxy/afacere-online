@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -18,5 +20,11 @@ class AiPrompt extends Model
     public function runs(): HasMany
     {
         return $this->hasMany(AiRun::class);
+    }
+
+    /** @return HasMany<AiPromptVersion, $this> */
+    public function versions(): HasMany
+    {
+        return $this->hasMany(AiPromptVersion::class);
     }
 }
