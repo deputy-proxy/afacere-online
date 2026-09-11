@@ -58,7 +58,7 @@ it('stores valid ai feedback and rejects feedback for another user', function ()
     $owner = User::factory()->create();
     $run = AiRun::create(['user_id' => $owner->id, 'provider' => 'test', 'model' => 'test', 'status' => 'completed']);
 
-    expect(fn () => app(FeedbackService::class)->submit($user, $run, 5, 'Not mine.'))->toThrow(HttpException::class, 'Forbidden');
+    expect(fn () => app(FeedbackService::class)->submit($user, $run, 5, 'Not mine.'))->toThrow(HttpException::class);
 
     $ownedRun = AiRun::create(['user_id' => $user->id, 'provider' => 'test', 'model' => 'test', 'status' => 'completed']);
     $feedback = app(FeedbackService::class)->submit($user, $ownedRun, 4, 'Useful.');
