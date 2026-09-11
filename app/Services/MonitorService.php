@@ -69,17 +69,17 @@ final class MonitorService
         $checkIns = MonitorCheckIn::query()->where('business_id', $business->id)->whereBetween('recorded_at', [$start, $end])->orderBy('recorded_at')->get();
         $latest = $checkIns->last();
 
-        return MonitorSummary::query()->updateOrCreate(['business_id' => $business->id, 'period_start' => $start->toDateString(), 'period_end' => $end->toDateString()], ['summary' => ['check_ins' => $checkIns->count(), 'latest' => $latest?->responses ?? [], 'trend' => $this->trend($checkIns->all())]]);
+        return MonitorSummary::query()->updateOrCreate(['business_id' => $business->id, 'period_start' => $start->toDateString(), 'period_end' => $end->toDateString()], ['summary' => ['check_ins' => $checkIns->count(), 'latest' => $latest?->responses ?? [], 'trend' => $this->trend(array_values($checkIns->all()))]]);
     }
 
-    /** @param list<MonitorCheckIn> $checkIns */
+    /** @param list<MonitorCheckIn> $checkIns @return array<string, float> */
     private function trend(array $checkIns): array
     {
         if (count($checkIns) < 2) {
             return [];
         }
-        $first = $checkIns[0]->responses ?? [];
-        $last = $checkIns[count($checkIns) - 1]->responses ?? [];
+        $first = $checkIns[0]->responses;
+        $last = $checkIns[count($checkIns) - 1]->responses;
         $result = [];
         foreach (['revenue', 'customers', 'cash', 'confidence'] as $key) {
             if (is_numeric($first[$key] ?? null) && is_numeric($last[$key] ?? null)) {
