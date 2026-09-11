@@ -15,6 +15,7 @@ final class BusinessContextService
 {
     private const SESSION_KEY = 'afacere.current_business_id';
 
+    /** @return array<int, Business> */
     public function forUser(User $user): array
     {
         return $user->businesses()
