@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Models\Business;
 use App\Models\Opportunity;
 use App\Models\OpportunityApplication;
+use App\Models\OpportunityEvent;
 use App\Models\OpportunityMatch;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -36,9 +37,22 @@ final class OpportunityMatchingService
     {
         $this->authorizeBusiness($business, $user);
 
-        return $this->current()->get()->map(function (Opportunity $opportunity) use ($business): OpportunityMatch {
-            return $this->evaluate($opportunity, $business);
+        return $this->current()->get()->map(function (Opportunity $opportunity) use ($business, $user): OpportunityMatch {
+            $match = $this->evaluate($opportunity, $business);
+            if ((float) $match->getAttribute('score') === 1.0) {
+                $this->recordOncePerDay($opportunity, $business, $user, 'matched', ['match_id' => $match->id]);
+            }
+
+            return $match;
         })->filter(fn (OpportunityMatch $match): bool => $match->getAttribute('score') !== null && (float) $match->getAttribute('score') > 0)->sortByDesc(fn (OpportunityMatch $match): float => (float) $match->getAttribute('score'))->values();
+    }
+
+    public function viewed(Opportunity $opportunity, Business $business, User $user): void
+    {
+        $this->authorizeBusiness($business, $user);
+        if ($opportunity->isCurrent()) {
+            $this->recordOncePerDay($opportunity, $business, $user, 'viewed');
+        }
     }
 
     public function apply(Opportunity $opportunity, Business $business, User $user): OpportunityApplication
@@ -53,12 +67,15 @@ final class OpportunityMatchingService
             throw ValidationException::withMessages(['opportunity' => 'The business does not meet all required eligibility criteria.']);
         }
 
-        return DB::transaction(function () use ($opportunity, $business, $user, $match): OpportunityApplication {
+        $application = DB::transaction(function () use ($opportunity, $business, $user, $match): OpportunityApplication {
             return OpportunityApplication::query()->firstOrCreate(
                 ['opportunity_id' => $opportunity->id, 'business_id' => $business->id, 'user_id' => $user->id],
                 ['context' => ['match_id' => $match->id], 'submitted_at' => now()],
             );
         });
+        $this->recordOncePerDay($opportunity, $business, $user, 'applied', ['application_id' => $application->id]);
+
+        return $application;
     }
 
     private function evaluate(Opportunity $opportunity, Business $business): OpportunityMatch
@@ -101,6 +118,28 @@ final class OpportunityMatchingService
             'max' => is_numeric($actual) && is_numeric($expected) && (float) $actual <= (float) $expected,
             default => false,
         };
+    }
+
+    private function recordOncePerDay(Opportunity $opportunity, Business $business, User $user, string $type, array $context = []): void
+    {
+        $exists = OpportunityEvent::query()
+            ->where('opportunity_id', $opportunity->id)
+            ->where('business_id', $business->id)
+            ->where('user_id', $user->id)
+            ->where('event_type', $type)
+            ->whereDate('occurred_at', today())
+            ->exists();
+
+        if (! $exists) {
+            OpportunityEvent::query()->create([
+                'opportunity_id' => $opportunity->id,
+                'business_id' => $business->id,
+                'user_id' => $user->id,
+                'event_type' => $type,
+                'context' => $context,
+                'occurred_at' => now(),
+            ]);
+        }
     }
 
     private function authorizeBusiness(Business $business, User $user): void
