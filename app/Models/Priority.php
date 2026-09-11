@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Priority extends Model
 {
@@ -19,5 +20,11 @@ class Priority extends Model
     public function recommendation(): BelongsTo
     {
         return $this->belongsTo(Recommendation::class);
+    }
+
+    /** @return BelongsToMany<Guide, $this> */
+    public function guides(): BelongsToMany
+    {
+        return $this->belongsToMany(Guide::class, 'guide_priority_assignments');
     }
 }
