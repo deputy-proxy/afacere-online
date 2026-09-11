@@ -51,10 +51,15 @@ it('records authorized activity with business context', function (): void {
         ->and(DomainEvent::query()->first()->type)->toBe('evaluation.completed');
 });
 
-it('rejects feedback submitted for another user ai run', function (): void {
+it('stores valid ai feedback and rejects feedback for another user', function (): void {
     $user = User::factory()->create();
     $owner = User::factory()->create();
     $run = \App\Models\AiRun::create(['user_id' => $owner->id, 'provider' => 'test', 'model' => 'test', 'status' => 'completed']);
 
     expect(fn () => app(FeedbackService::class)->submit($user, $run, 5, 'Not mine.'))->toThrow(\Symfony\Component\HttpKernel\Exception\HttpException::class, 'Forbidden');
+
+    $ownedRun = \App\Models\AiRun::create(['user_id' => $user->id, 'provider' => 'test', 'model' => 'test', 'status' => 'completed']);
+    $feedback = app(FeedbackService::class)->submit($user, $ownedRun, 4, 'Useful.');
+
+    expect($feedback->rating)->toBe(4)->and($feedback->feedback)->toBe('Useful.');
 });
