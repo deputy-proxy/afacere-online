@@ -17,7 +17,7 @@ final class EvaluationService
 {
     public function startOrResume(Business $business): Evaluation
     {
-        $existing = $business->evaluations()->whereIn('status', [EvaluationStatus::Draft, EvaluationStatus::InProgress])->latest('id')->first();
+        $existing = $business->evaluations()->whereIn('status', [EvaluationStatus::Draft->value, EvaluationStatus::InProgress->value])->latest('id')->first();
         if ($existing !== null) {
             return $existing->load('version.sections.questions', 'answers');
         }
@@ -104,7 +104,8 @@ final class EvaluationService
 
     private function ensureEditable(Evaluation $evaluation): void
     {
-        if (in_array($evaluation->status, [EvaluationStatus::Completed, EvaluationStatus::Archived], true)) {
+        $status = $evaluation->getRawOriginal('status');
+        if (is_string($status) && in_array($status, [EvaluationStatus::Completed->value, EvaluationStatus::Archived->value], true)) {
             throw ValidationException::withMessages(['evaluation' => 'This evaluation can no longer be changed.']);
         }
         $evaluation->loadMissing('version.sections.questions', 'answers');
