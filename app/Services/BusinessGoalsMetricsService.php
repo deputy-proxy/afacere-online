@@ -25,7 +25,7 @@ final class BusinessGoalsMetricsService
     {
         Gate::forUser($actor)->authorize('update', $business);
 
-        $target = $attributes['target'] ?? null;
+        $target = $attributes['target'];
         if (is_numeric($target)) {
             $status = $this->goalStatus($attributes['status'] ?? BusinessGoalStatus::Active);
             $stage = $this->businessStage($attributes['stage'] ?? null);
@@ -89,6 +89,9 @@ final class BusinessGoalsMetricsService
         ]);
     }
 
+    /**
+     * @param  array<string, mixed>  $context
+     */
     public function recordMetricValue(BusinessMetric $metric, User $actor, int|float|string $value, DateTimeInterface $measuredAt, array $context = []): BusinessMetricValue
     {
         Gate::forUser($actor)->authorize('update', $metric->business);
@@ -104,7 +107,7 @@ final class BusinessGoalsMetricsService
         ]);
     }
 
-    /** @return list<BusinessMetricValue> */
+    /** @return array<int, BusinessMetricValue> */
     public function metricHistory(BusinessMetric $metric, User $actor): array
     {
         Gate::forUser($actor)->authorize('view', $metric->business);
