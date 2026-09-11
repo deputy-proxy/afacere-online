@@ -12,7 +12,7 @@ return new class extends Migration
     {
         Schema::create('guide_progress_events', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('guide_progress_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('guide_progress_id')->constrained('guide_progress')->cascadeOnDelete();
             $table->foreignId('guide_id')->constrained()->cascadeOnDelete();
             $table->foreignId('business_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
