@@ -6,8 +6,8 @@ use App\Models\Business;
 use App\Models\Recommendation;
 use App\Models\User;
 use App\Services\RecommendationPresentationService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
