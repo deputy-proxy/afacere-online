@@ -10,4 +10,4 @@ The remaining Phase 1 implementation is organized around deterministic business 
 - Analytics: product events remain separate from transactional truth; conversions and period snapshots are idempotent.
 - Filament: operational resources are read-only where mutation would bypass domain workflows, with server-side admin authorization.
 
-Structured AI output is validated before it is allowed to create an AI recommendation, and confirmation remains a separate user action. Public service arrays carry explicit PHPStan value types. The AI service now follows the repository's Pint constructor style.
+Structured AI output is validated before it is allowed to create an AI recommendation, and confirmation remains a separate user action. Public service arrays carry explicit PHPStan value types. The AI service uses an explicit dependency property and local array type assertions.
