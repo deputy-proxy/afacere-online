@@ -26,23 +26,23 @@ final class BusinessGoalsMetricsService
         Gate::forUser($actor)->authorize('update', $business);
 
         $target = $attributes['target'] ?? null;
-        if (! is_numeric($target)) {
-            throw ValidationException::withMessages(['target' => 'A measurable goal requires a numeric target.']);
+        if (is_numeric($target)) {
+            $status = $this->goalStatus($attributes['status'] ?? BusinessGoalStatus::Active);
+            $stage = $this->businessStage($attributes['stage'] ?? null);
+
+            return $business->goals()->create([
+                'type' => $attributes['type'],
+                'title' => $attributes['title'],
+                'description' => $attributes['description'] ?? null,
+                'target' => $target,
+                'unit' => $attributes['unit'] ?? null,
+                'deadline' => $attributes['deadline'] ?? null,
+                'status' => $status,
+                'stage' => $stage,
+            ]);
         }
 
-        $status = $this->goalStatus($attributes['status'] ?? BusinessGoalStatus::Active);
-        $stage = $this->businessStage($attributes['stage'] ?? null);
-
-        return $business->goals()->create([
-            'type' => $attributes['type'],
-            'title' => $attributes['title'],
-            'description' => $attributes['description'] ?? null,
-            'target' => $target,
-            'unit' => $attributes['unit'] ?? null,
-            'deadline' => $attributes['deadline'] ?? null,
-            'status' => $status,
-            'stage' => $stage,
-        ]);
+        throw ValidationException::withMessages(['target' => 'A measurable goal requires a numeric target.']);
     }
 
     /** @param array{status?: BusinessGoalStatus|string, target?: int|float|string, deadline?: DateTimeInterface|string|null, title?: string, description?: string|null, unit?: string|null, stage?: BusinessStage|string|null} $attributes */
