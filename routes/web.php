@@ -16,6 +16,13 @@ use App\Livewire\Business\OpportunityReader;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
+Route::view('/how-it-works', 'public.how-it-works')->name('public.how-it-works');
+Route::view('/pricing', 'public.pricing')->name('public.pricing');
+Route::view('/about', 'public.about')->name('public.about');
+Route::view('/faq', 'public.faq')->name('public.faq');
+Route::view('/contact', 'public.contact')->name('public.contact');
+Route::view('/legal', 'public.legal')->name('public.legal');
+
 Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::livewire('dashboard', Dashboard::class)->name('dashboard');
     Route::livewire('account/subscription', Subscription::class)->name('account.subscription');
@@ -29,4 +36,5 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::livewire('business/opportunities/{opportunityId}', OpportunityReader::class)->name('business.opportunities.show');
     Route::livewire('business/monitor', Monitor::class)->name('business.monitor');
 });
+
 require __DIR__.'/settings.php';
