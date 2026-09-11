@@ -17,7 +17,7 @@ final class TransitionAction
 
     public function execute(Action $action, ActionStatus $next, User $actor, ?string $reason = null): Action
     {
-        return DB::transaction(function () use ($action, $next, $actor, $reason): Action {
+        $result = DB::transaction(function () use ($action, $next, $actor, $reason): array {
             $action->refresh();
             $business = $action->plan()->firstOrFail()->business()->firstOrFail();
             abort_unless($business->members()->whereKey($actor->id)->exists(), 403);
@@ -46,13 +46,17 @@ final class TransitionAction
                 'occurred_at' => Carbon::now(),
             ]);
 
-            $this->notifications->recordEvent('action.status_changed', $actor, $business, $action, ['from' => $from, 'to' => $next->value]);
-            $this->notifications->notify($actor, 'action.status_changed', 'Action updated', sprintf('%s is now %s.', $action->title, $next->value), $business, [
-                'event_key' => sprintf('action:%d:%s', $action->id, $next->value),
-                'url' => route('business.action-plan'),
-            ]);
-
-            return $action->fresh() ?? $action;
+            return [$action->fresh() ?? $action, $business, $from];
         });
+
+        /** @var Action $updated */
+        [$updated, $business, $from] = $result;
+        $this->notifications->recordEvent('action.status_changed', $actor, $business, $updated, ['from' => $from, 'to' => $next->value]);
+        $this->notifications->notify($actor, 'action.status_changed', 'Action updated', sprintf('%s is now %s.', $updated->title, $next->value), $business, [
+            'event_key' => sprintf('action:%d:%s', $updated->id, $next->value),
+            'url' => route('business.action-plan'),
+        ]);
+
+        return $updated;
     }
 }
