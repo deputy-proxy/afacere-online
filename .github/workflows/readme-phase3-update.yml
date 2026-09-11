@@ -1,0 +1,44 @@
+name: Update Phase 3 README
+
+on:
+  push:
+    branches:
+      - phase-3-readme
+
+permissions:
+  contents: write
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update README
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('README.md')
+          s = p.read_text()
+          s = s.replace('> **Status:** Phase 1 complete · Application foundation and Phase 1 domain implementation established', '> **Status:** Phase 3 active · Ecosystem, monetization and production-readiness implementation underway')
+          s = s.replace('- **Phase 2 — Entrepreneur-facing experience and product integration:** Next', '- **Phase 2 — Entrepreneur-facing experience and product integration:** Complete\n- **Phase 3 — Ecosystem, monetization and production readiness:** Active')
+          marker = '### Authoritative specifications'
+          insertion = '''### Phase 2 completion\n\nPhase 2 has been implemented and merged into `main`. The entrepreneur-facing progression is now integrated across public discovery, account/onboarding, business management, evaluation, diagnosis, priorities, Action Plans, execution, Guides, Opportunities, Monitor, subscriptions, notifications, analytics and cross-domain workflows.\n\nPhase 2 completion was subject to the repository's quality gates: lint/format validation, PHPStan/Larastan, automated tests, application setup/migrations, frontend build validation, and a GREEN repository CI check.\n\n### Phase 3\n\nPhase 3 extends the completed entrepreneur progression into the broader afacere.online ecosystem. It focuses on Experts, Marketplace providers, Community and Peer Review, Events, secure business documents and evidence, transactional commerce, unified discovery, trust and moderation, product analytics, and final production-readiness hardening.\n\nThe Phase 3 implementation roadmap is tracked through repository issues **#80–#89**, following the naming convention `Phase 3.x — ...`.\n\nEvery Phase 3 issue is subject to the same mandatory quality gates: lint/format validation, PHPStan/Larastan, automated tests, frontend build validation, and a **GREEN repository CI check**. No Phase 3 issue is considered complete while any required CI check is red.\n\n'''
+          if '### Phase 3\n' not in s:
+              s = s.replace(marker, insertion + marker, 1)
+          old = '''### Phase 2 — Entrepreneur Experience & Product Integration\n**Status: Planned.**'''
+          new = '''### Phase 2 — Entrepreneur Experience & Product Integration\n**Status: Complete.**'''
+          s = s.replace(old, new)
+          phase3_marker = '### Phase 3 — Ecosystem, Monetization & Production Readiness'
+          if phase3_marker not in s:
+              roadmap = '''### Phase 3 — Ecosystem, Monetization & Production Readiness\n\n**Status: Active.**\n\nPhase 3 extends the entrepreneur progression into the broader platform ecosystem and commercial layer.\n\nExpected focus areas include:\n\n- Expert discovery, matching and consultation workflows;\n- Marketplace provider onboarding, verification and service workflows;\n- Community and structured Peer Review;\n- Events, registration and participation;\n- business documents, evidence and secure sharing;\n- transactional commerce for consultations, services and paid events;\n- advanced search and unified discovery;\n- trust, moderation and operational governance;\n- product analytics, funnel intelligence and outcome measurement;\n- end-to-end integration, UX hardening and production readiness.\n\nPhase 3 implementation is tracked through issues **#80–#89**. Every issue must satisfy the repository's lint/format, PHPStan/Larastan, automated test, application setup/migration, frontend build and **GREEN CI** requirements before it is considered complete.\n\n'''
+              s = s.replace('### Phase 2 — Entrepreneur Experience & Product Integration', roadmap + '### Phase 2 — Entrepreneur Experience & Product Integration', 1)
+          p.write_text(s)
+          PY
+      - name: Commit README
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md
+          git diff --cached --quiet && exit 0
+          git commit -m 'Update README for Phase 3'
+          git push
