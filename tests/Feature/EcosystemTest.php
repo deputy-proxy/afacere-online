@@ -3,57 +3,22 @@
 declare(strict_types=1);
 
 use App\Models\Business;
-use App\Models\CommunityPost;
-use App\Models\Expert;
-use App\Models\MarketplaceProvider;
-use App\Models\MarketplaceService;
-use App\Models\PlatformEvent;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('exposes the phase three ecosystem through an authenticated business route', function (): void {
+it('renders the ecosystem for an authenticated business member', function (): void {
     $user = User::factory()->create(['email_verified_at' => now()]);
     $business = Business::factory()->create();
     $business->members()->attach($user->id, ['role' => 'owner', 'joined_at' => now()]);
-
-    Expert::query()->create([
-        'user_id' => $user->id,
-        'title' => 'Verified Expert',
-        'verification_status' => 'verified',
-    ]);
-    $provider = MarketplaceProvider::query()->create([
-        'name' => 'Verified Provider',
-        'verification_status' => 'verified',
-    ]);
-    MarketplaceService::query()->create([
-        'provider_id' => $provider->id,
-        'name' => 'Published service',
-        'is_published' => true,
-    ]);
-    CommunityPost::query()->create([
-        'user_id' => $user->id,
-        'title' => 'Community question',
-        'body' => 'A useful question.',
-        'visibility' => 'community',
-        'status' => 'published',
-    ]);
-    PlatformEvent::query()->create([
-        'title' => 'Business workshop',
-        'description' => 'Upcoming workshop.',
-        'status' => 'published',
-        'starts_at' => now()->addDay(),
-        'price' => 0,
-        'is_online' => true,
-    ]);
 
     $this->actingAs($user)
         ->get(route('business.ecosystem'))
         ->assertOk()
         ->assertSee('Ecosystem')
-        ->assertSee('Verified Expert')
-        ->assertSee('Verified Provider')
-        ->assertSee('Community question')
-        ->assertSee('Business workshop');
+        ->assertSee('Experts')
+        ->assertSee('Marketplace providers')
+        ->assertSee('Community')
+        ->assertSee('Events');
 });

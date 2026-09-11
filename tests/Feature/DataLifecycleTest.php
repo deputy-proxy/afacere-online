@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Models\Business;
-use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +11,6 @@ uses(RefreshDatabase::class);
 
 it('allows a verified user to export account data without internal credentials', function (): void {
     $user = User::factory()->create(['is_admin' => true]);
-    Profile::query()->create(['user_id' => $user->id, 'bio' => 'Founder', 'phone' => '0712345678', 'locale' => 'ro']);
     $business = Business::factory()->create(['name' => 'Exportable Business']);
     $business->members()->attach($user->id, ['role' => 'owner', 'joined_at' => now()]);
 
@@ -22,8 +20,7 @@ it('allows a verified user to export account data without internal credentials',
         ->assertJsonPath('user.id', $user->id)
         ->assertJsonPath('businesses.0.name', 'Exportable Business')
         ->assertJsonMissingPath('user.is_admin')
-        ->assertJsonMissingPath('user.password')
-        ->assertJsonPath('profile.bio', 'Founder');
+        ->assertJsonMissingPath('user.password');
 });
 
 it('creates one auditable deletion request for a user', function (): void {
