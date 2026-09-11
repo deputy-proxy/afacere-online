@@ -59,7 +59,7 @@ final class GuideReader extends Component
     {
         return app(GuideExecutionService::class)
             ->relevantForBusiness($this->business(), $this->user())
-            ->whereKeyNot($this->guide()->id)
+            ->where('id', '!=', $this->guide()->id)
             ->limit(3)
             ->get();
     }
