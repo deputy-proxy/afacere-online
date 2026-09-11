@@ -9,7 +9,6 @@ uses(RefreshDatabase::class);
 
 it('reports the phase three integration surface as ready after migrations', function (): void {
     $service = app(PhaseThreeReadinessService::class);
-
     expect($service->isReady())->toBeTrue();
     expect($service->checks())->toHaveCount(8)->each->toBeTrue();
 });

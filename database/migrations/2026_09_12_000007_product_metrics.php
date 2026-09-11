@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -23,7 +21,6 @@ return new class extends Migration
             $table->unique(['metric_key', 'scope_type', 'scope_id', 'period_start', 'period_end']);
         });
     }
-
     public function down(): void
     {
         Schema::dropIfExists('product_metric_snapshots');

@@ -8,6 +8,7 @@ use App\Services\EventRegistrationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 uses(RefreshDatabase::class);
 
@@ -27,7 +28,7 @@ it('allows cancellation only to the registering user', function (): void {
     $other = User::factory()->create();
     $id = app(EventRegistrationService::class)->register($event, $user);
 
-    expect(fn (): mixed => app(EventRegistrationService::class)->cancel($id, $other))->toThrow(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+    expect(fn (): mixed => app(EventRegistrationService::class)->cancel($id, $other))->toThrow(NotFoundHttpException::class);
     app(EventRegistrationService::class)->cancel($id, $user);
     expect(DB::table('event_registrations')->where('id', $id)->value('status'))->toBe('cancelled');
 });

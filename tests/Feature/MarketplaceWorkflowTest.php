@@ -18,9 +18,7 @@ it('only discovers verified providers with published services', function (): voi
     $pending = MarketplaceProvider::query()->create(['name' => 'Pending', 'verification_status' => 'pending']);
     MarketplaceService::query()->create(['provider_id' => $verified->id, 'name' => 'SEO', 'is_published' => true]);
     MarketplaceService::query()->create(['provider_id' => $pending->id, 'name' => 'Ads', 'is_published' => true]);
-
     $results = app(MarketplaceServiceLayer::class)->discover(Business::factory()->create());
-
     expect($results)->toHaveCount(1)->and($results->first()?->id)->toBe($verified->id);
 });
 
@@ -30,9 +28,7 @@ it('creates a business-scoped lead only for a verified published service', funct
     $business->members()->attach($user->id, ['role' => 'owner', 'joined_at' => now()]);
     $provider = MarketplaceProvider::query()->create(['name' => 'Provider', 'verification_status' => 'verified']);
     $service = MarketplaceService::query()->create(['provider_id' => $provider->id, 'name' => 'SEO', 'is_published' => true]);
-
     $leadId = app(MarketplaceServiceLayer::class)->createLead($business, $provider, $service, 'Please contact me.');
-
     expect(DB::table('marketplace_leads')->where('id', $leadId)->value('business_id'))->toBe($business->id);
 });
 
@@ -42,6 +38,5 @@ it('rejects unpublished services', function (): void {
     $business->members()->attach($user->id, ['role' => 'owner', 'joined_at' => now()]);
     $provider = MarketplaceProvider::query()->create(['name' => 'Provider', 'verification_status' => 'verified']);
     $service = MarketplaceService::query()->create(['provider_id' => $provider->id, 'name' => 'SEO', 'is_published' => false]);
-
     expect(fn (): mixed => app(MarketplaceServiceLayer::class)->createLead($business, $provider, $service, 'Hello'))->toThrow(ValidationException::class);
 });

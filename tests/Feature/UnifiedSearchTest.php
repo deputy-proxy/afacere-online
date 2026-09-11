@@ -16,8 +16,6 @@ it('searches only published public resources', function (): void {
     Guide::query()->create(['title' => 'Private Guide', 'description' => 'Improve sales', 'published_at' => null]);
     Opportunity::query()->create(['title' => 'Sales Opportunity', 'description' => 'Sales', 'is_published' => true]);
     Opportunity::query()->create(['title' => 'Hidden Opportunity', 'description' => 'Sales', 'is_published' => false]);
-
     $results = app(UnifiedSearchService::class)->search($user, 'Sales');
-
     expect($results)->toHaveCount(2);
 });
