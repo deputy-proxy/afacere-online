@@ -24,6 +24,7 @@ final class MonitorService
         abort_unless(in_array($cadence, ['daily', 'weekly', 'monthly'], true), 422);
         $configuration = MonitorConfiguration::query()->updateOrCreate(['business_id' => $business->id], ['enabled' => $enabled, 'cadence' => $cadence, 'next_check_in_at' => $enabled ? $this->next($cadence) : null]);
         $this->track($business, $user, 'monitor.configured', ['enabled' => $enabled, 'cadence' => $cadence]);
+
         return $configuration;
     }
 
@@ -34,12 +35,14 @@ final class MonitorService
         abort_unless($user->isAdmin() || app(EntitlementService::class)->allows($user, 'monitor'), 403);
         $configuration = $business->monitorConfiguration()->first();
         abort_unless($configuration?->enabled === true, 422);
+
         return DB::transaction(function () use ($business, $user, $responses, $configuration): MonitorCheckIn {
             $checkIn = MonitorCheckIn::create(['business_id' => $business->id, 'user_id' => $user->id, 'responses' => $responses, 'recorded_at' => Carbon::now()]);
             $configuration->update(['next_check_in_at' => $this->next($configuration->cadence)]);
             $this->recordHealthIndicators($business, $responses);
             $this->evaluateThresholds($business);
             $this->track($business, $user, 'monitor.check_in_completed', ['check_in_id' => $checkIn->id]);
+
             return $checkIn;
         });
     }
@@ -49,13 +52,15 @@ final class MonitorService
         foreach (MonitorThreshold::query()->where('business_id', $business->id)->where('enabled', true)->get() as $threshold) {
             $metric = $business->metrics()->where('key', $threshold->metric_key)->first();
             $value = $metric?->values()->latest('measured_at')->value('value');
-            if ($value === null || ! $this->passes((float) $value, $threshold->operator, (float) $threshold->threshold)) {
+            if ($value === null) {
                 continue;
             }
-            if (MonitorAlert::query()->where('business_id', $business->id)->where('monitor_threshold_id', $threshold->id)->whereNull('resolved_at')->exists()) {
-                continue;
+            if ($this->passes((float) $value, $threshold->operator, (float) $threshold->threshold)) {
+                if (MonitorAlert::query()->where('business_id', $business->id)->where('monitor_threshold_id', $threshold->id)->whereNull('resolved_at')->exists()) {
+                    continue;
+                }
+                MonitorAlert::create(['business_id' => $business->id, 'monitor_threshold_id' => $threshold->id, 'type' => 'threshold', 'severity' => $threshold->severity, 'message' => "Metric {$threshold->metric_key} crossed its {$threshold->operator} threshold.", 'context' => ['value' => $value], 'triggered_at' => Carbon::now()]);
             }
-            MonitorAlert::create(['business_id' => $business->id, 'monitor_threshold_id' => $threshold->id, 'type' => 'threshold', 'severity' => $threshold->severity, 'message' => "Metric {$threshold->metric_key} crossed its {$threshold->operator} threshold.", 'context' => ['value' => $value], 'triggered_at' => Carbon::now()]);
         }
     }
 
@@ -63,6 +68,7 @@ final class MonitorService
     {
         $checkIns = MonitorCheckIn::query()->where('business_id', $business->id)->whereBetween('recorded_at', [$start, $end])->orderBy('recorded_at')->get();
         $latest = $checkIns->last();
+
         return MonitorSummary::query()->updateOrCreate(['business_id' => $business->id, 'period_start' => $start->toDateString(), 'period_end' => $end->toDateString()], ['summary' => ['check_ins' => $checkIns->count(), 'latest' => $latest?->responses ?? [], 'trend' => $this->trend($checkIns->all())]]);
     }
 
@@ -80,6 +86,7 @@ final class MonitorService
                 $result[$key] = (float) $last[$key] - (float) $first[$key];
             }
         }
+
         return $result;
     }
 
@@ -98,6 +105,7 @@ final class MonitorService
         if (in_array($key, ['cash', 'confidence'], true)) {
             return $value >= 4 ? 'healthy' : ($value >= 3 ? 'watch' : 'critical');
         }
+
         return $value > 0 ? 'healthy' : 'critical';
     }
 
