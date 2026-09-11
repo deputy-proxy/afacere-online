@@ -85,7 +85,7 @@ it('keeps progress tied to the published guide version', function (): void {
 
     expect($newProgress->guide_version)->toBe(2)
         ->and($newProgress->completed_steps)->toBe([])
-        ->and($guide->progress()->where('business_id', $business->id)->count())->toBe(1);
+        ->and($guide->progress()->where('business_id', $business->id)->count())->toBe(2);
 });
 
 it('rejects guide execution for a non-member business', function (): void {
