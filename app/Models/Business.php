@@ -79,6 +79,12 @@ class Business extends Model
         return $this->hasMany(MonitorCheckIn::class);
     }
 
+    /** @return HasMany<MonitorAlert, $this> */
+    public function monitorAlerts(): HasMany
+    {
+        return $this->hasMany(MonitorAlert::class);
+    }
+
     /** @return HasMany<OpportunityMatch, $this> */
     public function opportunityMatches(): HasMany
     {
