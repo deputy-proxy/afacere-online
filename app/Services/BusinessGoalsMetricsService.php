@@ -51,7 +51,7 @@ final class BusinessGoalsMetricsService
         $business = $goal->business;
         Gate::forUser($actor)->authorize('update', $business);
 
-        if (array_key_exists('target', $attributes) && ! is_numeric($attributes['target'])) {
+        if (array_key_exists('target', $attributes) && is_numeric($attributes['target']) === false) {
             throw ValidationException::withMessages(['target' => 'The goal target must be numeric.']);
         }
 
@@ -91,7 +91,7 @@ final class BusinessGoalsMetricsService
     {
         Gate::forUser($actor)->authorize('update', $metric->business);
 
-        if (! is_numeric($value)) {
+        if (is_numeric($value) === false) {
             throw ValidationException::withMessages(['value' => 'Metric values must be numeric.']);
         }
 
