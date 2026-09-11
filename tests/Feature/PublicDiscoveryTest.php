@@ -12,13 +12,13 @@ it('exposes the public acquisition pages without authentication', function (stri
         ->assertSee($text)
         ->assertSee('Start the free evaluator', false);
 })->with([
-    ['/','Turn business uncertainty into your next best action.'],
-    ['/how-it-works','Understand the business. Choose the priority. Do the work.'],
-    ['/pricing','Start free. Pay when the business needs more.'],
-    ['/about','A calmer way to work on the business.'],
-    ['/faq','Questions entrepreneurs reasonably ask.'],
-    ['/contact','Need help with afacere.online?'],
-    ['/legal','Privacy, terms and responsible product use.'],
+    ['/', 'Turn business uncertainty into your next best action.'],
+    ['/how-it-works', 'Understand the business. Choose the priority. Do the work.'],
+    ['/pricing', 'Start free. Pay when the business needs more.'],
+    ['/about', 'A calmer way to work on the business.'],
+    ['/faq', 'Questions entrepreneurs reasonably ask.'],
+    ['/contact', 'Need help with afacere.online?'],
+    ['/legal', 'Privacy, terms and responsible product use.'],
 ]);
 
 it('keeps entrepreneur application routes behind authentication', function (): void {
