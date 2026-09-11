@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire;
 
+use App\Models\Business;
 use App\Models\CommunityPost;
 use App\Models\Expert;
 use App\Models\MarketplaceProvider;
@@ -26,6 +27,12 @@ final class Ecosystem extends Component
     public function mount(BusinessContextService $businessContext): void
     {
         abort_unless($businessContext->current($this->user()) !== null, 404);
+    }
+
+    #[Computed]
+    public function business(): ?Business
+    {
+        return app(BusinessContextService::class)->current($this->user());
     }
 
     /** @return Collection<int, Expert> */

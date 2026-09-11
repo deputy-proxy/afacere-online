@@ -6,6 +6,7 @@ use App\Models\Business;
 use App\Models\CommunityPost;
 use App\Models\Expert;
 use App\Models\MarketplaceProvider;
+use App\Models\MarketplaceService;
 use App\Models\PlatformEvent;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -22,9 +23,14 @@ it('exposes the phase three ecosystem through an authenticated business route', 
         'title' => 'Verified Expert',
         'verification_status' => 'verified',
     ]);
-    MarketplaceProvider::query()->create([
+    $provider = MarketplaceProvider::query()->create([
         'name' => 'Verified Provider',
         'verification_status' => 'verified',
+    ]);
+    MarketplaceService::query()->create([
+        'provider_id' => $provider->id,
+        'name' => 'Published service',
+        'is_published' => true,
     ]);
     CommunityPost::query()->create([
         'user_id' => $user->id,
