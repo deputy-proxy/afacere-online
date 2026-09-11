@@ -9,7 +9,7 @@ use App\Models\OpportunityMatch;
 use App\Models\User;
 use App\Services\BusinessContextService;
 use App\Services\OpportunityMatchingService;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
