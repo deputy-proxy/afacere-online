@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\DataLifecycleController;
 use App\Http\Controllers\ReadinessController;
 use App\Livewire\Account\Subscription;
 use App\Livewire\Business\ActionPlan;
@@ -27,6 +28,8 @@ Route::view('/legal', 'public.legal')->name('public.legal');
 Route::get('/health/ready', ReadinessController::class)->name('health.ready');
 
 Route::middleware(['auth', 'verified'])->group(function (): void {
+    Route::get('account/data/export', [DataLifecycleController::class, 'export'])->name('account.data.export');
+    Route::post('account/data/deletion', [DataLifecycleController::class, 'requestDeletion'])->name('account.data.deletion');
     Route::livewire('dashboard', Dashboard::class)->name('dashboard');
     Route::livewire('notifications', Notifications::class)->name('business.notifications');
     Route::livewire('account/subscription', Subscription::class)->name('account.subscription');
