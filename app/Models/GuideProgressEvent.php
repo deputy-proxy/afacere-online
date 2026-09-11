@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class GuideProgressEvent extends Model
 {
+    protected $table = 'guide_progress_events';
+
     protected $guarded = ['id'];
 
     protected function casts(): array
