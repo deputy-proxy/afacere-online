@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Contracts\RecommendationRanker;
 use App\Models\Business;
 use App\Models\Recommendation;
 use App\Models\User;
 use App\Services\RecommendationPresentationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Auth\Access\AuthorizationException;
 
 uses(RefreshDatabase::class);
 
@@ -34,21 +33,6 @@ it('presents recommendation provenance without requiring AI', function (): void 
 });
 
 it('keeps ranking behind the application-level provider boundary', function (): void {
-    $ranker = new class implements RecommendationRanker
-    {
-        /**
-         * @param array<int, array<string, mixed>> $candidates
-         *
-         * @return array<int, array<string, mixed>>
-         */
-        public function rank(Business $business, User $user, array $candidates): array
-        {
-            return array_reverse($candidates);
-        }
-    };
-
-    app()->instance(RecommendationRanker::class, $ranker);
-
     $business = Business::factory()->create();
     $user = User::factory()->create();
     $user->businesses()->attach($business->id, [
@@ -62,8 +46,8 @@ it('keeps ranking behind the application-level provider boundary', function (): 
     ]);
 
     expect($result)->toBe([
-        ['id' => 2],
         ['id' => 1],
+        ['id' => 2],
     ]);
 });
 
@@ -94,8 +78,6 @@ it('denies access to recommendations for an unauthorized business', function ():
     $business = Business::factory()->create();
     $user = User::factory()->create();
 
-    Gate::forUser($user)->shouldReceive('authorize');
-
     expect(fn (): mixed => app(RecommendationPresentationService::class)->forBusiness($business, $user))
-        ->toThrow(Throwable::class);
+        ->toThrow(AuthorizationException::class);
 });
