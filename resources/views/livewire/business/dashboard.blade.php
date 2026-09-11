@@ -19,7 +19,7 @@
             @endif
         </div>
 
-        <div class="grid gap-4 md:grid-cols-3">
+        <div class="grid gap-4 md:grid-cols-4">
             <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
                 <p class="text-sm text-zinc-500">{{ __('Current stage') }}</p>
                 <p class="mt-2 text-lg font-medium">{{ $this->business->stage->value }}</p>
@@ -32,6 +32,10 @@
                 <p class="text-sm text-zinc-500">{{ __('Next action') }}</p>
                 <p class="mt-2 text-lg font-medium">{{ __('Complete your evaluation') }}</p>
             </div>
+            <a href="{{ route('business.opportunities') }}" wire:navigate class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
+                <p class="text-sm text-zinc-500">{{ __('Opportunities') }}</p>
+                <p class="mt-2 text-lg font-medium">{{ __('See current matches') }} →</p>
+            </a>
         </div>
     @endif
 </div>
