@@ -18,9 +18,12 @@ final class OpportunityService
     /** @return array{eligible: bool, score: float, results: array<string, bool>} */
     public function evaluate(Business $business, Opportunity $opportunity, ?Carbon $at = null): array
     {
-        $at ??= now();
+        $at ??= Carbon::now();
+        /** @var array<string, mixed> $criteria */
+        $criteria = is_array($opportunity->criteria) ? $opportunity->criteria : [];
+        /** @var array<string, bool> $results */
         $results = [];
-        foreach ($opportunity->criteria ?? [] as $key => $rule) {
+        foreach ($criteria as $key => $rule) {
             if (! is_array($rule) || ! array_key_exists('operator', $rule) || ! array_key_exists('value', $rule)) {
                 throw ValidationException::withMessages(['criteria' => "Invalid criterion [{$key}]."]);
             }
@@ -43,7 +46,7 @@ final class OpportunityService
 
         return OpportunityMatch::query()->updateOrCreate(
             ['business_id' => $business->id, 'opportunity_id' => $opportunity->id],
-            ['score' => $evaluation['score'], 'criteria_results' => $evaluation['results'], 'matched_at' => now()],
+            ['score' => $evaluation['score'], 'criteria_results' => $evaluation['results'], 'matched_at' => Carbon::now()],
         );
     }
 
