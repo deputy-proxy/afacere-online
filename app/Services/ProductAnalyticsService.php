@@ -19,6 +19,7 @@ final class ProductAnalyticsService
         ];
     }
 
+    /** @param array<string, mixed> $dimensions */
     public function snapshot(string $metricKey, string $scopeType, ?int $scopeId, string $start, string $end, float $value, array $dimensions = []): void
     {
         DB::table('product_metric_snapshots')->updateOrInsert(

@@ -10,6 +10,7 @@ use App\Models\ConsultationShare;
 use App\Models\Expert;
 use App\Models\ExpertAvailability;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
@@ -33,7 +34,7 @@ final class ExpertConsultationService
     public function request(Business $business, User $user, Expert $expert, ExpertAvailability $availability, ?string $note = null): Consultation
     {
         abort_unless($business->members()->whereKey($user->id)->exists(), 403);
-        if (! $expert->isVerified() || ! $availability->is_bookable || $availability->expert_id !== $expert->id || $availability->starts_at->isPast()) {
+        if (! $expert->isVerified() || ! $availability->is_bookable || $availability->expert_id !== $expert->id || CarbonImmutable::parse($availability->starts_at)->isPast()) {
             throw ValidationException::withMessages(['availability' => 'The selected expert availability is not bookable.']);
         }
 

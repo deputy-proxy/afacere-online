@@ -28,6 +28,7 @@ final class MarketplaceServiceLayer
         return $query->orderBy('name')->get();
     }
 
+    /** @param array<int, mixed> $sharedContext */
     public function createLead(Business $business, MarketplaceProvider $provider, MarketplaceService $service, string $message, array $sharedContext = []): int
     {
         abort_unless($business->members()->exists(), 403);

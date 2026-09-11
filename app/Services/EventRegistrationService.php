@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\PlatformEvent;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -13,7 +14,7 @@ final class EventRegistrationService
 {
     public function register(PlatformEvent $event, User $user): int
     {
-        if ($event->status !== 'published' || $event->starts_at->isPast()) {
+        if ($event->status !== 'published' || CarbonImmutable::parse($event->starts_at)->isPast()) {
             throw ValidationException::withMessages(['event' => 'This event is not open for registration.']);
         }
         $query = DB::table('event_registrations')->where('event_id', $event->id)->where('status', 'registered');

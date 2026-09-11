@@ -16,11 +16,13 @@ class Consultation extends Model
         return ['scheduled_at' => 'datetime', 'cancelled_at' => 'datetime'];
     }
 
+    /** @return BelongsTo<Business, $this> */
     public function business(): BelongsTo
     {
         return $this->belongsTo(Business::class);
     }
 
+    /** @return BelongsTo<Expert, $this> */
     public function expert(): BelongsTo
     {
         return $this->belongsTo(Expert::class);
