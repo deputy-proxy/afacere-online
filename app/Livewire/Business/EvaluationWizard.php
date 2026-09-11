@@ -56,13 +56,13 @@ final class EvaluationWizard extends Component
     #[Computed]
     public function section(): mixed
     {
-        return $this->evaluation?->version->sections->values()->get($this->sectionIndex);
+        return $this->evaluation()?->version->sections->values()->get($this->sectionIndex);
     }
 
     public function saveAndNext(EvaluationService $evaluationService): void
     {
-        $evaluation = $this->evaluation;
-        $section = $this->section;
+        $evaluation = $this->evaluation();
+        $section = $this->section();
         abort_unless($evaluation !== null && $section !== null, 404);
 
         $question = $section->questions->first();
@@ -87,13 +87,13 @@ final class EvaluationWizard extends Component
         }
 
         $this->sectionIndex--;
-        $this->loadCurrentAnswer($this->evaluation);
+        $this->loadCurrentAnswer($this->evaluation());
     }
 
     public function complete(EvaluationService $evaluationService): void
     {
-        $evaluation = $this->evaluation;
-        $section = $this->section;
+        $evaluation = $this->evaluation();
+        $section = $this->section();
         abort_unless($evaluation !== null && $section !== null, 404);
 
         $question = $section->questions->first();
@@ -117,11 +117,14 @@ final class EvaluationWizard extends Component
 
     private function loadCurrentAnswer(?Evaluation $evaluation): void
     {
-        $question = $this->section?->questions->first();
+        $question = $this->section()?->questions->first();
         $stored = $question !== null && $evaluation !== null
-            ? $evaluation->answers->firstWhere('question_key', $question->key)?->value
+            ? $evaluation->answers->firstWhere('question_key', $question->key)?->getRawOriginal('value')
             : null;
-        $this->answer = is_array($stored) && isset($stored['answer']) ? (string) $stored['answer'] : '';
+        $decoded = is_string($stored) ? json_decode($stored, true) : null;
+        $this->answer = is_array($decoded) && isset($decoded['answer']) && is_scalar($decoded['answer'])
+            ? (string) $decoded['answer']
+            : '';
     }
 
     private function user(): User
