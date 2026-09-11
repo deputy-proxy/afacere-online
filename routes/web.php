@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Livewire\Business\ActionPlan;
 use App\Livewire\Business\Dashboard;
 use App\Livewire\Business\EvaluationDiagnosis;
 use App\Livewire\Business\EvaluationWizard;
@@ -15,6 +16,7 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::livewire('business/onboarding', Onboarding::class)->name('business.onboarding');
     Route::livewire('business/evaluation', EvaluationWizard::class)->name('business.evaluation');
     Route::livewire('business/evaluation/diagnosis', EvaluationDiagnosis::class)->name('business.evaluation.diagnosis');
+    Route::livewire('business/action-plan', ActionPlan::class)->name('business.action-plan');
 });
 
 require __DIR__.'/settings.php';
