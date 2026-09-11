@@ -19,6 +19,7 @@ return new class extends Migration
             $table->index(['target_type', 'target_id']);
         });
     }
+
     public function down(): void
     {
         Schema::dropIfExists('trust_actions');

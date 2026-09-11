@@ -17,7 +17,6 @@ return new class extends Migration
             $table->timestamp('verified_at')->nullable();
             $table->timestamps();
         });
-
         Schema::create('marketplace_services', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('provider_id')->constrained('marketplace_providers')->cascadeOnDelete();
@@ -28,7 +27,6 @@ return new class extends Migration
             $table->boolean('is_published')->default(false);
             $table->timestamps();
         });
-
         Schema::create('marketplace_leads', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('business_id')->constrained()->cascadeOnDelete();
@@ -40,7 +38,6 @@ return new class extends Migration
             $table->timestamps();
             $table->index(['business_id', 'status']);
         });
-
         Schema::create('marketplace_reviews', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('lead_id')->constrained('marketplace_leads')->cascadeOnDelete();

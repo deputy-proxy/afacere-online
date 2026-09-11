@@ -31,7 +31,7 @@ final class MarketplaceServiceLayer
     public function createLead(Business $business, MarketplaceProvider $provider, MarketplaceService $service, string $message, array $sharedContext = []): int
     {
         abort_unless($business->members()->exists(), 403);
-        if ($provider->verification_status !== 'verified' || $service->provider_id !== $provider->id || !$service->is_published) {
+        if ($provider->verification_status !== 'verified' || $service->provider_id !== $provider->id || ! $service->is_published) {
             throw ValidationException::withMessages(['service' => 'This service is not currently available.']);
         }
 

@@ -25,7 +25,7 @@ final class PhaseThreeReadinessService
 
     public function isReady(): bool
     {
-        return !in_array(false, $this->checks(), true);
+        return array_sum(array_map(static fn (bool $ready): int => (int) $ready, $this->checks())) === 8;
     }
 
     private function tableExists(string $table): bool

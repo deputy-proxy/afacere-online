@@ -29,6 +29,7 @@ return new class extends Migration
             $table->index(['recipient_type', 'recipient_id']);
         });
     }
+
     public function down(): void
     {
         Schema::dropIfExists('document_shares');

@@ -33,7 +33,7 @@ final class ExpertConsultationService
     public function request(Business $business, User $user, Expert $expert, ExpertAvailability $availability, ?string $note = null): Consultation
     {
         abort_unless($business->members()->whereKey($user->id)->exists(), 403);
-        if (!$expert->isVerified() || !$availability->is_bookable || $availability->expert_id !== $expert->id || $availability->starts_at->isPast()) {
+        if (! $expert->isVerified() || ! $availability->is_bookable || $availability->expert_id !== $expert->id || $availability->starts_at->isPast()) {
             throw ValidationException::withMessages(['availability' => 'The selected expert availability is not bookable.']);
         }
 

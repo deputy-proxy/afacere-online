@@ -16,7 +16,7 @@ final class PeerReviewService
         if ($post->user_id !== $user->id) {
             abort(403);
         }
-        if (!in_array($visibility, ['private', 'selected', 'community', 'anonymized'], true)) {
+        if (! in_array($visibility, ['private', 'selected', 'community', 'anonymized'], true)) {
             throw ValidationException::withMessages(['visibility' => 'Invalid visibility mode.']);
         }
 

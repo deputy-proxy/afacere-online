@@ -47,6 +47,7 @@ return new class extends Migration
             $table->index(['reportable_type', 'reportable_id']);
         });
     }
+
     public function down(): void
     {
         Schema::dropIfExists('moderation_reports');

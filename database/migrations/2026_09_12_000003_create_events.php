@@ -39,6 +39,7 @@ return new class extends Migration
             $table->unique('registration_id');
         });
     }
+
     public function down(): void
     {
         Schema::dropIfExists('event_attendance');

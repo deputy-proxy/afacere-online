@@ -36,6 +36,7 @@ return new class extends Migration
             $table->index(['user_id', 'key']);
         });
     }
+
     public function down(): void
     {
         Schema::dropIfExists('commerce_entitlements');
