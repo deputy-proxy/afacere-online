@@ -45,7 +45,10 @@ it('keeps ranking behind the application-level provider boundary', function (): 
 
     $business = Business::factory()->create();
     $user = User::factory()->create();
-    $user->businesses()->attach($business->id);
+    $user->businesses()->attach($business->id, [
+        'role' => 'owner',
+        'joined_at' => now(),
+    ]);
 
     $result = app(RecommendationPresentationService::class)->rank($business, $user, [
         ['id' => 1],
