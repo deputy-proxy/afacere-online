@@ -41,8 +41,8 @@ final class RecommendationPresentationService
     }
 
     /**
-     * @param array<int, array<string, mixed>> $candidates Candidates available for ranking.
-     * @return array<int, array<string, mixed>>                    Ranked candidates.
+     * @param array<int, array<string, mixed>> $candidates
+     * @return array<int, array<string, mixed>>
      */
     public function rank(Business $business, User $user, array $candidates): array
     {
