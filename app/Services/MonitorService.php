@@ -22,7 +22,10 @@ final class MonitorService
         abort_unless($user->isAdmin() || app(EntitlementService::class)->allows($user, 'monitor'), 403);
         abort_unless(in_array($cadence, ['daily', 'weekly', 'monthly'], true), 422);
 
-        return MonitorConfiguration::query()->updateOrCreate(['business_id' => $business->id], ['enabled' => $enabled, 'cadence' => $cadence, 'next_check_in_at' => $this->next($cadence)]);
+        return MonitorConfiguration::query()->updateOrCreate(
+            ['business_id' => $business->id],
+            ['enabled' => $enabled, 'cadence' => $cadence, 'next_check_in_at' => $this->next($cadence)],
+        );
     }
 
     /** @param array<string, mixed> $responses */
@@ -33,7 +36,7 @@ final class MonitorService
         abort_unless($configuration?->enabled === true, 422);
 
         return DB::transaction(function () use ($business, $user, $responses, $configuration): MonitorCheckIn {
-            $checkIn = MonitorCheckIn::create(['business_id' => $business->id, 'user_id' => $user->id, 'responses' => $responses, 'recorded_at' => now()]);
+            $checkIn = MonitorCheckIn::create(['business_id' => $business->id, 'user_id' => $user->id, 'responses' => $responses, 'recorded_at' => Carbon::now()]);
             $configuration->update(['next_check_in_at' => $this->next($configuration->cadence)]);
             $this->evaluateThresholds($business);
 
@@ -49,7 +52,7 @@ final class MonitorService
             if ($value === null || ! $this->passes((float) $value, $threshold->operator, (float) $threshold->threshold)) {
                 continue;
             }
-            MonitorAlert::create(['business_id' => $business->id, 'monitor_threshold_id' => $threshold->id, 'type' => 'threshold', 'severity' => $threshold->severity, 'message' => "Metric {$threshold->metric_key} crossed its {$threshold->operator} threshold.", 'context' => ['value' => $value], 'triggered_at' => now()]);
+            MonitorAlert::create(['business_id' => $business->id, 'monitor_threshold_id' => $threshold->id, 'type' => 'threshold', 'severity' => $threshold->severity, 'message' => "Metric {$threshold->metric_key} crossed its {$threshold->operator} threshold.", 'context' => ['value' => $value], 'triggered_at' => Carbon::now()]);
         }
     }
 
@@ -57,21 +60,32 @@ final class MonitorService
     {
         abort_unless($business->exists, 404);
         $checkIns = MonitorCheckIn::query()->where('business_id', $business->id)->whereBetween('recorded_at', [$start, $end])->orderBy('recorded_at')->get();
+        $latest = $checkIns->last();
 
-        return MonitorSummary::query()->updateOrCreate(['business_id' => $business->id, 'period_start' => $start->toDateString(), 'period_end' => $end->toDateString()], ['summary' => ['check_ins' => $checkIns->count(), 'latest' => $checkIns->last()?->responses ?? []]]);
+        return MonitorSummary::query()->updateOrCreate(
+            ['business_id' => $business->id, 'period_start' => $start->toDateString(), 'period_end' => $end->toDateString()],
+            ['summary' => ['check_ins' => $checkIns->count(), 'latest' => $latest === null ? [] : $latest->responses]],
+        );
     }
 
     private function next(string $cadence): Carbon
     {
         return match ($cadence) {
-            'daily' => now()->addDay(), 'monthly' => now()->addMonth(), default => now()->addWeek()
+            'daily' => Carbon::now()->addDay(),
+            'monthly' => Carbon::now()->addMonth(),
+            default => Carbon::now()->addWeek(),
         };
     }
 
     private function passes(float $value, string $operator, float $threshold): bool
     {
         return match ($operator) {
-            '>' => $value > $threshold, '>=' => $value >= $threshold, '<' => $value < $threshold, '<=' => $value <= $threshold, '=' => $value === $threshold, default => false
+            '>' => $value > $threshold,
+            '>=' => $value >= $threshold,
+            '<' => $value < $threshold,
+            '<=' => $value <= $threshold,
+            '=' => $value === $threshold,
+            default => false,
         };
     }
 }
