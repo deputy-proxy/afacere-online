@@ -18,6 +18,10 @@ final class AiService
 {
     public function __construct(private readonly AiProvider $provider) {}
 
+    /**
+     * @param array<string, mixed>  $input
+     * @param array<string, string>  $outputRules
+     */
     public function run(AiPrompt $prompt, string $model, array $input, ?User $user = null, ?Business $business = null, array $outputRules = []): AiRun
     {
         $run = AiRun::create([
