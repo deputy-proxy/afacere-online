@@ -47,6 +47,7 @@ final class AiGovernanceService
         );
     }
 
+    /** @param array<string, mixed> $payload */
     public function confirmRecommendation(AiRun $run, Business $business, array $payload): void
     {
         abort_unless($run->business_id === $business->id, 403);
