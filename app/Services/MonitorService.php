@@ -76,9 +76,10 @@ final class MonitorService
         $last = $checkIns[count($checkIns) - 1]->responses ?? [];
         $result = [];
         foreach (['revenue', 'customers', 'cash', 'confidence'] as $key) {
-            if (is_numeric($first[$key] ?? null) && is_numeric($last[$key] ?? null)) {
-                $result[$key] = (float) $last[$key] - (float) $first[$key];
+            if (!is_numeric($first[$key] ?? null) || !is_numeric($last[$key] ?? null)) {
+                continue;
             }
+            $result[$key] = (float) $last[$key] - (float) $first[$key];
         }
         return $result;
     }
@@ -87,7 +88,7 @@ final class MonitorService
     private function recordHealthIndicators(Business $business, array $responses): void
     {
         foreach (['revenue', 'customers', 'cash', 'confidence'] as $key) {
-            if (! is_numeric($responses[$key] ?? null)) {
+            if (!is_numeric($responses[$key] ?? null)) {
                 continue;
             }
             HealthIndicator::create(['business_id' => $business->id, 'key' => $key, 'status' => $this->status($key, (float) $responses[$key]), 'value' => (float) $responses[$key], 'measured_at' => Carbon::now(), 'context' => ['source' => 'monitor_check_in']]);
