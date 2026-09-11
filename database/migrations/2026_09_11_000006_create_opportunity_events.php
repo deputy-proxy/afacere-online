@@ -19,7 +19,7 @@ return new class extends Migration
             $table->json('context')->nullable();
             $table->timestamp('occurred_at');
             $table->timestamps();
-            $table->index(['business_id', 'opportunity_id', 'event_type', 'occurred_at'], 'opportunity_events_bus_opp_eve_occ_index);
+            $table->index(['business_id', 'opportunity_id', 'event_type', 'occurred_at'], 'opportunity_events_bus_opp_eve_occ_index');
         });
     }
 
