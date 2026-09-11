@@ -43,6 +43,7 @@ it('only exposes published guides through the entrepreneur catalogue', function 
     $draft = Guide::query()->create([
         'slug' => 'draft-guide',
         'title' => 'Draft Guide',
+        'status' => 'draft',
         'author_id' => $user->id,
     ]);
     $published = publishedGuide($user);
@@ -50,7 +51,7 @@ it('only exposes published guides through the entrepreneur catalogue', function 
     expect(app(GuideExecutionService::class)->published()->pluck('id')->all())
         ->toBe([$published->id]);
 
-    expect($draft->fresh()->getAttribute('status'))->toBeNull();
+    expect($draft->fresh()->getAttribute('status'))->toBe('draft');
 });
 
 it('persists business-scoped progress for the published guide version', function (): void {
