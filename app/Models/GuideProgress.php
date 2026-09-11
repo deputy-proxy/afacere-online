@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class GuideProgress extends Model
 {
+    protected $table = 'guide_progress';
+
     protected $guarded = ['id'];
 
     protected function casts(): array
