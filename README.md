@@ -2,7 +2,7 @@
 
 ## Application Plan
 
-> **Status:** Phase 1 in progress · Application foundation established
+> **Status:** Phase 1 complete · Application foundation and Phase 1 domain implementation established
 > **Product:** afacere.online Business Progression
 > **Stack:** Laravel 13, Filament 5, Livewire 4, PHP 8.4
 >
@@ -11,7 +11,14 @@
 ### Phase status
 
 - **Phase 0 — Product, domain, methodology and architecture:** Complete
-- **Phase 1 — Application foundation and domain implementation:** In progress
+- **Phase 1 — Application foundation and domain implementation:** Complete
+- **Phase 2 — Entrepreneur-facing experience and product integration:** Next
+
+### Phase 1 completion
+
+Phase 1 has been implemented and merged into `main`. The application foundation and core business domains required for the MVP are now in place, including identity and business access control, business lifecycle, evaluations, recommendations and priorities, action planning, Guides, Opportunities, Monitor, AI infrastructure, commerce and entitlements, notifications and auditability, analytics, and the internal Filament operations interface.
+
+Phase 1 completion is subject to the repository's existing quality gates: lint/format validation, PHPStan/Larastan, automated tests, application setup/migrations, and frontend build validation must remain green for subsequent changes.
 
 ### Authoritative specifications
 
@@ -713,144 +720,124 @@ The exact pricing remains configurable until validated through actual demand.
 
 Completed:
 
-- Product refactoring around the business progression loop
-- Core promise and product principles
-- Primary actor definitions
-- Business as the central aggregate
-- Business lifecycle definition
-- Evaluator → Priorities → Action Plan progression
-- Guide / Opportunity / Expert / Marketplace relationship to business needs
-- Monitor as the recurring-value layer
-- Opportunity engine with funding as a vertical
-- Recommendation and matching architecture
-- AI assistance boundaries and provider abstraction
-- Peer review and community purpose
-- Event role in acquisition, community and monetization
-- Subscription and entitlement strategy
-- €5,000 MRR commercial objective
-- Domain model and bounded concepts
-- Authorization and privacy boundaries
-- Repository decision-recording workflow
+- product definition;
+- target users and actors;
+- business progression methodology;
+- lifecycle model;
+- domain model;
+- architecture decisions;
+- security and authorization principles;
+- AI architecture principles;
+- commerce model;
+- analytics principles;
+- repository decision-recording process.
 
-Authoritative outputs:
+### Phase 1 — Application Foundation & Core Domains
 
-- `README.md`
-- repository decision issues
+**Status: Complete.**
 
-### Phase 1 — Application Foundation & Domain Implementation
+Phase 1 delivered the application foundation and the core domain infrastructure required to operate the MVP:
 
-**Status: In progress.**
+1. application foundation;
+2. identity, profiles and business access control;
+3. business core domain and lifecycle;
+4. goals and metrics;
+5. versioned evaluations;
+6. recommendations and priorities;
+7. action plans and execution history;
+8. Guides and content foundation;
+9. Opportunities and matching/application tracking;
+10. Monitor and recurring progress infrastructure;
+11. AI abstraction, auditable runs, recommendations, feedback and usage tracking;
+12. subscriptions, plans, entitlements, payments and invoice lifecycle foundation;
+13. domain events, notifications and auditability;
+14. analytics events, conversions and snapshots;
+15. Filament operations/admin foundation;
+16. testing, static analysis and CI quality gates.
 
-Current focus:
+Phase 1 is closed. Changes to completed Phase 1 domains should be treated as incremental improvements, bug fixes or extensions and should not reopen the phase unless a material architectural decision requires it.
 
-- application foundation and configuration
-- domain models and enums
-- Business and Business Profile persistence
-- business stage and lifecycle primitives
-- evaluation persistence
-- recommendation and priority persistence
-- Action Plan foundations
-- policy-driven authorization
-- auditability of important state changes
-- subscription and entitlement foundations
-- AI abstraction boundaries
-- CI, linting, PHPStan and automated tests
+### Phase 2 — Entrepreneur Experience & Product Integration
 
-Remaining Phase 1 work:
+**Status: Planned.**
 
-- reconcile implementation with the approved domain model
-- complete remaining lifecycle entities and relationships
-- harden domain invariants against all mutation paths
-- complete evaluation and recommendation workflow foundations
-- expand authorization, business lifecycle and subscription test coverage
-- keep CI green across lint, PHPStan and test suites
+Phase 2 will turn the completed domain foundation into the coherent entrepreneur-facing product experience.
 
-### Phase 2 — Evaluator & Action Plan
+Expected focus areas include:
 
-- entrepreneur business onboarding
-- evaluator flow
-- evaluation sections and answers
-- diagnostic findings
-- priorities
-- recommendation generation
-- Action Plan creation
-- plan item lifecycle
-- progress and evidence
-- evaluation history
-- reassessment workflow
+- authenticated entrepreneur dashboard;
+- business onboarding;
+- evaluation UX and result presentation;
+- priority and Action Plan experience;
+- Guide consumption;
+- Opportunity discovery and application flows;
+- Monitor experience and recurring engagement;
+- subscription and entitlement UX;
+- notification experience;
+- AI-assisted user workflows with explicit confirmation boundaries;
+- product-level navigation and information architecture;
+- public-to-authenticated acquisition funnel integration;
+- end-to-end product journeys and integration tests.
 
-### Phase 3 — Guides, Opportunities & Matching
-
-- Guide catalogue and authoring
-- Guide execution flow
-- templates/checklists/resources
-- Opportunity catalogue
-- funding vertical
-- eligibility and matching rules
-- contextual recommendations
-- Opportunity preparation actions
-- recommendation ranking and explanation
-
-### Phase 4 — Experts, Marketplace & Community
-
-- Expert onboarding and profiles
-- expertise and availability
-- consultation workflow
-- mentoring relationships
-- Marketplace providers and services
-- provider verification
-- contextual provider matching
-- lead workflow
-- peer review
-- community moderation
-- controlled visibility
-
-### Phase 5 — Monitor, Subscription & Public Product
-
-- Monitor configuration
-- business health indicators
-- recurring check-ins
-- alerts and thresholds
-- periodic summaries
-- trend/history views
-- subscription plans and entitlements
-- billing/payment flows
-- public website
-- Events and registrations
-- launch readiness
-
-### Phase 6 — Optimization & Scale
-
-- recommendation quality improvement
-- AI cost and quality optimization
-- cohort and funnel analytics
-- retention optimization
-- provider and Expert network growth
-- marketplace monetization
-- event monetization
-- pricing experimentation
-- operational automation
-- performance and infrastructure hardening
-- progression toward and beyond €5,000 MRR
+Phase 2 should preserve the Phase 1 principles: business context first, deterministic domain rules, server-side authorization, auditability, user ownership of AI decisions, and measurable progress over feature volume.
 
 ---
 
-## 16. Development Rules
+## 16. Technical Quality Standards
 
-1. Keep business rules in explicit domain services, policies and workflows rather than relying on UI behavior.
-2. Treat the Business as the central aggregate and preserve meaningful historical context.
-3. Record important state changes, administrative actions and materially relevant AI decisions in auditable data where appropriate.
-4. Never allow commercial incentives to override recommendation relevance or business need.
-5. Keep AI-generated suggestions distinguishable from user-confirmed decisions.
-6. Use deterministic rules for deterministic eligibility and policy decisions.
-7. Update the relevant documentation or decision issue whenever an important product, architecture, business, AI, workflow or security decision changes.
-8. Prefer explicit domain workflows over generic CRUD when direct editing could violate an invariant.
-9. Build for the current phase and target MRR rather than prematurely implementing the entire product portfolio.
-10. Keep acquisition, activation, retention and conversion measurable from the beginning.
+Every meaningful implementation change must preserve the project's quality gates.
 
+Required checks include:
 
-## Static Analysis
+- Laravel/PHP coding standards through Pint;
+- PHPStan/Larastan static analysis;
+- Pest automated tests;
+- database migration/setup validation;
+- frontend dependency/build validation where applicable;
+- authorization and domain-rule tests for workflow-sensitive changes.
 
-Phase 1 development uses Laravel Pint, PHPStan and automated tests as CI quality gates. Domain models and services should provide concrete types for relationships, factories, enums, dates, collections and workflow results so static analysis can reason about business logic without broad suppressions.
+CI must be green before a change is considered complete.
 
-PHPStan failures, lint failures and test failures are treated as implementation defects rather than normal development noise. Temporary diagnostic or repair changes may be used during development, but they must not remain as permanent quality compromises.
+Business rules must live in appropriate domain/application services and policies rather than being duplicated across controllers, Livewire components or Filament resources.
+
+Historical and audit-sensitive records must remain traceable. Destructive or state-changing operations should be explicit, authorized and tested.
+
+---
+
+## 17. Development Rules
+
+1. Read the relevant issue/specification before implementing a domain change.
+2. Treat answered repository issues as authoritative business decisions.
+3. Do not silently invent business rules when an important decision is unresolved.
+4. Keep deterministic eligibility and authorization rules deterministic.
+5. Keep AI provider dependencies behind application abstractions.
+6. Persist important AI runs and distinguish suggestions from confirmed decisions.
+7. Keep user/business data private by default.
+8. Enforce authorization server-side.
+9. Preserve history for evaluations, action plans, recommendations, commercial state and audit-sensitive records.
+10. Add or update tests with domain behavior changes.
+11. Run and satisfy Pint, PHPStan/Larastan and Pest before declaring work complete.
+12. Do not use Filament as a second business-logic layer.
+13. Prefer small, reviewable changes that preserve the integrity of completed domains.
+14. Update documentation when implementation-significant decisions change.
+
+---
+
+## 18. MVP Success Criteria
+
+The MVP is successful when a real entrepreneur can:
+
+1. create a business;
+2. complete an evaluation;
+3. receive an understandable diagnosis;
+4. see what matters most now;
+5. accept a prioritized action plan;
+6. execute actions and record evidence/outcomes;
+7. use relevant Guides and Opportunities;
+8. return later and see measurable progress;
+9. receive useful recurring Monitor signals;
+10. understand when and why paid functionality is valuable;
+11. subscribe without operational friction;
+12. trust that their data and decisions are controlled and auditable.
+
+The primary commercial objective remains **€5,000 MRR**, but product validation should prioritize genuine user progress and recurring value rather than optimizing prematurely for revenue alone.
