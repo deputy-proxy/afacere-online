@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Livewire\Business;
 
 use App\Models\Business;
+use App\Models\DomainEvent;
 use App\Models\User;
 use App\Models\UserNotification;
 use App\Services\BusinessContextService;
 use App\Services\NotificationService;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
@@ -38,6 +40,13 @@ final class Notifications extends Component
     public function notifications(): array
     {
         return app(NotificationService::class)->recent($this->user(), $this->business());
+    }
+
+    /** @return Collection<int, DomainEvent> */
+    #[Computed]
+    public function activity(): Collection
+    {
+        return app(NotificationService::class)->activity($this->user(), $this->business());
     }
 
     #[Computed]
