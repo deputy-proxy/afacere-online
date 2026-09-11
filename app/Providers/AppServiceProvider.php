@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Contracts\RecommendationRanker;
 use App\Services\NullRecommendationRanker;
+use App\Services\PerformanceMonitoringService;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        app(PerformanceMonitoringService::class)->register();
     }
 
     protected function configureDefaults(): void
