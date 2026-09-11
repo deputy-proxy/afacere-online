@@ -36,6 +36,12 @@ class Guide extends Model
         return $this->hasMany(GuideRevision::class)->orderByDesc('version');
     }
 
+    /** @return HasMany<GuideProgress, $this> */
+    public function progress(): HasMany
+    {
+        return $this->hasMany(GuideProgress::class);
+    }
+
     /** @return BelongsToMany<GuideTag, $this> */
     public function tags(): BelongsToMany
     {
