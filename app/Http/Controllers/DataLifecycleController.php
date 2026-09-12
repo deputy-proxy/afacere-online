@@ -47,8 +47,8 @@ final class DataLifecycleController
         return response()->json([
             'data_request_id' => $dataRequest?->id,
             'status' => $dataRequest?->status,
-            'requested_at' => $dataRequest?->requested_at?->toIso8601String(),
-            'completed_at' => $dataRequest?->completed_at?->toIso8601String(),
+            'requested_at' => $this->formatDate($dataRequest?->requested_at),
+            'completed_at' => $this->formatDate($dataRequest?->completed_at),
         ]);
     }
 
@@ -78,5 +78,10 @@ final class DataLifecycleController
             'data_request_id' => $dataRequest->id,
             'status' => $dataRequest->status,
         ]);
+    }
+
+    private function formatDate(?string $value): ?string
+    {
+        return $value === null ? null : date(DATE_ATOM, strtotime($value));
     }
 }
