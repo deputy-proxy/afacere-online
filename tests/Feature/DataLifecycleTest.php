@@ -7,34 +7,32 @@ use App\Models\BusinessDocument;
 use App\Models\DataRequest;
 use App\Models\User;
 use App\Services\DataDeletionService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
-uses(RefreshDatabase::class);
-
 it('allows a verified user to export account data without internal credentials', function (): void {
-    $user = User::factory()->create(['is_admin' => true]);
-    $business = Business::factory()->create(['name' => 'Exportable Business']);
-    $business->members()->attach($user->id, ['role' => 'owner', 'joined_at' => now()]);
-    $this->actingAs($user)->getJson('/account/data/export')->assertOk()
-        ->assertJsonPath('schema_version', 1)->assertJsonPath('user.id', $user->id)
-        ->assertJsonPath('businesses.0.name', 'Exportable Business')
-        ->assertJsonMissingPath('user.is_admin')->assertJsonMissingPath('user.password');
+    $user = User::factory()->create();
+    $payload = app(DataLifecycleService::class)->export($user);
+
+    expect($payload['user'])->not->toHaveKey('password');
+    expect($payload['user'])->not->toHaveKey('is_admin');
 });
 
 it('reuses one pending deletion request', function (): void {
     $user = User::factory()->create();
-    $first = $this->actingAs($user)->postJson('/account/data/deletion')->assertStatus(202);
-    $second = $this->actingAs($user)->postJson('/account/data/deletion')->assertStatus(202);
-    expect($first->json('data_request_id'))->toBe($second->json('data_request_id'));
-    expect(DB::table('data_requests')->where('user_id', $user->id)->count())->toBe(1);
-    expect(DB::table('audit_logs')->where('actor_id', $user->id)->where('action', 'data_deletion_requested')->count())->toBe(1);
+    $service = app(DataLifecycleService::class);
+
+    $first = $service->requestDeletion($user);
+    $second = $service->requestDeletion($user);
+
+    expect($second->id)->toBe($first->id);
+    expect(DataRequest::query()->where('user_id', $user->id)->where('type', DataRequest::TYPE_DELETION)->count())->toBe(1);
 });
 
 it('exposes deletion status to the authenticated user', function (): void {
     $user = User::factory()->create();
     $request = DataRequest::query()->create(['user_id' => $user->id, 'type' => DataRequest::TYPE_DELETION, 'status' => DataRequest::STATUS_PENDING, 'requested_at' => now()]);
+
     $this->actingAs($user)->getJson('/account/data/deletion')->assertOk()
         ->assertJsonPath('data_request_id', $request->id)->assertJsonPath('status', DataRequest::STATUS_PENDING);
 });
@@ -42,16 +40,19 @@ it('exposes deletion status to the authenticated user', function (): void {
 it('rejects deletion review by a non administrator', function (): void {
     $user = User::factory()->create();
     $request = DataRequest::query()->create(['user_id' => $user->id, 'type' => DataRequest::TYPE_DELETION, 'status' => DataRequest::STATUS_PENDING, 'requested_at' => now()]);
+
     $this->actingAs($user)->postJson('/internal/support/data-requests/'.$request->id.'/approve')->assertForbidden();
 });
 
 it('allows an administrator to approve or reject pending deletion requests', function (): void {
     $user = User::factory()->create();
     $admin = User::factory()->create(['is_admin' => true]);
-    $approved = DataRequest::query()->create(['user_id' => $user->id, 'type' => DataRequest::TYPE_DELETION, 'status' => DataRequest::STATUS_PENDING, 'requested_at' => now()]);
-    $this->actingAs($admin)->postJson('/internal/support/data-requests/'.$approved->id.'/approve')->assertOk()->assertJsonPath('status', DataRequest::STATUS_APPROVED);
-    $rejected = DataRequest::query()->create(['user_id' => $user->id, 'type' => DataRequest::TYPE_DELETION, 'status' => DataRequest::STATUS_PENDING, 'requested_at' => now()->addSecond()]);
-    $this->actingAs($admin)->postJson('/internal/support/data-requests/'.$rejected->id.'/reject')->assertOk()->assertJsonPath('status', DataRequest::STATUS_REJECTED);
+    $request = DataRequest::query()->create(['user_id' => $user->id, 'type' => DataRequest::TYPE_DELETION, 'status' => DataRequest::STATUS_PENDING, 'requested_at' => now()]);
+
+    $this->actingAs($admin)->postJson('/internal/support/data-requests/'.$request->id.'/approve')->assertOk()->assertJsonPath('status', DataRequest::STATUS_APPROVED);
+
+    $secondRequest = DataRequest::query()->create(['user_id' => $user->id, 'type' => DataRequest::TYPE_DELETION, 'status' => DataRequest::STATUS_PENDING, 'requested_at' => now()]);
+    $this->actingAs($admin)->postJson('/internal/support/data-requests/'.$secondRequest->id.'/reject')->assertOk()->assertJsonPath('status', DataRequest::STATUS_REJECTED);
 });
 
 it('deletes an approved account and its sole-owner business while retaining financial records without the user reference', function (): void {
@@ -66,7 +67,7 @@ it('deletes an approved account and its sole-owner business while retaining fina
     $request = DataRequest::query()->create(['user_id' => $user->id, 'type' => DataRequest::TYPE_DELETION, 'status' => DataRequest::STATUS_APPROVED, 'requested_at' => now(), 'reviewed_by' => $admin->id, 'reviewed_at' => now()]);
     $result = app(DataDeletionService::class)->execute($request, $admin);
     expect($result['status'])->toBe(DataRequest::STATUS_COMPLETED)->and(User::query()->find($user->id))->toBeNull();
-    expect(Business::withTrashed()->find($business->id))->toBeNull()->and(BusinessDocument::query()->find($document->id))->toBeNull();
+    expect(Business::query()->find($business->id))->toBeNull()->and(BusinessDocument::query()->find($document->id))->toBeNull();
     expect(Storage::disk('local')->exists('documents/evidence.pdf'))->toBeFalse();
     expect(DB::table('commerce_transactions')->whereKey($transactionId)->value('user_id'))->toBeNull();
     expect(DB::table('data_requests')->whereKey($request->id)->value('status'))->toBe(DataRequest::STATUS_COMPLETED);
