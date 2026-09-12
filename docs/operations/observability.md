@@ -1,18 +1,28 @@
-# Observability and incident response
+# Operational observability
 
-## Health signals
+The canonical observability contract, telemetry events, alert policy, ownership requirements and incident runbooks are maintained in [`docs/observability.md`](../observability.md).
 
-- `/up` is the framework-level health endpoint.
-- `/health/ready` validates the application configuration and required Phase 3 domain tables.
-- Slow database queries are logged with connection and duration metadata without logging query bindings.
+## Production verification gate
 
-## Incident response
+Repository implementation must be complemented by target-environment evidence for:
 
-1. Confirm the health endpoint and recent deployment status.
-2. Identify whether the incident affects availability, latency, payments, notifications, search or data integrity.
-3. Preserve relevant logs and timestamps before restarting workers or changing infrastructure.
-4. Apply the smallest reversible mitigation available.
-5. Verify the critical smoke journey after mitigation.
-6. Record root cause, customer impact, corrective action and follow-up work.
+- health and readiness behavior;
+- dependency failure detection;
+- real alert delivery;
+- named alert ownership and escalation;
+- queue failure visibility;
+- payment/webhook failure visibility;
+- alert recovery and clearing.
 
-Operational logs must not contain passwords, secrets, payment credentials or unnecessary personal/business data.
+Source-code presence and automated tests do not substitute for this infrastructure evidence.
+
+## Incident response summary
+
+1. Confirm `/up` and `/health/ready`.
+2. Identify deployment and first observed timestamp.
+3. Determine impact and preserve evidence.
+4. Classify application, database, queue, provider or infrastructure failure.
+5. Apply the smallest reversible mitigation.
+6. Verify critical smoke journeys.
+7. Escalate payment, security, privacy and data-integrity incidents immediately.
+8. Record root cause, impact, corrective action and follow-up ownership.
