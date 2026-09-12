@@ -76,6 +76,7 @@ final class DataDeletionService
                     'occurred_at' => now(),
                 ]);
 
+                $request->forceFill(['user_id' => null])->save();
                 User::destroy($user->id);
             });
 
