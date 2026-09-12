@@ -12,8 +12,6 @@ use Illuminate\Support\Collection;
 
 final class SubscriptionService
 {
-    public function __construct(private readonly ObservabilityService $observability) {}
-
     /** @return Collection<int, ProductPlan> */
     public function plans(): Collection
     {
@@ -31,9 +29,7 @@ final class SubscriptionService
     public function planSummary(ProductPlan $plan): array
     {
         $entitlements = $plan->getAttribute('entitlements');
-        if (!is_array($entitlements)) {
-            $entitlements = [];
-        }
+        $entitlements = is_array($entitlements) ? $entitlements : [];
 
         $limit = $entitlements['business_limit'] ?? 1;
 
@@ -82,7 +78,7 @@ final class SubscriptionService
         }
 
         $subscription = $subscription->load('plan');
-        $this->observability->record('subscription.changed', [
+        app(ObservabilityService::class)->record('subscription.changed', [
             'subscription_id' => $subscription->getKey(),
             'user_id' => $user->getKey(),
             'plan' => $plan->getAttribute('key'),
