@@ -11,7 +11,6 @@ class DataRequest extends Model
 {
     public const TYPE_EXPORT = 'export';
     public const TYPE_DELETION = 'deletion';
-
     public const STATUS_PENDING = 'pending';
     public const STATUS_APPROVED = 'approved';
     public const STATUS_REJECTED = 'rejected';
