@@ -31,6 +31,7 @@ Route::get('/health/ready', ReadinessController::class)->name('health.ready');
 
 Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::get('account/data/export', [DataLifecycleController::class, 'export'])->name('account.data.export');
+    Route::get('account/data/deletion', [DataLifecycleController::class, 'deletionStatus'])->name('account.data.deletion.status');
     Route::post('account/data/deletion', [DataLifecycleController::class, 'requestDeletion'])->name('account.data.deletion');
     Route::livewire('dashboard', Dashboard::class)->name('dashboard');
     Route::livewire('notifications', Notifications::class)->name('business.notifications');
@@ -50,6 +51,8 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
 Route::middleware(['auth', 'verified', 'admin'])->prefix('internal/support')->name('internal.support.')->group(function (): void {
     Route::get('users/{user}', [AdminSupportController::class, 'summary'])->name('users.summary');
     Route::post('users/{user}/password-recovery', [AdminSupportController::class, 'passwordRecovery'])->name('users.password-recovery');
+    Route::post('data-requests/{dataRequest}/approve', [DataLifecycleController::class, 'approveDeletion'])->name('data-requests.approve');
+    Route::post('data-requests/{dataRequest}/reject', [DataLifecycleController::class, 'rejectDeletion'])->name('data-requests.reject');
 });
 
 require __DIR__.'/settings.php';

@@ -14,7 +14,7 @@ This is an evidence decision, not a statement that the repository code is broken
 | #104 | Deployment validation runbook | Target deployment and smoke evidence | Pending |
 | #105 | Authorization remediation + security audit | Production edge/rate-limit/provider verification | Pending |
 | #106 | Billing/idempotency documentation | Provider signature, callbacks and reconciliation | Pending |
-| #107 | Explicit export fields, idempotent request lifecycle, tests and privacy runbook | Destructive deletion/storage propagation | Pending |
+| #107 | Explicit export contract, deletion state machine, storage propagation, retention policy and lifecycle tests | Real object-storage deletion/restore verification and legal/privacy review | Pending |
 | #108 | Observability and incident runbook | Real alerts, owners and dependency monitoring | Pending |
 | #109 | Performance budgets and query review | Production-like load test | Pending |
 | #110 | Accessibility/UX checklist | Keyboard/screen-reader/responsive/contrast browser evidence | Pending |
@@ -28,12 +28,12 @@ This is an evidence decision, not a statement that the repository code is broken
 1. **Exact release-candidate GitHub CI is not yet GREEN.**
 2. **Target-environment deployment evidence is missing.**
 3. **Payment-provider signature/reconciliation evidence is missing.**
-4. **Destructive deletion and external-storage propagation require operational verification.**
+4. **Real object-storage deletion propagation for #107 requires operational verification.**
 5. **Real alert delivery and ownership are not verified.**
 6. **No production-like load test has been executed.**
 7. **Browser accessibility/responsive verification has not been executed.**
 8. **No isolated backup restore drill has been executed.**
-9. **README's existing phase-status text still needs direct reconciliation because the current contents API cannot safely patch the long blueprint without replacing its complete content.**
+9. **Counsel-reviewed production privacy terms are not yet represented as a release artifact.**
 
 ## Release procedure when blockers are cleared
 
