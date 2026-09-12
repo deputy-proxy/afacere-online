@@ -25,7 +25,14 @@ final class ObservabilityService
             }
         }
 
-        Log::{$level}($event, $payload);
+        match ($level) {
+            'debug' => Log::debug($event, $payload),
+            'notice' => Log::notice($event, $payload),
+            'warning' => Log::warning($event, $payload),
+            'error' => Log::error($event, $payload),
+            'critical' => Log::critical($event, $payload),
+            default => Log::info($event, $payload),
+        };
     }
 
     /** @param mixed $value */
