@@ -18,6 +18,20 @@ final class DataLifecycleService
     {
         $user->load(['profile', 'businesses']);
 
+        $dataRequests = [];
+        foreach (DataRequest::query()
+            ->where('user_id', $user->id)
+            ->orderBy('requested_at')
+            ->get(['id', 'type', 'status', 'requested_at', 'completed_at']) as $request) {
+            $dataRequests[] = [
+                'id' => $request->id,
+                'type' => $request->type,
+                'status' => $request->status,
+                'requested_at' => $this->formatDate($request->requested_at),
+                'completed_at' => $this->formatDate($request->completed_at),
+            ];
+        }
+
         return [
             'schema_version' => 1,
             'exported_at' => now()->toIso8601String(),
@@ -38,18 +52,7 @@ final class DataLifecycleService
                     ->where('user_id', $user->id)
                     ->first(['role', 'joined_at']),
             ])->values()->all(),
-            'data_requests' => DataRequest::query()
-                ->where('user_id', $user->id)
-                ->orderBy('requested_at')
-                ->get(['id', 'type', 'status', 'requested_at', 'completed_at'])
-                ->map(static fn (DataRequest $request): array => [
-                    'id' => $request->id,
-                    'type' => $request->type,
-                    'status' => $request->status,
-                    'requested_at' => $request->requested_at?->toIso8601String(),
-                    'completed_at' => $request->completed_at?->toIso8601String(),
-                ])
-                ->all(),
+            'data_requests' => $dataRequests,
         ];
     }
 
@@ -123,5 +126,10 @@ final class DataLifecycleService
         ]);
 
         return $request->refresh();
+    }
+
+    private function formatDate(?string $value): ?string
+    {
+        return $value === null ? null : date(DATE_ATOM, strtotime($value));
     }
 }
