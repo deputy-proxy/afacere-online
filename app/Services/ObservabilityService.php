@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Log;
 
 final class ObservabilityService
 {
-    /** @param array<string, mixed> $context */
     public function record(string $event, array $context = [], string $level = 'info'): void
     {
         $payload = [
@@ -35,7 +34,6 @@ final class ObservabilityService
         };
     }
 
-    /** @param mixed $value */
     private function sanitize(mixed $value, ?string $key = null): mixed
     {
         if ($key !== null && $this->isSensitiveKey($key)) {
