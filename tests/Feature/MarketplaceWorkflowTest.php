@@ -10,6 +10,7 @@ use App\Services\MarketplaceServiceLayer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 uses(RefreshDatabase::class);
 
@@ -22,14 +23,26 @@ it('only discovers verified providers with published services', function (): voi
     expect($results)->toHaveCount(1)->and($results->first()?->id)->toBe($verified->id);
 });
 
-it('creates a business-scoped lead only for a verified published service', function (): void {
+it('creates a business-scoped lead only for a verified published service and member', function (): void {
     $user = User::factory()->create();
     $business = Business::factory()->create();
     $business->members()->attach($user->id, ['role' => 'owner', 'joined_at' => now()]);
     $provider = MarketplaceProvider::query()->create(['name' => 'Provider', 'verification_status' => 'verified']);
     $service = MarketplaceService::query()->create(['provider_id' => $provider->id, 'name' => 'SEO', 'is_published' => true]);
-    $leadId = app(MarketplaceServiceLayer::class)->createLead($business, $provider, $service, 'Please contact me.');
+    $leadId = app(MarketplaceServiceLayer::class)->createLead($user, $business, $provider, $service, 'Please contact me.');
     expect(DB::table('marketplace_leads')->where('id', $leadId)->value('business_id'))->toBe($business->id);
+});
+
+it('rejects an authenticated user who is not a business member', function (): void {
+    $member = User::factory()->create();
+    $outsider = User::factory()->create();
+    $business = Business::factory()->create();
+    $business->members()->attach($member->id, ['role' => 'owner', 'joined_at' => now()]);
+    $provider = MarketplaceProvider::query()->create(['name' => 'Provider', 'verification_status' => 'verified']);
+    $service = MarketplaceService::query()->create(['provider_id' => $provider->id, 'name' => 'SEO', 'is_published' => true]);
+
+    expect(fn (): mixed => app(MarketplaceServiceLayer::class)->createLead($outsider, $business, $provider, $service, 'Hello'))
+        ->toThrow(HttpException::class);
 });
 
 it('rejects unpublished services', function (): void {
@@ -38,5 +51,5 @@ it('rejects unpublished services', function (): void {
     $business->members()->attach($user->id, ['role' => 'owner', 'joined_at' => now()]);
     $provider = MarketplaceProvider::query()->create(['name' => 'Provider', 'verification_status' => 'verified']);
     $service = MarketplaceService::query()->create(['provider_id' => $provider->id, 'name' => 'SEO', 'is_published' => false]);
-    expect(fn (): mixed => app(MarketplaceServiceLayer::class)->createLead($business, $provider, $service, 'Hello'))->toThrow(ValidationException::class);
+    expect(fn (): mixed => app(MarketplaceServiceLayer::class)->createLead($user, $business, $provider, $service, 'Hello'))->toThrow(ValidationException::class);
 });

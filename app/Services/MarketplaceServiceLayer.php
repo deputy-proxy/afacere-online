@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Models\Business;
 use App\Models\MarketplaceProvider;
 use App\Models\MarketplaceService;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\ValidationException;
@@ -29,9 +30,9 @@ final class MarketplaceServiceLayer
     }
 
     /** @param array<int, mixed> $sharedContext */
-    public function createLead(Business $business, MarketplaceProvider $provider, MarketplaceService $service, string $message, array $sharedContext = []): int
+    public function createLead(User $user, Business $business, MarketplaceProvider $provider, MarketplaceService $service, string $message, array $sharedContext = []): int
     {
-        abort_unless($business->members()->exists(), 403);
+        abort_unless($business->members()->whereKey($user->id)->exists(), 403);
         if ($provider->verification_status !== 'verified' || $service->provider_id !== $provider->id || ! $service->is_published) {
             throw ValidationException::withMessages(['service' => 'This service is not currently available.']);
         }
