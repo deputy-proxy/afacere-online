@@ -1,16 +1,16 @@
 <?php
 
 use App\Models\User;
-use App\Providers\Filament\AdminPanelProvider;
+use Filament\Panel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
 test('only administrator users can access the admin panel', function (): void {
-    $provider = new AdminPanelProvider(app());
+    $panel = app(Panel::class);
     $admin = User::factory()->admin()->create();
     $user = User::factory()->create();
 
-    expect($provider->canAccessPanel($admin))->toBeTrue()
-        ->and($provider->canAccessPanel($user))->toBeFalse();
+    expect($admin->canAccessPanel($panel))->toBeTrue()
+        ->and($user->canAccessPanel($panel))->toBeFalse();
 });
