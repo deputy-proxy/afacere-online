@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Models\DataRequest;
 use App\Models\User;
 use App\Services\DataLifecycleService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -82,6 +83,6 @@ final class DataLifecycleController
 
     private function formatDate(?string $value): ?string
     {
-        return $value === null ? null : date(DATE_ATOM, strtotime($value));
+        return $value === null ? null : Carbon::parse($value)->toIso8601String();
     }
 }
