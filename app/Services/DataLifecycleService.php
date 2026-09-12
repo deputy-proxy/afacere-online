@@ -8,6 +8,7 @@ use App\Models\AuditLog;
 use App\Models\Business;
 use App\Models\DataRequest;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -130,6 +131,6 @@ final class DataLifecycleService
 
     private function formatDate(?string $value): ?string
     {
-        return $value === null ? null : date(DATE_ATOM, strtotime($value));
+        return $value === null ? null : Carbon::parse($value)->toIso8601String();
     }
 }
