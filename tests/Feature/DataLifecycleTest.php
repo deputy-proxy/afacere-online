@@ -66,14 +66,14 @@ it('deletes an approved account and its sole-owner business while retaining fina
     $document = BusinessDocument::query()->create(['business_id' => $business->id, 'uploaded_by' => $user->id, 'name' => 'evidence.pdf', 'disk' => 'local', 'path' => 'documents/evidence.pdf', 'visibility' => 'private', 'uploaded_at' => now()]);
     $transactionId = DB::table('commerce_transactions')->insertGetId(['user_id' => $user->id, 'purchasable_type' => 'product', 'purchasable_id' => 1, 'provider' => 'test', 'provider_reference' => 'ref-'.$user->id, 'status' => 'confirmed', 'amount' => 100, 'currency' => 'RON', 'idempotency_key' => 'key-'.$user->id, 'confirmed_at' => now(), 'refunded_at' => null, 'created_at' => now(), 'updated_at' => now()]);
     $request = DataRequest::query()->create(['user_id' => $user->id, 'type' => DataRequest::TYPE_DELETION, 'status' => DataRequest::STATUS_APPROVED, 'requested_at' => now(), 'reviewed_by' => $admin->id, 'reviewed_at' => now()]);
-    $requestId = $request->id;
     $result = app(DataDeletionService::class)->execute($request, $admin);
     expect($result['status'])->toBe(DataRequest::STATUS_COMPLETED)->and(User::query()->find($user->id))->toBeNull();
     expect(Business::query()->find($business->id))->toBeNull()->and(BusinessDocument::query()->find($document->id))->toBeNull();
     expect(Storage::disk('local')->exists('documents/evidence.pdf'))->toBeFalse();
     expect(DB::table('commerce_transactions')->whereKey($transactionId)->value('user_id'))->toBeNull();
-    expect(DB::table('data_requests')->whereKey($requestId)->value('status'))->toBe(DataRequest::STATUS_COMPLETED);
-    expect(DB::table('audit_logs')->where('subject_type', DataRequest::class)->where('subject_id', $requestId)->where('action', 'data_deletion_completed')->exists())->toBeTrue();
+    $completedRequest = DataRequest::query()->where('type', DataRequest::TYPE_DELETION)->where('status', DataRequest::STATUS_COMPLETED)->whereNull('user_id')->latest('id')->first();
+    expect($completedRequest)->not->toBeNull();
+    expect(DB::table('audit_logs')->where('subject_type', DataRequest::class)->where('subject_id', $completedRequest->id)->where('action', 'data_deletion_completed')->exists())->toBeTrue();
 });
 
 it('removes only the deleted member from a shared business', function (): void {
