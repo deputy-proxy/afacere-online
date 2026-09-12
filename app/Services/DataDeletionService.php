@@ -22,6 +22,7 @@ final class DataDeletionService
             throw new RuntimeException('Only approved deletion requests can be executed.');
         }
 
+        $requestId = $request->id;
         $user = $request->user()->first();
         if (! $user instanceof User) {
             throw new RuntimeException('The deletion request has no active user.');
@@ -89,19 +90,10 @@ final class DataDeletionService
                 'financial_records' => 'retained with user reference removed',
                 'audit_records' => 'retained with actor reference removed',
             ];
-            $retainedRequest = DataRequest::query()->find($request->id);
 
-            if ($retainedRequest instanceof DataRequest) {
-                $retainedRequest->forceFill([
-                    'status' => DataRequest::STATUS_COMPLETED,
-                    'completed_at' => $now,
-                    'updated_at' => $now,
-                    'retention' => $retention,
-                ])->save();
-            } else {
-                $retainedRequest = new DataRequest;
-                $retainedRequest->forceFill([
-                    'id' => $request->id,
+            DB::table('data_requests')->updateOrInsert(
+                ['id' => $requestId],
+                [
                     'user_id' => null,
                     'type' => DataRequest::TYPE_DELETION,
                     'status' => DataRequest::STATUS_COMPLETED,
@@ -111,16 +103,16 @@ final class DataDeletionService
                     'started_at' => $request->started_at ?? $now,
                     'completed_at' => $now,
                     'updated_at' => $now,
-                    'retention' => $retention,
-                ])->save();
-            }
+                    'retention' => json_encode($retention, JSON_THROW_ON_ERROR),
+                ]
+            );
 
             AuditLog::create([
                 'actor_id' => $actor->id,
                 'subject_type' => DataRequest::class,
-                'subject_id' => $retainedRequest->id,
+                'subject_id' => $requestId,
                 'action' => 'data_deletion_completed',
-                'context' => ['data_request_id' => $retainedRequest->id],
+                'context' => ['data_request_id' => $requestId],
                 'occurred_at' => $now,
             ]);
 
