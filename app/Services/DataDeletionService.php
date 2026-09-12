@@ -99,7 +99,7 @@ final class DataDeletionService
                     'retention' => $retention,
                 ])->save();
             } else {
-                $retainedRequest = new DataRequest();
+                $retainedRequest = new DataRequest;
                 $retainedRequest->forceFill([
                     'id' => $request->id,
                     'user_id' => null,
