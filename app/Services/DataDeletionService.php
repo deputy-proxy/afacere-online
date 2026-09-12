@@ -99,7 +99,8 @@ final class DataDeletionService
                     'retention' => $retention,
                 ])->save();
             } else {
-                $retainedRequest = DataRequest::query()->create([
+                $retainedRequest = new DataRequest();
+                $retainedRequest->forceFill([
                     'id' => $request->id,
                     'user_id' => null,
                     'type' => DataRequest::TYPE_DELETION,
@@ -111,7 +112,7 @@ final class DataDeletionService
                     'completed_at' => $now,
                     'updated_at' => $now,
                     'retention' => $retention,
-                ]);
+                ])->save();
             }
 
             AuditLog::create([
