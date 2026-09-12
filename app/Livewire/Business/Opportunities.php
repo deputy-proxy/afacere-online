@@ -12,9 +12,11 @@ use App\Services\OpportunityMatchingService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
+#[Layout('layouts.app')]
 #[Title('Opportunities')]
 final class Opportunities extends Component
 {
