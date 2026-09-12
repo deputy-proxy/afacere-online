@@ -31,6 +31,7 @@ Route::get('/health/ready', ReadinessController::class)->name('health.ready');
 
 Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::get('account/data/export', [DataLifecycleController::class, 'export'])->name('account.data.export');
+    Route::get('account/data/deletion', [DataLifecycleController::class, 'deletionStatus'])->name('account.data.deletion.status');
     Route::post('account/data/deletion', [DataLifecycleController::class, 'requestDeletion'])->name('account.data.deletion');
     Route::livewire('dashboard', Dashboard::class)->name('dashboard');
     Route::livewire('notifications', Notifications::class)->name('business.notifications');
