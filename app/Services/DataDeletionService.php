@@ -84,24 +84,43 @@ final class DataDeletionService
                 throw new RuntimeException('User record still exists after deletion.');
             }
 
-            $request->refresh();
-            $request->forceFill([
-                'status' => DataRequest::STATUS_COMPLETED,
-                'completed_at' => now(),
-                'updated_at' => now(),
-                'retention' => [
-                    'financial_records' => 'retained with user reference removed',
-                    'audit_records' => 'retained with actor reference removed',
-                ],
-            ])->save();
+            $now = now();
+            $retention = [
+                'financial_records' => 'retained with user reference removed',
+                'audit_records' => 'retained with actor reference removed',
+            ];
+            $retainedRequest = DataRequest::query()->find($request->id);
+
+            if ($retainedRequest instanceof DataRequest) {
+                $retainedRequest->forceFill([
+                    'status' => DataRequest::STATUS_COMPLETED,
+                    'completed_at' => $now,
+                    'updated_at' => $now,
+                    'retention' => $retention,
+                ])->save();
+            } else {
+                $retainedRequest = DataRequest::query()->create([
+                    'id' => $request->id,
+                    'user_id' => null,
+                    'type' => DataRequest::TYPE_DELETION,
+                    'status' => DataRequest::STATUS_COMPLETED,
+                    'requested_at' => $request->requested_at ?? $now,
+                    'reviewed_by' => $request->reviewed_by ?? $actor->id,
+                    'reviewed_at' => $request->reviewed_at ?? $now,
+                    'started_at' => $request->started_at ?? $now,
+                    'completed_at' => $now,
+                    'updated_at' => $now,
+                    'retention' => $retention,
+                ]);
+            }
 
             AuditLog::create([
                 'actor_id' => $actor->id,
                 'subject_type' => DataRequest::class,
-                'subject_id' => $request->id,
+                'subject_id' => $retainedRequest->id,
                 'action' => 'data_deletion_completed',
-                'context' => ['data_request_id' => $request->id],
-                'occurred_at' => now(),
+                'context' => ['data_request_id' => $retainedRequest->id],
+                'occurred_at' => $now,
             ]);
 
             return [
