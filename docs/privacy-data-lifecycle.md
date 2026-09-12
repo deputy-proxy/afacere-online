@@ -58,12 +58,11 @@ A business with no remaining members after the request is permanently removed. A
 - Financial records: retained for the applicable accounting/provider obligation, with direct user references removed where the schema permits.
 - Security audit records: retained for the applicable security/accountability obligation and must contain only the minimum context required.
 
-The configured retention defaults are applied by `data:apply-retention`. Changes to legal retention requirements must update the policy and configuration together.
+The retention periods are configuration-backed and documented in `docs/data-retention-policy.md`. Automated scheduling of retention enforcement remains an operational deployment concern and must use the configured values rather than duplicating them in infrastructure scripts.
 
 ## Operational controls
 
-- `data:process-deletions` executes approved deletion requests.
-- `data:apply-retention` applies configured privacy retention rules.
+- Approved deletion requests are executable through the dedicated `DataDeletionService` and its `data:process-deletions` command.
 - Review endpoints require authenticated administrator access.
 - Destructive execution is not exposed as an unrestricted CRUD operation.
 
