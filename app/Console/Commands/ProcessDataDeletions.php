@@ -29,6 +29,7 @@ class ProcessDataDeletions extends Command
         $actor = User::query()->where('is_admin', true)->orderBy('id')->first();
         if (! $actor instanceof User) {
             $this->error('No administrator is available to execute data deletion requests.');
+
             return self::FAILURE;
         }
 
@@ -46,6 +47,7 @@ class ProcessDataDeletions extends Command
         }
 
         $this->info(sprintf('Processed %d deletion request(s).', $processed));
+
         return self::SUCCESS;
     }
 }
