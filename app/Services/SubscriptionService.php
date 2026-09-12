@@ -12,9 +12,7 @@ use Illuminate\Support\Collection;
 
 final class SubscriptionService
 {
-    public function __construct(private readonly ObservabilityService $observability)
-    {
-    }
+    public function __construct(private readonly ObservabilityService $observability) {}
 
     /** @return Collection<int, ProductPlan> */
     public function plans(): Collection
@@ -33,7 +31,7 @@ final class SubscriptionService
     public function planSummary(ProductPlan $plan): array
     {
         $entitlements = $plan->getAttribute('entitlements');
-        if (! is_array($entitlements)) {
+        if (!is_array($entitlements)) {
             $entitlements = [];
         }
 
