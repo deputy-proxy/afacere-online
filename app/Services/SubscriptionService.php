@@ -12,6 +12,10 @@ use Illuminate\Support\Collection;
 
 final class SubscriptionService
 {
+    public function __construct(private readonly ObservabilityService $observability)
+    {
+    }
+
     /** @return Collection<int, ProductPlan> */
     public function plans(): Collection
     {
@@ -80,6 +84,13 @@ final class SubscriptionService
         }
 
         $subscription = $subscription->load('plan');
+        $this->observability->record('subscription.changed', [
+            'subscription_id' => $subscription->getKey(),
+            'user_id' => $user->getKey(),
+            'plan' => $plan->getAttribute('key'),
+            'status' => $subscription->getAttribute('status'),
+        ]);
+
         $notifications = app(NotificationService::class);
         $notifications->recordEvent('subscription.changed', $user, null, $subscription, ['plan' => $plan->getAttribute('key')]);
         $notifications->notify(
