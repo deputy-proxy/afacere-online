@@ -6,11 +6,12 @@ namespace App\Services;
 
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 final class PerformanceMonitoringService
 {
     private static bool $registered = false;
+
+    public function __construct(private readonly ObservabilityService $observability) {}
 
     public function register(): void
     {
@@ -27,10 +28,10 @@ final class PerformanceMonitoringService
                 return;
             }
 
-            Log::warning('Slow database query detected.', [
+            $this->observability->record('database.slow_query', [
                 'connection' => $query->connectionName,
                 'duration_ms' => $query->time,
-            ]);
+            ], 'warning');
         });
     }
 }

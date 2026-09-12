@@ -29,9 +29,7 @@ final class SubscriptionService
     public function planSummary(ProductPlan $plan): array
     {
         $entitlements = $plan->getAttribute('entitlements');
-        if (! is_array($entitlements)) {
-            $entitlements = [];
-        }
+        $entitlements = is_array($entitlements) ? $entitlements : [];
 
         $limit = $entitlements['business_limit'] ?? 1;
 
@@ -80,6 +78,13 @@ final class SubscriptionService
         }
 
         $subscription = $subscription->load('plan');
+        app(ObservabilityService::class)->record('subscription.changed', [
+            'subscription_id' => $subscription->getKey(),
+            'user_id' => $user->getKey(),
+            'plan' => $plan->getAttribute('key'),
+            'status' => $subscription->getAttribute('status'),
+        ]);
+
         $notifications = app(NotificationService::class);
         $notifications->recordEvent('subscription.changed', $user, null, $subscription, ['plan' => $plan->getAttribute('key')]);
         $notifications->notify(
