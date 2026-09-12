@@ -51,6 +51,8 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
 Route::middleware(['auth', 'verified', 'admin'])->prefix('internal/support')->name('internal.support.')->group(function (): void {
     Route::get('users/{user}', [AdminSupportController::class, 'summary'])->name('users.summary');
     Route::post('users/{user}/password-recovery', [AdminSupportController::class, 'passwordRecovery'])->name('users.password-recovery');
+    Route::post('data-requests/{dataRequest}/approve', [DataLifecycleController::class, 'approveDeletion'])->name('data-requests.approve');
+    Route::post('data-requests/{dataRequest}/reject', [DataLifecycleController::class, 'rejectDeletion'])->name('data-requests.reject');
 });
 
 require __DIR__.'/settings.php';
