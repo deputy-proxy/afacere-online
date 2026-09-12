@@ -57,7 +57,7 @@ final class DataDeletionService
                 }
 
                 foreach ($ownedBusinessIds as $businessId) {
-                    Business::query()->withTrashed()->whereKey($businessId)->forceDelete();
+                    Business::query()->whereKey($businessId)->delete();
                 }
 
                 if ($businessIds !== []) {
