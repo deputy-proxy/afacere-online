@@ -9,6 +9,7 @@ use App\Models\Business;
 use App\Models\DataRequest;
 use App\Models\User;
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -129,8 +130,12 @@ final class DataLifecycleService
         return $request->refresh();
     }
 
-    private function formatDate(?string $value): ?string
+    private function formatDate(CarbonInterface|string|null $value): ?string
     {
+        if ($value instanceof CarbonInterface) {
+            return $value->toIso8601String();
+        }
+
         return $value === null ? null : Carbon::parse($value)->toIso8601String();
     }
 }
