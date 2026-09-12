@@ -90,10 +90,10 @@ final class DataDeletionService
                 'financial_records' => 'retained with user reference removed',
                 'audit_records' => 'retained with actor reference removed',
             ];
+            $retainedRequest = DataRequest::query()->find($requestId);
 
-            DB::table('data_requests')->updateOrInsert(
-                ['id' => $requestId],
-                [
+            if (! $retainedRequest instanceof DataRequest) {
+                $retainedRequest = DataRequest::query()->create([
                     'user_id' => null,
                     'type' => DataRequest::TYPE_DELETION,
                     'status' => DataRequest::STATUS_COMPLETED,
@@ -103,16 +103,24 @@ final class DataDeletionService
                     'started_at' => $request->started_at ?? $now,
                     'completed_at' => $now,
                     'updated_at' => $now,
-                    'retention' => json_encode($retention, JSON_THROW_ON_ERROR),
-                ]
-            );
+                    'retention' => $retention,
+                ]);
+            } else {
+                $retainedRequest->forceFill([
+                    'user_id' => null,
+                    'status' => DataRequest::STATUS_COMPLETED,
+                    'completed_at' => $now,
+                    'updated_at' => $now,
+                    'retention' => $retention,
+                ])->save();
+            }
 
             AuditLog::create([
                 'actor_id' => $actor->id,
                 'subject_type' => DataRequest::class,
-                'subject_id' => $requestId,
+                'subject_id' => $retainedRequest->id,
                 'action' => 'data_deletion_completed',
-                'context' => ['data_request_id' => $requestId],
+                'context' => ['data_request_id' => $retainedRequest->id],
                 'occurred_at' => $now,
             ]);
 
