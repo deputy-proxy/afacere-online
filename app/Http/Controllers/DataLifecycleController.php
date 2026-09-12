@@ -8,6 +8,7 @@ use App\Models\DataRequest;
 use App\Models\User;
 use App\Services\DataLifecycleService;
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -81,8 +82,12 @@ final class DataLifecycleController
         ]);
     }
 
-    private function formatDate(?string $value): ?string
+    private function formatDate(CarbonInterface|string|null $value): ?string
     {
+        if ($value instanceof CarbonInterface) {
+            return $value->toIso8601String();
+        }
+
         return $value === null ? null : Carbon::parse($value)->toIso8601String();
     }
 }
