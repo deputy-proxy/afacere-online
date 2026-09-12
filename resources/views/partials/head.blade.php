@@ -11,5 +11,8 @@
 
 @fonts
 
-@vite(['resources/css/app.css', 'resources/js/app.js'])
+{{ Vite::useBuildDirectory('build')->withEntryPoints([
+    'resources/css/app.css',
+    'resources/js/app.js',
+]) }}
 @fluxAppearance
