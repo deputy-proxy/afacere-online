@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 final class ObservabilityService
 {
+    /** @param array<string, mixed> $context */
     public function record(string $event, array $context = [], string $level = 'info'): void
     {
         $payload = [
