@@ -11,9 +11,7 @@ final class PerformanceMonitoringService
 {
     private static bool $registered = false;
 
-    public function __construct(private readonly ObservabilityService $observability)
-    {
-    }
+    public function __construct(private readonly ObservabilityService $observability) {}
 
     public function register(): void
     {
