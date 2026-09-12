@@ -45,6 +45,7 @@ final class ObservabilityService
             foreach ($value as $childKey => $childValue) {
                 $result[(string) $childKey] = $this->sanitize($childValue, (string) $childKey);
             }
+
             return $result;
         }
 
