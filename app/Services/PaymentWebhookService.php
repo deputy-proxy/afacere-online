@@ -10,6 +10,7 @@ final class PaymentWebhookService
 {
     public function __construct(private readonly ObservabilityService $observability) {}
 
+    /** @param array<string, mixed> $payload */
     public function claim(string $provider, string $externalId, array $payload): bool
     {
         $claimed = DB::table('payment_webhook_events')->insertOrIgnore([
