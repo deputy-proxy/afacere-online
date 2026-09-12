@@ -18,6 +18,7 @@
 
 - [Security audit](security-audit.md)
 - [Data lifecycle and privacy](privacy-data-lifecycle.md)
+- [Data retention policy](data-retention-policy.md)
 - [Performance and scalability](performance-scalability.md)
 - [Accessibility and responsive UX](operations/accessibility.md)
 
