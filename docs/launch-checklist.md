@@ -1,22 +1,24 @@
 # Launch checklist
 
-Use this as the single release gate. Each row must link to evidence. `Repository` means evidence in source/tests/CI; `Manual` means evidence from a browser or operator; `Infrastructure` means evidence from the target environment.
+Use this as the single release gate. Each row identifies the evidence class, current status, responsible owner role and the condition that blocks launch.
 
-| Gate | Evidence type | Status | Blocking condition |
-| --- | --- | --- | --- |
-| Phase 5 issue #103 ecosystem reachability | Repository | Implemented | Critical workflow unreachable |
-| #104 deployment validation | Infrastructure | Pending | Fresh staging or production deployment not verified |
-| #105 security/privacy authorization | Repository + Infrastructure | Partial | Unverified external security controls |
-| #106 billing/payment validation | Repository + Infrastructure | Partial | Provider integration/signature/reconciliation not verified |
-| #107 data lifecycle | Repository + Manual | Partial | Destructive deletion/storage propagation not verified |
-| #108 observability | Repository + Infrastructure | Partial | Alerts/owners not verified in target environment |
-| #109 performance/scalability | Repository + Manual | Partial | Production-like load test not executed |
-| #110 accessibility/UX | Manual | Pending | Browser/assistive-tech verification missing |
-| #111 release smoke coverage | Repository | Implemented | CI smoke suite fails |
-| #112 backup/restore/DR | Infrastructure | Pending | Verified restore drill missing |
-| #113 operations/support | Repository + Manual | Partial | Named owners and production operator verification missing |
-| #114 documentation reconciliation | Repository | In progress | README/status claims stale |
-| #115 final release audit | Repository + Infrastructure | Pending | Any launch blocker unresolved |
+`Repository` means evidence in source, tests or CI. `Manual` means evidence from a browser, human workflow or external test. `Infrastructure` means evidence from the target environment.
+
+| Gate | Evidence type | Status | Owner | Evidence required | Blocking condition |
+| --- | --- | --- | --- | --- | --- |
+| #103 ecosystem reachability | Repository + Manual | Implemented / external verification pending | Engineering + Product | Route/component tests plus browser journey evidence | Critical workflow unreachable |
+| #104 deployment validation | Infrastructure | Pending | Engineering / Release | Fresh target deployment, health checks and smoke evidence | Target deployment not verified |
+| #105 security/privacy authorization | Repository + Infrastructure | Partial | Engineering + Security | Authorization tests, audit findings and production edge/rate-limit/provider verification | Critical security/privacy control unverified |
+| #106 billing/payment validation | Repository + Infrastructure | Partial | Engineering + Finance/Billing | Idempotency tests plus provider signatures, callbacks and reconciliation evidence | Payment integrity unverified |
+| #107 data lifecycle | Repository + Manual + Infrastructure | Partial | Engineering + Privacy | Export/deletion/retention tests plus storage propagation and legal/privacy review | Data deletion or retention behavior unverified |
+| #108 observability | Repository + Infrastructure | Partial | Engineering / Operations | Instrumentation/runbook plus real alert delivery, dependency checks and named owners | Critical alerting or ownership unverified |
+| #109 performance/scalability | Repository + Manual | Partial | Engineering | Query/resource review and production-like load-test evidence | Critical performance/resource risk unverified |
+| #110 accessibility/UX | Manual | Pending | Product / UX | Keyboard, screen-reader, responsive and contrast verification | Critical accessibility or UX defect |
+| #111 release smoke coverage | Repository | Implemented | Engineering | Release smoke suite and authorization checks with green CI | CI smoke suite fails |
+| #112 backup/restore/DR | Infrastructure | Pending | Engineering / Operations | Backup configuration plus successful isolated restore drill and approved RPO/RTO | Recovery evidence missing |
+| #113 operations/support | Repository + Manual | Partial | Operations / Support | Runbooks, access tests, named production operators and procedure verification | Production support ownership unverified |
+| #114 documentation reconciliation | Repository | In progress | Engineering / Release | README, documentation index, status register and launch checklist aligned | Documentation claims stale or contradictory |
+| #115 final release audit | Repository + Infrastructure | Pending | Release owner | Exact release-candidate evidence review and final GO/NO-GO record | Any launch blocker unresolved |
 
 ## Code and CI
 
@@ -76,4 +78,4 @@ The release is **NO-GO** if any of the following remain unresolved:
 - missing backup/restore evidence;
 - missing target-environment deployment verification.
 
-Known limitations that do not block launch must be explicitly recorded with an owner, mitigation and review date. Silence is not a risk-management strategy, despite humanity's extensive historical experimentation with it.
+Known limitations that do not block launch must be recorded with an owner, status, mitigation and review date. Evidence gaps must remain explicit until the required evidence is attached or the gate is formally accepted by the responsible owner.
