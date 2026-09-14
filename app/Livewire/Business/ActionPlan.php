@@ -91,6 +91,13 @@ final class ActionPlan extends Component
         $this->evidence = '';
     }
 
+    public function cancelCompletion(): void
+    {
+        $this->completionActionId = null;
+        $this->outcome = '';
+        $this->evidence = '';
+    }
+
     public function complete(TransitionAction $transition): void
     {
         $this->validate([
@@ -117,9 +124,7 @@ final class ActionPlan extends Component
             ]);
         }
 
-        $this->completionActionId = null;
-        $this->outcome = '';
-        $this->evidence = '';
+        $this->cancelCompletion();
     }
 
     private function actionForCurrentPlan(int $actionId): Action
