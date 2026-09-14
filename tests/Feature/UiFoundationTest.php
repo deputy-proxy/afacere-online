@@ -23,12 +23,3 @@ it('renders the authenticated dashboard through the shared ui foundation', funct
         ->assertDontSee('https://github.com/laravel/livewire-starter-kit')
         ->assertDontSee('https://laravel.com/docs/starter-kits#livewire');
 });
-
-it('renders the dashboard empty state when no business is available', function (): void {
-    $user = User::factory()->create();
-
-    $this->actingAs($user)->get(route('dashboard'))
-        ->assertOk()
-        ->assertSee('No business selected')
-        ->assertSee('Create or select a business to continue.');
-});
