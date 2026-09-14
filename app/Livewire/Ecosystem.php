@@ -64,9 +64,12 @@ final class Ecosystem extends Component
 
     public string $reportReason = '';
 
+    public BaseCollection $eventRegistrationIds;
+
     public function mount(BusinessContextService $businessContext): void
     {
         abort_unless($businessContext->current($this->user()) !== null, 404);
+        $this->refreshEventRegistrationIds();
     }
 
     #[Computed]
@@ -185,13 +188,6 @@ final class Ecosystem extends Component
         return PlatformEvent::query()->where('status', 'published')->find($this->selectedEventId);
     }
 
-    /** @return BaseCollection<int|string, int> */
-    #[Computed]
-    public function eventRegistrationIds(): BaseCollection
-    {
-        return DB::table('event_registrations')->where('user_id', $this->user()->id)->where('status', 'registered')->pluck('id', 'event_id');
-    }
-
     /** @return BaseCollection<int, array{type: string, id: int, title: string}> */
     #[Computed]
     public function results(): BaseCollection
@@ -278,12 +274,14 @@ final class Ecosystem extends Component
     {
         $event = PlatformEvent::query()->findOrFail($eventId);
         $registrations->register($event, $this->user());
+        $this->refreshEventRegistrationIds();
         session()->flash('ecosystem_success', 'Event registration confirmed.');
     }
 
     public function cancelEventRegistration(EventRegistrationService $registrations, int $registrationId): void
     {
         $registrations->cancel($registrationId, $this->user());
+        $this->refreshEventRegistrationIds();
         session()->flash('ecosystem_success', 'Event registration cancelled.');
     }
 
@@ -291,6 +289,11 @@ final class Ecosystem extends Component
     {
         abort_unless(in_array($section, ['all', 'experts', 'marketplace', 'community', 'events'], true), 404);
         $this->section = $section;
+    }
+
+    private function refreshEventRegistrationIds(): void
+    {
+        $this->eventRegistrationIds = DB::table('event_registrations')->where('user_id', $this->user()->id)->where('status', 'registered')->pluck('id', 'event_id');
     }
 
     private function businessOrFail(): Business
