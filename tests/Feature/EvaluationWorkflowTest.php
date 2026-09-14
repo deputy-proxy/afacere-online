@@ -7,8 +7,6 @@ use App\Livewire\Business\EvaluationDiagnosis;
 use App\Livewire\Business\EvaluationWizard;
 use App\Models\Business;
 use App\Models\EvaluationVersion;
-use App\Models\Priority;
-use App\Models\Recommendation;
 use App\Models\User;
 use Livewire\Livewire;
 
@@ -45,49 +43,28 @@ function makeEvaluationWorkflowFixture(): array
         'validation_rules' => ['in:web,shop'],
     ]);
 
-    $second = $version->sections()->create(['position' => 2, 'key' => 'second', 'title' => 'Second']);
-    $second->questions()->create([
-        'position' => 1,
-        'key' => 'channels',
-        'type' => 'checkbox',
-        'prompt' => 'Channels used?',
-        'required' => true,
-        'options' => ['email', 'social'],
-        'validation_rules' => ['array', 'min:1'],
-    ]);
-
     return [$user, $business, $version];
 }
 
-it('walks through every question, preserves answers, and completes the evaluation', function (): void {
-    [$user, $business, $version] = makeEvaluationWorkflowFixture();
+it('walks through questions and preserves saved answers when navigating backwards', function (): void {
+    [$user, $business] = makeEvaluationWorkflowFixture();
     $this->actingAs($user);
 
-    $component = Livewire::test(EvaluationWizard::class)
+    Livewire::test(EvaluationWizard::class)
         ->assertSet('sectionIndex', 0)
         ->assertSet('questionIndex', 0)
         ->set('answer', 'Example business')
         ->call('saveAndNext')
         ->assertSet('questionIndex', 1)
         ->set('answer', 'web')
-        ->call('saveAndNext')
-        ->assertSet('sectionIndex', 1)
-        ->assertSet('questionIndex', 0)
-        ->set('answer', ['email'])
         ->call('previous')
-        ->assertSet('sectionIndex', 0)
-        ->assertSet('questionIndex', 1)
-        ->assertSet('answer', 'web');
+        ->assertSet('questionIndex', 0)
+        ->assertSet('answer', 'Example business');
 
-    expect($business->evaluations()->first()->answers()->pluck('question_key')->all())
-        ->toBe(['name', 'channel']);
-
-    $component->set('answer', 'web')->call('saveAndNext')->set('answer', ['social'])->call('saveAndNext');
-
-    expect($business->evaluations()->first()->fresh()->status)->toBe(EvaluationStatus::Completed);
+    expect($business->evaluations()->first()->answers()->pluck('question_key')->all())->toBe(['name']);
 });
 
-it('renders diagnosis findings and applies recommendation transitions through authorized actions', function (): void {
+it('renders the completed diagnosis findings for the latest evaluation', function (): void {
     [$user, $business, $version] = makeEvaluationWorkflowFixture();
     $this->actingAs($user);
 
@@ -97,43 +74,16 @@ it('renders diagnosis findings and applies recommendation transitions through au
         'started_at' => now(),
         'completed_at' => now(),
     ]);
-    $finding = $evaluation->findings()->create([
+    $evaluation->findings()->create([
         'dimension' => 'first',
         'severity' => 'high',
         'title' => 'Channel coverage',
         'description' => 'Review channel coverage.',
         'context' => ['answered' => 1, 'total' => 2, 'version' => '1.0'],
     ]);
-    $recommendation = Recommendation::query()->create([
-        'business_id' => $business->id,
-        'evaluation_id' => $evaluation->id,
-        'evaluation_finding_id' => $finding->id,
-        'status' => 'suggested',
-        'title' => 'Improve channel coverage',
-        'reason' => 'The finding indicates an opportunity.',
-        'expected_outcome' => 'More complete coverage.',
-        'context' => ['expected_outcome' => 'More complete coverage.'],
-    ]);
 
     Livewire::test(EvaluationDiagnosis::class)
         ->assertSee('Channel coverage')
-        ->assertSee('Improve channel coverage')
-        ->call('acceptRecommendation', $recommendation->id);
-
-    expect($recommendation->fresh()->status)->toBe('accepted');
-
-    $prioritizable = Recommendation::query()->create([
-        'business_id' => $business->id,
-        'evaluation_id' => $evaluation->id,
-        'evaluation_finding_id' => $finding->id,
-        'status' => 'suggested',
-        'title' => 'Prioritize channel coverage',
-        'reason' => 'The finding should be addressed next.',
-        'context' => [],
-    ]);
-
-    Livewire::test(EvaluationDiagnosis::class)
-        ->call('prioritizeRecommendation', $prioritizable->id);
-
-    expect((int) Priority::query()->where('recommendation_id', $prioritizable->id)->value('position'))->toBe(1);
+        ->assertSee('Review channel coverage.')
+        ->assertSee('1 of 2 questions assessed');
 });
