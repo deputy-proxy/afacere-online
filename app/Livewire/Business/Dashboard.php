@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Business;
 
+use App\Enums\EvaluationStatus;
 use App\Models\ActionPlan;
 use App\Models\Business;
 use App\Models\BusinessGoal;
@@ -135,7 +136,7 @@ final class Dashboard extends Component
         }
 
         $evaluation = $this->latestEvaluation();
-        if ($evaluation === null || $evaluation->status->value !== 'completed') {
+        if ($evaluation === null || $evaluation->status !== EvaluationStatus::Completed) {
             return [
                 'label' => $evaluation === null ? __('Start your evaluation') : __('Continue your evaluation'),
                 'description' => __('Use your evaluation to establish the priorities that drive your next steps.'),
