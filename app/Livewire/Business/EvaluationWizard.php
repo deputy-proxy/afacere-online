@@ -124,7 +124,7 @@ final class EvaluationWizard extends Component
             $this->questionIndex--;
         } else {
             $this->sectionIndex--;
-            $this->questionIndex = max(0, $this->section()?->questions->count() - 1);
+            $this->questionIndex = (int) max(0, $this->section()?->questions->count() - 1);
         }
 
         $this->loadCurrentAnswer($this->evaluation());
@@ -171,7 +171,7 @@ final class EvaluationWizard extends Component
 
         return [
             max(0, $evaluation->version->sections->count() - 1),
-            max(0, $evaluation->version->sections->last()?->questions->count() - 1),
+            (int) max(0, ($evaluation->version->sections->last()?->questions->count() ?? 0) - 1),
         ];
     }
 
@@ -182,7 +182,12 @@ final class EvaluationWizard extends Component
             return;
         }
 
-        $questions = $evaluation->version->sections->values()->get($this->sectionIndex)?->questions ?? collect();
+        $section = $evaluation->version->sections->values()->get($this->sectionIndex);
+        if ($section === null) {
+            return;
+        }
+
+        $questions = $section->questions;
         if ($this->questionIndex + 1 < $questions->count()) {
             $this->questionIndex++;
 
