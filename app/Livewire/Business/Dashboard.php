@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Business;
 
+use App\Enums\ActionStatus;
 use App\Enums\EvaluationStatus;
+use App\Models\Action;
 use App\Models\ActionPlan;
 use App\Models\Business;
 use App\Models\BusinessGoal;
@@ -164,7 +166,14 @@ final class Dashboard extends Component
             ];
         }
 
-        $openAction = $plan->actions->first(fn ($action): bool => in_array($action->status->value, ['recommended', 'accepted', 'active'], true));
+        $openAction = $plan->actions->first(
+            fn (Action $action): bool => in_array($action->status, [
+                ActionStatus::Recommended,
+                ActionStatus::Accepted,
+                ActionStatus::Active,
+            ], true),
+        );
+
         if ($openAction !== null) {
             return [
                 'label' => __('Continue your Action Plan'),
