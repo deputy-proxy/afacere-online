@@ -256,10 +256,10 @@ final class Ecosystem extends Component
         session()->flash('ecosystem_success', 'Consultation request sent.');
     }
 
-    public function selectProvider(int $providerId): void
+    public function selectService(int $providerId, int $serviceId): void
     {
         $this->selectedProviderId = $providerId;
-        $this->selectedServiceId = null;
+        $this->selectedServiceId = $serviceId;
     }
 
     public function createMarketplaceLead(MarketplaceServiceLayer $marketplace): void
