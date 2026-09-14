@@ -28,12 +28,19 @@ use Livewire\Component;
 final class ActionPlan extends Component
 {
     public ?int $planId = null;
+
     public string $outcome = '';
+
     public string $evidence = '';
+
     public string $resolutionReason = '';
+
     public ?int $completionActionId = null;
+
     public ?int $resolutionActionId = null;
+
     public ?string $resolutionStatus = null;
+
     public bool $showResolutionModal = false;
 
     public function mount(BusinessContextService $businessContext): void
@@ -49,6 +56,7 @@ final class ActionPlan extends Component
     {
         $business = app(BusinessContextService::class)->current($this->user());
         abort_unless($business !== null, 404);
+
         return $business;
     }
 
@@ -58,6 +66,7 @@ final class ActionPlan extends Component
         if ($this->planId === null) {
             return null;
         }
+
         return ActionPlanModel::query()
             ->whereKey($this->planId)
             ->where('business_id', $this->business()->id)
@@ -91,6 +100,7 @@ final class ActionPlan extends Component
         if ($plan === null) {
             return collect();
         }
+
         return $plan->revisions;
     }
 
@@ -145,7 +155,8 @@ final class ActionPlan extends Component
         $this->completionActionId = null;
         $this->outcome = '';
         $this->evidence = '';
-        $this->resetValidation(['outcome', 'evidence']);
+        $this->resetValidation('outcome');
+        $this->resetValidation('evidence');
     }
 
     public function complete(int $actionId, TransitionAction $transition, ActionPlanRevisionService $revisions): void
@@ -158,6 +169,7 @@ final class ActionPlan extends Component
             'evidence' => $this->evidence !== '' ? [$this->evidence] : null,
             'recorded_at' => now(),
         ]);
+
         if ($this->evidence !== '') {
             ActionEvidence::create([
                 'action_id' => $action->id,
@@ -167,6 +179,7 @@ final class ActionPlan extends Component
                 'recorded_at' => now(),
             ]);
         }
+
         $revisions->snapshot($this->planOrFail(), $this->user());
         $this->cancelCompletion();
     }
@@ -192,6 +205,7 @@ final class ActionPlan extends Component
     {
         $plan = $this->plan();
         abort_unless($plan !== null, 404);
+
         return $plan;
     }
 
@@ -199,6 +213,7 @@ final class ActionPlan extends Component
     {
         $user = Auth::user();
         abort_unless($user instanceof User, 401);
+
         return $user;
     }
 
