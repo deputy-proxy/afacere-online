@@ -48,7 +48,7 @@ it('creates a plan, exposes valid transitions, records completion data, and pres
         ->assertSee('Version 1')
         ->assertSee('Recommended');
 
-    $plan = $business->actionPlans()->firstOrFail();
+    $plan = ActionPlan::query()->where('business_id', $business->id)->latest('version')->firstOrFail();
     $action = $plan->actions()->firstOrFail();
 
     $component->call('updateStatus', $action->id, 'accepted')
