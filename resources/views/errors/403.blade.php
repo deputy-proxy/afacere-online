@@ -1,0 +1,5 @@
+@php($status = 403)
+@php($title = 'Access denied')
+@php($heading = 'You do not have access to this page')
+@php($description = 'Your account can reach this area, but this action or resource is not currently available to you.')
+@include('errors.page')

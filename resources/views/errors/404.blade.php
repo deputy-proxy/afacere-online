@@ -1,0 +1,5 @@
+@php($status = 404)
+@php($title = 'Page not found')
+@php($heading = 'We could not find that page')
+@php($description = 'The link may be outdated, the resource may have been removed, or the address may be incorrect.')
+@include('errors.page')

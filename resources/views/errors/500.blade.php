@@ -1,0 +1,5 @@
+@php($status = 500)
+@php($title = 'Temporary problem')
+@php($heading = 'Something went wrong')
+@php($description = 'We could not complete this request. No changes were applied. Please try again.')
+@include('errors.page')
