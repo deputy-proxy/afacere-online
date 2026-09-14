@@ -40,13 +40,11 @@
                                     </div>
                                     <flux:badge variant="outline" aria-label="Status {{ $action->status->value }}">{{ $action->status->value }}</flux:badge>
                                 </div>
-
                                 <div class="mt-4 grid gap-2 text-xs text-zinc-500 sm:grid-cols-3">
                                     @if ($action->accepted_at)<span>Accepted {{ $action->accepted_at->format('d M Y H:i') }}</span>@endif
                                     @if ($action->started_at)<span>Started {{ $action->started_at->format('d M Y H:i') }}</span>@endif
                                     @if ($action->completed_at)<span>Completed {{ $action->completed_at->format('d M Y H:i') }}</span>@endif
                                 </div>
-
                                 @if ($action->guides->isNotEmpty())
                                     <div class="mt-4 space-y-2">
                                         <flux:text size="sm" class="font-medium">Execution guides</flux:text>
@@ -59,7 +57,6 @@
                                         </div>
                                     </div>
                                 @endif
-
                                 @if ($action->status === \App\Enums\ActionStatus::Recommended)
                                     <div class="mt-4 flex flex-wrap gap-2">
                                         <flux:button size="sm" variant="primary" wire:click="updateStatus({{ $action->id }}, 'accepted')">Accept</flux:button>
@@ -108,7 +105,6 @@
                                         <flux:text size="sm" class="mt-1">This state is terminal under the current action transition rules. Its history remains available below.</flux:text>
                                     </div>
                                 @endif
-
                                 @if ($action->evidence->isNotEmpty())
                                     <div class="mt-4 space-y-2">
                                         <flux:text size="sm" class="font-medium">Evidence</flux:text>
@@ -119,17 +115,13 @@
                                         </ul>
                                     </div>
                                 @endif
-
                                 @php($history = $this->historyFor($action))
                                 @if ($history->isNotEmpty())
                                     <details class="mt-4 border-t border-zinc-100 pt-4 dark:border-zinc-800">
                                         <summary class="cursor-pointer text-sm font-medium">Progress history ({{ $history->count() }})</summary>
                                         <ol class="mt-3 space-y-2 text-xs text-zinc-500">
                                             @foreach ($history as $event)
-                                                <li>
-                                                    {{ $event->occurred_at?->format('d M Y H:i') }} · {{ data_get($event->context, 'from') }} → {{ data_get($event->context, 'to') }}
-                                                    @if (data_get($event->context, 'reason')) · {{ data_get($event->context, 'reason') }} @endif
-                                                </li>
+                                                <li>{{ $event->occurred_at?->format('d M Y H:i') }} · {{ data_get($event->context, 'from') }} → {{ data_get($event->context, 'to') }} @if (data_get($event->context, 'reason')) · {{ data_get($event->context, 'reason') }} @endif</li>
                                             @endforeach
                                         </ol>
                                     </details>
@@ -140,7 +132,6 @@
                 @endif
             @endforeach
         </div>
-
         @if ($this->revisions->isNotEmpty())
             <section class="space-y-3">
                 <div>
