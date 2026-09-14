@@ -26,8 +26,11 @@
                             {{ __('Set up your business') }}
                         </flux:sidebar.item>
                     @else
-                        <flux:sidebar.item icon="clipboard-document-check" :href="route('business.evaluation')" :current="request()->routeIs('business.evaluation*')" wire:navigate>
-                            {{ __('Evaluation & Diagnosis') }}
+                        <flux:sidebar.item icon="clipboard-document-check" :href="route('business.evaluation')" :current="request()->routeIs('business.evaluation')" wire:navigate>
+                            {{ __('Evaluation') }}
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="magnifying-glass" :href="route('business.evaluation.diagnosis')" :current="request()->routeIs('business.evaluation.diagnosis')" wire:navigate>
+                            {{ __('Diagnosis') }}
                         </flux:sidebar.item>
                         <flux:sidebar.item icon="list-bullet" :href="route('business.action-plan')" :current="request()->routeIs('business.action-plan')" wire:navigate>
                             {{ __('Action Plan') }}
