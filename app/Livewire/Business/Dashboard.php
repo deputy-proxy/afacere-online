@@ -57,14 +57,14 @@ final class Dashboard extends Component
     #[Computed]
     public function latestEvaluation(): ?Evaluation
     {
-        return $this->business?->evaluations()->latest('id')->first();
+        return $this->business()?->evaluations()->latest('id')->first();
     }
 
     /** @return array<int, Priority> */
     #[Computed]
     public function priorities(): array
     {
-        $business = $this->business;
+        $business = $this->business();
         if ($business === null) {
             return [];
         }
@@ -81,7 +81,7 @@ final class Dashboard extends Component
     #[Computed]
     public function recommendations(): array
     {
-        $business = $this->business;
+        $business = $this->business();
         if ($business === null) {
             return [];
         }
@@ -94,7 +94,7 @@ final class Dashboard extends Component
     #[Computed]
     public function actionPlan(): ?ActionPlan
     {
-        $business = $this->business;
+        $business = $this->business();
         if ($business === null) {
             return null;
         }
@@ -110,21 +110,21 @@ final class Dashboard extends Component
     #[Computed]
     public function goals(): array
     {
-        return $this->business?->goals()->where('status', '!=', 'completed')->latest('id')->get()->all() ?? [];
+        return $this->business()?->goals()->where('status', '!=', 'completed')->latest('id')->get()->all() ?? [];
     }
 
     /** @return array<int, BusinessMetric> */
     #[Computed]
     public function metrics(): array
     {
-        return $this->business?->metrics()->latest('id')->get()->all() ?? [];
+        return $this->business()?->metrics()->latest('id')->get()->all() ?? [];
     }
 
     /** @return array{label: string, description: string, route: string, route_parameters: array<string, mixed>} */
     #[Computed]
     public function nextAction(): array
     {
-        $business = $this->business;
+        $business = $this->business();
         if ($business === null) {
             return [
                 'label' => __('Set up your business'),
@@ -134,7 +134,7 @@ final class Dashboard extends Component
             ];
         }
 
-        $evaluation = $this->latestEvaluation;
+        $evaluation = $this->latestEvaluation();
         if ($evaluation === null || $evaluation->status->value !== 'completed') {
             return [
                 'label' => $evaluation === null ? __('Start your evaluation') : __('Continue your evaluation'),
@@ -144,7 +144,7 @@ final class Dashboard extends Component
             ];
         }
 
-        if ($this->priorities === []) {
+        if ($this->priorities() === []) {
             return [
                 'label' => __('Review your diagnosis'),
                 'description' => __('Turn your evaluation findings into clear business priorities.'),
@@ -153,7 +153,7 @@ final class Dashboard extends Component
             ];
         }
 
-        $plan = $this->actionPlan;
+        $plan = $this->actionPlan();
         if ($plan === null) {
             return [
                 'label' => __('Build your Action Plan'),
@@ -173,7 +173,7 @@ final class Dashboard extends Component
             ];
         }
 
-        if ($this->recommendations !== []) {
+        if ($this->recommendations() !== []) {
             return [
                 'label' => __('Review new recommendations'),
                 'description' => __('You have new suggested work to consider.'),
