@@ -7,6 +7,7 @@ use App\Enums\ActionStatus;
 use App\Livewire\Business\ActionPlan as ActionPlanComponent;
 use App\Models\Action;
 use App\Models\ActionEvidence;
+use App\Models\ActionOutcome;
 use App\Models\ActionPlan;
 use App\Models\AuditLog;
 use App\Models\Business;
@@ -46,7 +47,8 @@ it('creates a plan, exposes valid transitions, records completion data, and pres
         ->assertSee('Version 1')
         ->assertSee('Recommended');
 
-    $action = $business->actionPlans()->first()->actions()->first();
+    $plan = $business->actionPlans()->firstOrFail();
+    $action = $plan->actions()->firstOrFail();
 
     $component->call('updateStatus', $action->id, 'accepted')
         ->assertSee('Accepted')
@@ -59,11 +61,13 @@ it('creates a plan, exposes valid transitions, records completion data, and pres
         ->assertSee('Completed')
         ->assertSee('Spoke with five customers');
 
-    expect($action->fresh()->status)->toBe(ActionStatus::Completed)
-        ->and($action->fresh()->outcome->summary)->toBe('Spoke with five customers and documented the findings.')
+    $completedAction = Action::query()->findOrFail($action->id);
+
+    expect($completedAction->status)->toBe(ActionStatus::Completed)
+        ->and(ActionOutcome::query()->where('action_id', $action->id)->value('summary'))->toBe('Spoke with five customers and documented the findings.')
         ->and(ActionEvidence::query()->where('action_id', $action->id)->count())->toBe(1)
         ->and(AuditLog::query()->where('subject_type', Action::class)->where('subject_id', $action->id)->count())->toBe(3)
-        ->and($business->actionPlans()->first()->revisions()->count())->toBe(4);
+        ->and($plan->revisions()->count())->toBe(4);
 });
 
 it('requires an outcome before completing an active action', function (): void {
@@ -77,11 +81,11 @@ it('requires an outcome before completing an active action', function (): void {
         ->call('complete', $action->id)
         ->assertHasErrors(['outcome']);
 
-    expect($action->fresh()->status)->toBe(ActionStatus::Active)
-        ->and($action->fresh()->outcome)->toBeNull();
+    expect(Action::query()->findOrFail($action->id)->status)->toBe(ActionStatus::Active)
+        ->and(ActionOutcome::query()->where('action_id', $action->id)->exists())->toBeFalse();
 });
 
-it('requires a reason for skipped and blocked actions', function (): void {
+it('requires a reason before skipping or blocking an action', function (): void {
     [$user, $business] = makeActionPlanWorkflowFixture();
     $this->actingAs($user);
     $plan = ActionPlan::query()->create(['business_id' => $business->id, 'version' => 1, 'status' => 'active']);
@@ -93,7 +97,7 @@ it('requires a reason for skipped and blocked actions', function (): void {
         ->call('resolveAction')
         ->assertHasErrors(['resolutionReason']);
 
-    expect($action->fresh()->status)->toBe(ActionStatus::Recommended);
+    expect(Action::query()->findOrFail($action->id)->status)->toBe(ActionStatus::Recommended);
 });
 
 it('keeps invalid and unauthorized transitions rejected by the domain action', function (): void {
