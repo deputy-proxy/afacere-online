@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /** @property ActionStatus $status */
 class Action extends Model
@@ -58,5 +59,11 @@ class Action extends Model
     public function evidence(): HasMany
     {
         return $this->hasMany(ActionEvidence::class)->orderByDesc('recorded_at');
+    }
+
+    /** @return MorphMany<AuditLog, $this> */
+    public function auditLogs(): MorphMany
+    {
+        return $this->morphMany(AuditLog::class, 'subject')->orderByDesc('occurred_at');
     }
 }
