@@ -12,7 +12,7 @@
         </x-ui.page-header>
 
         <div wire:loading class="space-y-3" aria-live="polite" aria-busy="true">
-            <x-ui:loading label="Loading opportunities" />
+            <x-ui.loading label="Loading opportunities" />
         </div>
 
         <div wire:loading.remove>
