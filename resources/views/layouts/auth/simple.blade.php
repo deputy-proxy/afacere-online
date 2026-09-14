@@ -3,19 +3,37 @@
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-white antialiased dark:bg-linear-to-b dark:from-neutral-950 dark:to-neutral-900">
-        <div class="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-            <div class="flex w-full max-w-sm flex-col gap-2">
-                <a href="{{ route('home') }}" class="flex flex-col items-center gap-2 font-medium" wire:navigate>
-                    <span class="flex h-9 w-9 mb-1 items-center justify-center rounded-md">
-                        <x-app-logo-icon class="size-9 fill-current text-black dark:text-white" />
-                    </span>
-                    <span class="sr-only">{{ config('app.name', 'Laravel') }}</span>
+    <body class="min-h-screen bg-zinc-50 antialiased dark:bg-zinc-950">
+        <div class="min-h-svh lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(24rem,32rem)]">
+            <aside class="hidden border-e border-zinc-200 bg-zinc-100 p-10 dark:border-zinc-800 dark:bg-zinc-900 lg:flex lg:flex-col lg:justify-between">
+                <a href="{{ route('home') }}" class="inline-flex w-fit items-center gap-3 font-semibold" wire:navigate>
+                    <x-app-logo-icon class="size-8 fill-current text-zinc-900 dark:text-white" />
+                    <span>afacere.online</span>
                 </a>
-                <div class="flex flex-col gap-6">
-                    {{ $slot }}
+
+                <div class="max-w-lg space-y-5">
+                    <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">{{ __('For entrepreneurs who want clarity before another dashboard.') }}</p>
+                    <h1 class="text-4xl font-semibold tracking-tight text-zinc-950 dark:text-white">{{ __('Understand your business. Decide what matters. Keep moving.') }}</h1>
+                    <p class="text-base leading-7 text-zinc-600 dark:text-zinc-300">{{ __('Start with your account, then create the business workspace where your evaluation, priorities and progress live.') }}</p>
                 </div>
-            </div>
+
+                <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('Business decisions stay with you.') }}</p>
+            </aside>
+
+            <main class="flex min-h-svh flex-col justify-center px-6 py-10 sm:px-10">
+                <div class="mx-auto w-full max-w-md">
+                    <a href="{{ route('home') }}" class="mb-8 inline-flex items-center gap-3 font-semibold lg:hidden" wire:navigate>
+                        <x-app-logo-icon class="size-8 fill-current text-zinc-900 dark:text-white" />
+                        <span>afacere.online</span>
+                    </a>
+
+                    <div class="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8 dark:border-zinc-800 dark:bg-zinc-900">
+                        {{ $slot }}
+                    </div>
+
+                    <p class="mt-6 text-center text-xs leading-5 text-zinc-500 dark:text-zinc-400">{{ __('Secure account access. Your business data remains under your control.') }}</p>
+                </div>
+            </main>
         </div>
 
         @persist('toast')
