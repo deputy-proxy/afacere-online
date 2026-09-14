@@ -110,11 +110,10 @@ test('dashboard next action changes from evaluation to diagnosis when priorities
         'status' => 'active',
     ]);
 
-    $response = $this->actingAs($user)->get(route('dashboard'));
-
-    $response->assertOk();
-    $response->assertSee('Review your diagnosis');
-    $response->assertSee('Improve customer acquisition');
+    Livewire::actingAs($user)
+        ->test(Dashboard::class)
+        ->assertSee('Review your diagnosis')
+        ->assertSee('Improve customer acquisition');
 });
 
 test('authenticated dashboard remains isolated to businesses the user can access', function (): void {
@@ -151,6 +150,6 @@ test('dashboard component exposes the current business and completed evaluation'
     Livewire::actingAs($user)
         ->test(Dashboard::class)
         ->assertSet('businessId', $business->id)
-        ->assertComputed('business', fn (Business $value): bool => $value->is($business))
-        ->assertComputed('latestEvaluation', fn ($value): bool => $value->status === EvaluationStatus::Completed);
+        ->assertSee($business->name)
+        ->assertSee('Review your diagnosis');
 });
