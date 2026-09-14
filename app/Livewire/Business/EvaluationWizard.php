@@ -6,6 +6,7 @@ namespace App\Livewire\Business;
 
 use App\Models\Business;
 use App\Models\Evaluation;
+use App\Models\EvaluationAnswer;
 use App\Models\EvaluationQuestion;
 use App\Models\User;
 use App\Services\BusinessContextService;
@@ -208,7 +209,8 @@ final class EvaluationWizard extends Component
             return;
         }
 
-        $this->answer = $evaluation->answers->firstWhere('question_key', $question->key)->value;
+        $answer = $evaluation->answers->firstWhere('question_key', $question->key);
+        $this->answer = $answer instanceof EvaluationAnswer ? $answer->value : '';
     }
 
     private function user(): User
