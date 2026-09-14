@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\AdminSupportController;
 use App\Http\Controllers\DataLifecycleController;
 use App\Http\Controllers\ReadinessController;
+use App\Livewire\Account\DataLifecycle;
 use App\Livewire\Account\Subscription;
 use App\Livewire\Business\ActionPlan;
 use App\Livewire\Business\Dashboard;
@@ -36,6 +37,7 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::livewire('dashboard', Dashboard::class)->name('dashboard');
     Route::livewire('notifications', Notifications::class)->name('business.notifications');
     Route::livewire('account/subscription', Subscription::class)->name('account.subscription');
+    Route::livewire('account/data', DataLifecycle::class)->name('account.data');
     Route::livewire('business/onboarding', Onboarding::class)->name('business.onboarding');
     Route::livewire('business/evaluation', EvaluationWizard::class)->name('business.evaluation');
     Route::livewire('business/evaluation/diagnosis', EvaluationDiagnosis::class)->name('business.evaluation.diagnosis');
