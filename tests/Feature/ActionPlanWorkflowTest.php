@@ -17,6 +17,7 @@ use App\Models\User;
 use DomainException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 uses(RefreshDatabase::class);
 
@@ -110,5 +111,5 @@ it('keeps invalid and unauthorized transitions rejected by the domain action', f
 
     $outsider = User::factory()->create();
     expect(fn () => app(TransitionAction::class)->execute($action, ActionStatus::Completed, $outsider))
-        ->toThrow(\Symfony\Component\HttpKernel\Exception\HttpException::class);
+        ->toThrow(HttpException::class);
 });
