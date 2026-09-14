@@ -202,9 +202,10 @@ final class EvaluationWizard extends Component
     private function loadCurrentAnswer(?Evaluation $evaluation): void
     {
         $question = $this->question();
-        $this->answer = $question !== null && $evaluation !== null
-            ? ($evaluation->answers->firstWhere('question_key', $question->key)?->value ?? '')
-            : '';
+        $answer = $question !== null && $evaluation !== null
+            ? $evaluation->answers->firstWhere('question_key', $question->key)
+            : null;
+        $this->answer = $answer?->value ?? '';
     }
 
     private function user(): User
