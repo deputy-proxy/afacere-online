@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Livewire\Business;
 
 use App\Models\Business;
+use App\Models\MonitorCheckIn;
 use App\Models\User;
 use App\Services\BusinessContextService;
 use App\Services\MonitorService;
 use App\Services\NotificationService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
@@ -55,8 +57,9 @@ final class Monitor extends Component
         return $this->business()->monitorConfiguration()->first();
     }
 
+    /** @return Collection<int, MonitorCheckIn> */
     #[Computed]
-    public function checkIns(): mixed
+    public function checkIns(): Collection
     {
         return $this->business()->monitorCheckIns()->latest('recorded_at')->limit(8)->get();
     }
@@ -73,11 +76,34 @@ final class Monitor extends Component
         return $this->business()->healthIndicators()->latest('measured_at')->limit(8)->get()->unique('key')->values();
     }
 
+    /** @return array<string, float> */
+    #[Computed]
+    public function trends(): array
+    {
+        $checkIns = $this->checkIns()->sortBy('recorded_at')->values();
+        if ($checkIns->count() < 2) {
+            return [];
+        }
+
+        $first = $checkIns->first()->responses;
+        $last = $checkIns->last()->responses;
+        $trends = [];
+
+        foreach (['revenue', 'customers', 'cash', 'confidence'] as $key) {
+            if (is_numeric($first[$key] ?? null) && is_numeric($last[$key] ?? null)) {
+                $trends[$key] = (float) $last[$key] - (float) $first[$key];
+            }
+        }
+
+        return $trends;
+    }
+
     public function saveConfiguration(MonitorService $service): void
     {
         $this->validate(['cadence' => ['required', 'in:daily,weekly,monthly']]);
         $service->configure($this->business(), $this->user(), $this->enabled, $this->cadence);
         unset($this->configuration);
+        session()->flash('monitor_status', 'Monitor settings saved.');
     }
 
     public function checkIn(MonitorService $service, NotificationService $notifications): void
@@ -100,7 +126,7 @@ final class Monitor extends Component
             'url' => route('business.monitor'),
         ]);
         $this->reset('revenue', 'cash', 'customers', 'confidence');
-        unset($this->configuration, $this->checkIns, $this->alerts, $this->healthIndicators);
+        unset($this->configuration, $this->checkIns, $this->alerts, $this->healthIndicators, $this->trends);
         session()->flash('monitor_status', 'Check-in saved. Your progress history has been updated.');
     }
 

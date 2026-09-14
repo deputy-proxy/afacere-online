@@ -22,11 +22,13 @@ final class Notifications extends Component
     public function markRead(int $notificationId, NotificationService $notifications): void
     {
         $notifications->markRead($this->user(), $notificationId);
+        unset($this->notifications, $this->unread);
     }
 
     public function markUnread(int $notificationId, NotificationService $notifications): void
     {
         $notifications->markUnread($this->user(), $notificationId);
+        unset($this->notifications, $this->unread);
     }
 
     #[Computed]
