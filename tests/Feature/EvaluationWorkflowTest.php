@@ -11,7 +11,7 @@ use App\Models\Recommendation;
 use App\Models\User;
 use Livewire\Livewire;
 
-function evaluationFixture(): array
+function makeEvaluationWorkflowFixture(): array
 {
     $user = User::factory()->create();
     $business = Business::factory()->create();
@@ -59,7 +59,7 @@ function evaluationFixture(): array
 }
 
 it('walks through every question, preserves answers, and resumes at the first unanswered question', function (): void {
-    [$user, $business, $version] = evaluationFixture();
+    [$user, $business, $version] = makeEvaluationWorkflowFixture();
     $this->actingAs($user);
 
     $component = Livewire::test(EvaluationWizard::class)
@@ -91,8 +91,8 @@ it('walks through every question, preserves answers, and resumes at the first un
         ->assertSet('answer', ['social']);
 });
 
-it('renders diagnosis findings and exposes linked recommendations', function (): void {
-    [$user, $business, $version] = evaluationFixture();
+it('renders diagnosis findings and applies recommendation transitions through authorized actions', function (): void {
+    [$user, $business, $version] = makeEvaluationWorkflowFixture();
     $this->actingAs($user);
 
     $evaluation = $business->evaluations()->create([
@@ -108,7 +108,7 @@ it('renders diagnosis findings and exposes linked recommendations', function ():
         'description' => 'Review channel coverage.',
         'context' => ['answered' => 1, 'total' => 2, 'version' => '1.0'],
     ]);
-    Recommendation::query()->create([
+    $recommendation = Recommendation::query()->create([
         'business_id' => $business->id,
         'evaluation_id' => $evaluation->id,
         'evaluation_finding_id' => $finding->id,
@@ -122,5 +122,22 @@ it('renders diagnosis findings and exposes linked recommendations', function ():
     Livewire::test(EvaluationDiagnosis::class)
         ->assertSee('Channel coverage')
         ->assertSee('Improve channel coverage')
-        ->assertSee('Make a priority');
+        ->call('acceptRecommendation', $recommendation->id);
+
+    expect($recommendation->fresh()->status)->toBe('accepted');
+
+    $prioritizable = Recommendation::query()->create([
+        'business_id' => $business->id,
+        'evaluation_id' => $evaluation->id,
+        'evaluation_finding_id' => $finding->id,
+        'status' => 'suggested',
+        'title' => 'Prioritize channel coverage',
+        'reason' => 'The finding should be addressed next.',
+        'context' => [],
+    ]);
+
+    Livewire::test(EvaluationDiagnosis::class)
+        ->call('prioritizeRecommendation', $prioritizable->id);
+
+    expect($business->priorities()->where('recommendation_id', $prioritizable->id)->value('position'))->toBe(1);
 });
