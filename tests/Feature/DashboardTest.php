@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\Models\Business;
 use App\Models\BusinessGoal;
 use App\Models\BusinessMetric;
+use App\Models\EvaluationVersion;
+use App\Models\Priority;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -110,7 +112,7 @@ test('dashboard next action changes from evaluation to diagnosis when priorities
     $user = User::factory()->create();
     $business = Business::factory()->create();
     $business->members()->attach($user, ['role' => 'owner', 'joined_at' => now()]);
-    $evaluationVersion = \App\Models\EvaluationVersion::query()->create([
+    $evaluationVersion = EvaluationVersion::query()->create([
         'name' => 'Default',
         'version' => '1.0',
         'is_active' => true,
@@ -122,7 +124,7 @@ test('dashboard next action changes from evaluation to diagnosis when priorities
         'started_at' => now()->subDay(),
         'completed_at' => now(),
     ]);
-    \App\Models\Priority::query()->create([
+    Priority::query()->create([
         'business_id' => $business->id,
         'position' => 1,
         'title' => 'Improve customer acquisition',
