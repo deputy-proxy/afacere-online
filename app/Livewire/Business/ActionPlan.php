@@ -22,6 +22,8 @@ final class ActionPlan extends Component
 {
     public ?int $planId = null;
 
+    public ?int $completionActionId = null;
+
     public string $outcome = '';
 
     public string $evidence = '';
@@ -50,7 +52,19 @@ final class ActionPlan extends Component
             return null;
         }
 
-        return ActionPlanModel::query()->whereKey($this->planId)->where('business_id', $this->business()->id)->with('actions.priority', 'actions.recommendation', 'actions.outcome', 'actions.guides')->first();
+        return ActionPlanModel::query()
+            ->whereKey($this->planId)
+            ->where('business_id', $this->business()->id)
+            ->with([
+                'actions.priority',
+                'actions.recommendation',
+                'actions.outcome',
+                'actions.evidence.user',
+                'actions.guides',
+                'actions.auditLogs.actor',
+                'revisions',
+            ])
+            ->first();
     }
 
     public function createPlan(ActionPlanService $service): void
@@ -60,27 +74,60 @@ final class ActionPlan extends Component
 
     public function updateStatus(int $actionId, string $status, TransitionAction $transition): void
     {
-        $action = Action::query()
-            ->whereKey($actionId)
-            ->whereHas('plan', fn ($query) => $query->whereKey($this->planId)->where('business_id', $this->business()->id))
-            ->firstOrFail();
+        $action = $this->actionForCurrentPlan($actionId);
         $next = ActionStatus::tryFrom($status);
         abort_unless($next !== null, 422);
 
         $transition->execute($action, $next, $this->user());
     }
 
-    public function complete(int $actionId, TransitionAction $transition): void
+    public function openCompletionForm(int $actionId): void
     {
-        $this->validate(['outcome' => ['required', 'string', 'max:5000'], 'evidence' => ['nullable', 'string', 'max:5000']]);
-        $action = Action::query()
+        $action = $this->actionForCurrentPlan($actionId);
+        abort_unless($action->status === ActionStatus::Active, 422);
+
+        $this->completionActionId = $action->id;
+        $this->outcome = '';
+        $this->evidence = '';
+    }
+
+    public function complete(TransitionAction $transition): void
+    {
+        $this->validate([
+            'outcome' => ['required', 'string', 'max:5000'],
+            'evidence' => ['nullable', 'string', 'max:5000'],
+        ]);
+        abort_unless($this->completionActionId !== null, 422);
+
+        $action = $this->actionForCurrentPlan($this->completionActionId);
+        abort_unless($action->status === ActionStatus::Active, 422);
+        $transition->execute($action, ActionStatus::Completed, $this->user());
+        $action->outcome()->updateOrCreate([], [
+            'summary' => $this->outcome,
+            'evidence' => $this->evidence !== '' ? [$this->evidence] : null,
+            'recorded_at' => now(),
+        ]);
+
+        if ($this->evidence !== '') {
+            $action->evidence()->create([
+                'user_id' => $this->user()->id,
+                'type' => 'note',
+                'description' => $this->evidence,
+                'recorded_at' => now(),
+            ]);
+        }
+
+        $this->completionActionId = null;
+        $this->outcome = '';
+        $this->evidence = '';
+    }
+
+    private function actionForCurrentPlan(int $actionId): Action
+    {
+        return Action::query()
             ->whereKey($actionId)
             ->whereHas('plan', fn ($query) => $query->whereKey($this->planId)->where('business_id', $this->business()->id))
             ->firstOrFail();
-        $transition->execute($action, ActionStatus::Completed, $this->user());
-        $action->outcome()->updateOrCreate([], ['summary' => $this->outcome, 'evidence' => $this->evidence !== '' ? [$this->evidence] : null, 'recorded_at' => now()]);
-        $this->outcome = '';
-        $this->evidence = '';
     }
 
     private function user(): User
