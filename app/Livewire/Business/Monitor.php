@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Livewire\Business;
 
 use App\Models\Business;
+use App\Models\MonitorCheckIn;
 use App\Models\User;
 use App\Services\BusinessContextService;
 use App\Services\MonitorService;
 use App\Services\NotificationService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
@@ -55,8 +57,9 @@ final class Monitor extends Component
         return $this->business()->monitorConfiguration()->first();
     }
 
+    /** @return Collection<int, MonitorCheckIn> */
     #[Computed]
-    public function checkIns(): mixed
+    public function checkIns(): Collection
     {
         return $this->business()->monitorCheckIns()->latest('recorded_at')->limit(8)->get();
     }
