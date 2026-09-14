@@ -104,12 +104,13 @@ it('requires a reason before skipping or blocking an action', function (): void 
 it('keeps invalid and unauthorized transitions rejected by the domain action', function (): void {
     [$user, $business] = makeActionPlanWorkflowFixture();
     $plan = ActionPlan::query()->create(['business_id' => $business->id, 'version' => 1, 'status' => 'active']);
-    $action = $plan->actions()->create(['position' => 1, 'title' => 'Protected action', 'status' => ActionStatus::Completed]);
+    $completed = $plan->actions()->create(['position' => 1, 'title' => 'Completed action', 'status' => ActionStatus::Completed]);
+    $accepted = $plan->actions()->create(['position' => 2, 'title' => 'Protected action', 'status' => ActionStatus::Accepted]);
 
-    expect(fn () => app(TransitionAction::class)->execute($action, ActionStatus::Active, $user))
+    expect(fn () => app(TransitionAction::class)->execute($completed, ActionStatus::Active, $user))
         ->toThrow(DomainException::class);
 
     $outsider = User::factory()->create();
-    expect(fn () => app(TransitionAction::class)->execute($action, ActionStatus::Completed, $outsider))
+    expect(fn () => app(TransitionAction::class)->execute($accepted, ActionStatus::Active, $outsider))
         ->toThrow(HttpException::class);
 });
