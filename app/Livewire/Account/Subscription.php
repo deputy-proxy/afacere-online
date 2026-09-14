@@ -7,6 +7,7 @@ namespace App\Livewire\Account;
 use App\Models\ProductPlan;
 use App\Models\User;
 use App\Services\SubscriptionService;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
@@ -15,7 +16,8 @@ use Livewire\Component;
 #[Title('Account & subscription')]
 final class Subscription extends Component
 {
-    public function plans(SubscriptionService $service): mixed
+    /** @return Collection<int, ProductPlan> */
+    public function plans(SubscriptionService $service): Collection
     {
         return $service->plans();
     }
