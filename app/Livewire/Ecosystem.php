@@ -35,19 +35,33 @@ use Livewire\Component;
 final class Ecosystem extends Component
 {
     public string $search = '';
+
     public string $section = 'all';
+
     public ?int $selectedExpertId = null;
+
     public ?int $selectedProviderId = null;
+
     public ?int $selectedServiceId = null;
+
     public ?int $selectedEventId = null;
+
     public ?int $selectedPostId = null;
+
     public ?int $selectedAvailabilityId = null;
+
     public string $consultationNote = '';
+
     public string $leadMessage = '';
+
     public string $postTitle = '';
+
     public string $postBody = '';
+
     public string $peerReviewVisibility = 'community';
+
     public string $reviewBody = '';
+
     public string $reportReason = '';
 
     public function mount(BusinessContextService $businessContext): void
@@ -281,6 +295,7 @@ final class Ecosystem extends Component
     {
         $business = $this->business();
         abort_unless($business !== null, 404);
+
         return $business;
     }
 
@@ -288,6 +303,7 @@ final class Ecosystem extends Component
     {
         $user = Auth::user();
         abort_unless($user instanceof User, 401);
+
         return $user;
     }
 
