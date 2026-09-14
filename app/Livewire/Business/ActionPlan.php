@@ -176,6 +176,15 @@ final class ActionPlan extends Component
         $this->cancelCompletion();
     }
 
+    public function resetResolution(): void
+    {
+        $this->showResolutionModal = false;
+        $this->resolutionActionId = null;
+        $this->resolutionStatus = null;
+        $this->resolutionReason = '';
+        $this->resetValidation('resolutionReason');
+    }
+
     private function action(int $actionId): Action
     {
         return Action::query()
@@ -190,15 +199,6 @@ final class ActionPlan extends Component
         abort_unless($plan !== null, 404);
 
         return $plan;
-    }
-
-    private function resetResolution(): void
-    {
-        $this->showResolutionModal = false;
-        $this->resolutionActionId = null;
-        $this->resolutionStatus = null;
-        $this->resolutionReason = '';
-        $this->resetValidation('resolutionReason');
     }
 
     private function user(): User
