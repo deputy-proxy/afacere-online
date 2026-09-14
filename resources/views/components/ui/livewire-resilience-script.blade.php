@@ -1,20 +1,21 @@
 <script>
     document.addEventListener('livewire:init', () => {
         const dirtyForms = new WeakSet();
+        const disabledControls = new Map();
 
         document.addEventListener('input', (event) => {
-            const form = event.target.closest('form[data-unsaved-form]');
+            const form = event.target.closest('form');
             if (form) dirtyForms.add(form);
         }, true);
 
         document.addEventListener('submit', (event) => {
-            const form = event.target.closest('form[data-unsaved-form]');
+            const form = event.target.closest('form');
             if (form) dirtyForms.delete(form);
         }, true);
 
         window.addEventListener('beforeunload', (event) => {
             let hasDirtyForm = false;
-            document.querySelectorAll('form[data-unsaved-form]').forEach((form) => {
+            document.querySelectorAll('form').forEach((form) => {
                 if (dirtyForms.has(form)) hasDirtyForm = true;
             });
 
@@ -23,10 +24,28 @@
             event.returnValue = '';
         });
 
-        Livewire.hook('request', ({ succeed, fail }) => {
-            succeed(() => {
-                document.querySelectorAll('form[data-unsaved-form]').forEach((form) => dirtyForms.delete(form));
+        const setControlsDisabled = (disabled) => {
+            if (disabled) {
+                document.querySelectorAll('button, input[type="submit"]').forEach((control) => {
+                    if (control.disabled) return;
+                    disabledControls.set(control, true);
+                    control.disabled = true;
+                });
+                return;
+            }
+
+            disabledControls.forEach((_, control) => {
+                if (control.isConnected) control.disabled = false;
             });
+            disabledControls.clear();
+        };
+
+        Livewire.hook('request', ({ succeed, fail }) => {
+            setControlsDisabled(true);
+
+            const finish = () => setControlsDisabled(false);
+            succeed(finish);
+            fail(finish);
 
             fail(({ status, preventDefault }) => {
                 if (status < 400) return;
