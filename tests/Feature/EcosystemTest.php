@@ -28,7 +28,7 @@ it('renders the ecosystem for an authenticated business member', function (): vo
         ->assertSee('Ecosystem')
         ->assertSee('Experts')
         ->assertSee('Marketplace')
-        ->assertSee('Community & peer review')
+        ->assertSee('Community &amp; peer review', false)
         ->assertSee('Events');
 });
 
