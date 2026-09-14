@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Enums\ActionStatus;
 use App\Livewire\Business\ActionPlan;
-use App\Models\Action;
 use App\Models\ActionEvidence;
 use App\Models\ActionPlan as ActionPlanModel;
 use App\Models\AuditLog;
