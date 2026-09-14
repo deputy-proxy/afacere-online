@@ -13,18 +13,17 @@ use App\Services\EvaluationService;
 use App\Services\NotificationService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
+#[Layout('layouts.app')]
 #[Title('Evaluation')]
 final class EvaluationWizard extends Component
 {
     public ?int $evaluationId = null;
-
     public int $sectionIndex = 0;
-
     public int $questionIndex = 0;
-
     public mixed $answer = '';
 
     public function mount(BusinessContextService $businessContext, EvaluationService $evaluationService): void
@@ -44,11 +43,7 @@ final class EvaluationWizard extends Component
             return null;
         }
 
-        return Evaluation::query()
-            ->whereKey($this->evaluationId)
-            ->where('business_id', $this->business()->id)
-            ->with('version.sections.questions', 'answers')
-            ->first();
+        return Evaluation::query()->whereKey($this->evaluationId)->where('business_id', $this->business()->id)->with('version.sections.questions', 'answers')->first();
     }
 
     #[Computed]
@@ -56,7 +51,6 @@ final class EvaluationWizard extends Component
     {
         $business = app(BusinessContextService::class)->current($this->user());
         abort_unless($business !== null, 404);
-
         return $business;
     }
 
@@ -87,7 +81,6 @@ final class EvaluationWizard extends Component
         }
 
         $before = $evaluation->version->sections->take($this->sectionIndex)->sum(fn ($section): int => $section->questions->count());
-
         return $before + $this->questionIndex + 1;
     }
 
@@ -107,7 +100,6 @@ final class EvaluationWizard extends Component
         if (! $this->isLastQuestion()) {
             $this->advance();
             $this->loadCurrentAnswer($evaluation->fresh(['version.sections.questions', 'answers']));
-
             return;
         }
 
@@ -135,7 +127,6 @@ final class EvaluationWizard extends Component
         $evaluation = $this->evaluation();
         abort_unless($evaluation !== null, 404);
         abort_unless($index >= 0 && $index < $evaluation->version->sections->count(), 404);
-
         $this->sectionIndex = $index;
         $this->questionIndex = 0;
         $this->loadCurrentAnswer($evaluation);
@@ -169,10 +160,7 @@ final class EvaluationWizard extends Component
             }
         }
 
-        return [
-            max(0, $evaluation->version->sections->count() - 1),
-            (int) max(0, ($evaluation->version->sections->last()?->questions->count() ?? 0) - 1),
-        ];
+        return [max(0, $evaluation->version->sections->count() - 1), (int) max(0, ($evaluation->version->sections->last()?->questions->count() ?? 0) - 1)];
     }
 
     private function advance(): void
@@ -187,10 +175,8 @@ final class EvaluationWizard extends Component
             return;
         }
 
-        $questions = $section->questions;
-        if ($this->questionIndex + 1 < $questions->count()) {
+        if ($this->questionIndex + 1 < $section->questions->count()) {
             $this->questionIndex++;
-
             return;
         }
 
@@ -201,18 +187,15 @@ final class EvaluationWizard extends Component
     private function loadCurrentAnswer(?Evaluation $evaluation): void
     {
         $question = $this->question();
-        $stored = $question !== null && $evaluation !== null
-            ? $evaluation->answers->firstWhere('question_key', $question->key)?->value
-            : null;
-
-        $this->answer = $stored ?? '';
+        $this->answer = $question !== null && $evaluation !== null
+            ? ($evaluation->answers->firstWhere('question_key', $question->key)?->value ?? '')
+            : '';
     }
 
     private function user(): User
     {
         $user = Auth::user();
         abort_unless($user instanceof User, 401);
-
         return $user;
     }
 
