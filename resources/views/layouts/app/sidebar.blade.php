@@ -4,6 +4,11 @@
         @include('partials.head')
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
+        @php
+            $currentBusiness = app(\App\Services\BusinessContextService::class)->current(auth()->user());
+            $businesses = app(\App\Services\BusinessContextService::class)->forUser(auth()->user());
+        @endphp
+
         <flux:sidebar sticky collapsible="mobile" class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.header>
                 <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
@@ -11,12 +16,73 @@
             </flux:sidebar.header>
 
             <flux:sidebar.nav aria-label="{{ __('Primary navigation') }}">
-                <flux:sidebar.group :heading="__('Platform')" class="grid">
+                <flux:sidebar.group :heading="__('Workspace')" class="grid">
                     <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
                         {{ __('Dashboard') }}
                     </flux:sidebar.item>
+
+                    @if ($currentBusiness === null)
+                        <flux:sidebar.item icon="building-office" :href="route('business.onboarding')" :current="request()->routeIs('business.onboarding')" wire:navigate>
+                            {{ __('Set up your business') }}
+                        </flux:sidebar.item>
+                    @else
+                        <flux:sidebar.item icon="clipboard-document-check" :href="route('business.evaluation')" :current="request()->routeIs('business.evaluation*')" wire:navigate>
+                            {{ __('Evaluation & Diagnosis') }}
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="list-bullet" :href="route('business.action-plan')" :current="request()->routeIs('business.action-plan')" wire:navigate>
+                            {{ __('Action Plan') }}
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="book-open" :href="route('business.guides')" :current="request()->routeIs('business.guides*')" wire:navigate>
+                            {{ __('Guides') }}
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="sparkles" :href="route('business.opportunities')" :current="request()->routeIs('business.opportunities*')" wire:navigate>
+                            {{ __('Opportunities') }}
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="chart-bar" :href="route('business.monitor')" :current="request()->routeIs('business.monitor')" wire:navigate>
+                            {{ __('Monitor') }}
+                        </flux:sidebar.item>
+                        <flux:sidebar.item icon="globe-alt" :href="route('business.ecosystem')" :current="request()->routeIs('business.ecosystem')" wire:navigate>
+                            {{ __('Ecosystem') }}
+                        </flux:sidebar.item>
+                    @endif
+
                     <flux:sidebar.item icon="bell" :href="route('business.notifications')" :current="request()->routeIs('business.notifications')" wire:navigate>
                         {{ __('Notifications') }}
+                    </flux:sidebar.item>
+                </flux:sidebar.group>
+
+                @if ($currentBusiness !== null && count($businesses) > 1)
+                    <flux:sidebar.group :heading="__('Business')" class="grid">
+                        <flux:sidebar.item icon="building-office-2" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
+                            <span class="truncate">{{ $currentBusiness->name }}</span>
+                        </flux:sidebar.item>
+                    </flux:sidebar.group>
+                @elseif ($currentBusiness !== null)
+                    <flux:sidebar.group :heading="__('Business')" class="grid">
+                        <flux:sidebar.item icon="building-office-2" :href="route('dashboard')" :current="false" wire:navigate>
+                            <span class="truncate">{{ $currentBusiness->name }}</span>
+                        </flux:sidebar.item>
+                    </flux:sidebar.group>
+                @endif
+
+                <flux:sidebar.group :heading="__('Account')" class="grid">
+                    <flux:sidebar.item icon="credit-card" :href="route('account.subscription')" :current="request()->routeIs('account.subscription')" wire:navigate>
+                        {{ __('Subscription') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="user-circle" :href="route('profile.edit')" :current="request()->routeIs('profile.edit')" wire:navigate>
+                        {{ __('Profile') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="paint-brush" :href="route('appearance.edit')" :current="request()->routeIs('appearance.edit')" wire:navigate>
+                        {{ __('Appearance') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="shield-check" :href="route('security.edit')" :current="request()->routeIs('security.edit')" wire:navigate>
+                        {{ __('Security') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="arrow-down-tray" :href="route('account.data.export')" :current="false">
+                        {{ __('Export data') }}
+                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="archive-box" :href="route('account.data.deletion.status')" :current="request()->routeIs('account.data.deletion.status')" wire:navigate>
+                        {{ __('Data & deletion') }}
                     </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
