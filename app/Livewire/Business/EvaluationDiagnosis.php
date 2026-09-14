@@ -7,6 +7,7 @@ namespace App\Livewire\Business;
 use App\Models\Business;
 use App\Models\Evaluation;
 use App\Models\EvaluationFinding;
+use App\Models\Priority;
 use App\Models\Recommendation;
 use App\Models\User;
 use App\Services\BusinessContextService;
@@ -42,6 +43,7 @@ final class EvaluationDiagnosis extends Component
             ->firstOrFail();
     }
 
+    /** @return Collection<int, EvaluationFinding> */
     #[Computed]
     public function findings(): Collection
     {
@@ -84,8 +86,8 @@ final class EvaluationDiagnosis extends Component
     public function prioritizeRecommendation(int $recommendationId, RecommendationService $service): void
     {
         $recommendation = $this->recommendation($recommendationId);
-        $position = $this->business()->priorities()->max('position') + 1;
-        $service->prioritize($recommendation, $this->user(), max(1, $position));
+        $position = (int) (Priority::query()->where('business_id', $this->business()->id)->max('position') ?? 0) + 1;
+        $service->prioritize($recommendation, $this->user(), $position);
         unset($this->recommendations);
     }
 
