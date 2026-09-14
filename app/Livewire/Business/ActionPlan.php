@@ -145,6 +145,6 @@ final class ActionPlan extends Component
 
     public function render(): mixed
     {
-        return view('livewire.business.action-plan');
+        return view('livewire.business.action-plan-execution');
     }
 }
