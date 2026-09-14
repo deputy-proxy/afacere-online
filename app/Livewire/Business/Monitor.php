@@ -80,7 +80,7 @@ final class Monitor extends Component
     #[Computed]
     public function trends(): array
     {
-        $checkIns = $this->checkIns->sortBy('recorded_at')->values();
+        $checkIns = $this->checkIns()->sortBy('recorded_at')->values();
         if ($checkIns->count() < 2) {
             return [];
         }
