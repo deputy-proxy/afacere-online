@@ -34,6 +34,39 @@ test('authenticated users with a business can visit the entrepreneur dashboard',
     $response->assertSee('What should I do next?');
 });
 
+test('authenticated navigation exposes supported product and account destinations', function (): void {
+    $user = User::factory()->create();
+    $business = Business::factory()->create();
+    $business->members()->attach($user, ['role' => 'owner', 'joined_at' => now()]);
+
+    $response = $this->actingAs($user)->get(route('dashboard'));
+
+    $response->assertOk();
+
+    foreach ([
+        'business.evaluation',
+        'business.evaluation.diagnosis',
+        'business.action-plan',
+        'business.guides',
+        'business.opportunities',
+        'business.monitor',
+        'business.ecosystem',
+        'business.notifications',
+        'account.subscription',
+        'profile.edit',
+        'appearance.edit',
+        'security.edit',
+        'account.data.export',
+        'account.data.deletion.status',
+    ] as $routeName) {
+        $response->assertSee(route($routeName), false);
+    }
+
+    $response->assertDontSee('laravel.com/docs');
+    $response->assertDontSee('github.com/laravel');
+    $response->assertSee($business->name);
+});
+
 test('dashboard does not expose a business the user is not a member of', function (): void {
     $user = User::factory()->create();
     $business = Business::factory()->create();
