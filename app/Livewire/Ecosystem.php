@@ -64,6 +64,7 @@ final class Ecosystem extends Component
 
     public string $reportReason = '';
 
+    /** @var BaseCollection<int|string, int> */
     public BaseCollection $eventRegistrationIds;
 
     public function mount(BusinessContextService $businessContext): void
