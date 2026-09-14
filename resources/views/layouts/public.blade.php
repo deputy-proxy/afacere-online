@@ -13,6 +13,7 @@
     @fluxAppearance
 </head>
 <body class="min-h-screen bg-white text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-50">
+<a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-zinc-900 focus:shadow-lg dark:focus:bg-zinc-900 dark:focus:text-white">Skip to main content</a>
 <header class="border-b border-zinc-200 bg-white/95 dark:border-zinc-800 dark:bg-zinc-950/95">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <nav class="flex min-h-16 items-center justify-between gap-4" aria-label="Main navigation">
@@ -25,8 +26,8 @@
                 <a class="ml-2 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700 focus-visible:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200 dark:focus-visible:bg-zinc-200" href="{{ route('register') }}" data-analytics-event="public.evaluator.cta">Start free</a>
             </div>
             <details class="relative md:hidden">
-                <summary class="cursor-pointer list-none rounded-lg border border-zinc-300 px-3 py-2 text-sm font-semibold focus-visible:outline-3 focus-visible:outline-offset-2 dark:border-zinc-700"><span class="sr-only">Open navigation</span>Menu</summary>
-                <div class="absolute right-0 z-20 mt-2 w-64 rounded-xl border border-zinc-200 bg-white p-2 shadow-xl dark:border-zinc-700 dark:bg-zinc-900">
+                <summary aria-label="Open navigation" class="cursor-pointer list-none rounded-lg border border-zinc-300 px-3 py-2 text-sm font-semibold focus-visible:outline-3 focus-visible:outline-offset-2 dark:border-zinc-700"><span class="sr-only">Open navigation</span>Menu</summary>
+                <div class="absolute right-0 z-20 mt-2 w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white p-2 shadow-xl dark:border-zinc-700 dark:bg-zinc-900">
                     <a class="block rounded-lg px-3 py-3 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800" href="{{ route('public.how-it-works') }}" wire:navigate>How it works</a>
                     <a class="block rounded-lg px-3 py-3 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800" href="{{ route('home') }}#ecosystem">Ecosystem</a>
                     <a class="block rounded-lg px-3 py-3 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800" href="{{ route('public.pricing') }}" wire:navigate>Pricing</a>

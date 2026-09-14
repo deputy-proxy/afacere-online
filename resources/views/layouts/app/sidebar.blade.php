@@ -4,6 +4,7 @@
         @include('partials.head')
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
+        <a href="#app-main-content" class="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-zinc-900 focus:shadow-lg dark:focus:bg-zinc-900 dark:focus:text-white">{{ __('Skip to main content') }}</a>
         @php
             $currentBusiness = app(\App\Services\BusinessContextService::class)->current(auth()->user());
             $businesses = app(\App\Services\BusinessContextService::class)->forUser(auth()->user());
@@ -125,7 +126,9 @@
             </flux:dropdown>
         </flux:header>
 
-        {{ $slot }}
+        <main id="app-main-content" class="min-w-0">
+            {{ $slot }}
+        </main>
 
         @persist('toast')
             <flux:toast.group>
