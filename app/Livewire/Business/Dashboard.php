@@ -64,7 +64,17 @@ final class Dashboard extends Component
     #[Computed]
     public function priorities(): array
     {
-        return $this->business?->priorities()->where('status', 'active')->orderBy('position')->get()->all() ?? [];
+        $business = $this->business;
+        if ($business === null) {
+            return [];
+        }
+
+        return Priority::query()
+            ->where('business_id', $business->id)
+            ->where('status', 'active')
+            ->orderBy('position')
+            ->get()
+            ->all();
     }
 
     /** @return array<int, Recommendation> */
@@ -84,7 +94,16 @@ final class Dashboard extends Component
     #[Computed]
     public function actionPlan(): ?ActionPlan
     {
-        return $this->business?->actionPlans()->latest('version')->with('actions')->first();
+        $business = $this->business;
+        if ($business === null) {
+            return null;
+        }
+
+        return ActionPlan::query()
+            ->where('business_id', $business->id)
+            ->latest('version')
+            ->with('actions')
+            ->first();
     }
 
     /** @return array<int, BusinessGoal> */
