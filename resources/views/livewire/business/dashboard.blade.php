@@ -1,43 +1,57 @@
-<div class="flex w-full flex-col gap-8 py-6">
+<x-ui.page>
     @if ($this->business)
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-                <p class="text-sm text-zinc-500">{{ __('Your business') }}</p>
-                <h1 class="text-3xl font-semibold tracking-tight">{{ $this->business->name }}</h1>
-                <p class="mt-1 text-zinc-600 dark:text-zinc-400">{{ __('What should I do next?') }}</p>
-            </div>
+        <x-ui.page-header
+            :title="$this->business->name"
+            :description="__('What should I do next?')"
+        >
+            <x-slot:actions>
+                @if (count($this->businesses) > 1)
+                    <flux:field>
+                        <flux:label for="business-switcher" class="sr-only">{{ __('Business') }}</flux:label>
+                        <flux:select id="business-switcher" wire:model.live="businessId" wire:change="switchBusiness">
+                            @foreach ($this->businesses as $business)
+                                <option value="{{ $business->id }}">{{ $business->name }}</option>
+                            @endforeach
+                        </flux:select>
+                    </flux:field>
+                @endif
+            </x-slot:actions>
+        </x-ui.page-header>
 
-            @if (count($this->businesses) > 1)
-                <div class="flex items-center gap-2">
-                    <label for="business-switcher" class="sr-only">{{ __('Business') }}</label>
-                    <select id="business-switcher" wire:model.live="businessId" wire:change="switchBusiness" class="rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800">
-                        @foreach ($this->businesses as $business)
-                            <option value="{{ $business->id }}">{{ $business->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            @endif
-        </div>
+        <x-ui.section>
+            <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <flux:card class="min-w-0">
+                    <flux:text>{{ __('Current stage') }}</flux:text>
+                    <flux:heading size="lg" class="mt-2">{{ $this->business->stage->value }}</flux:heading>
+                </flux:card>
 
-        <div class="grid gap-4 md:grid-cols-4">
-            <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
-                <p class="text-sm text-zinc-500">{{ __('Current stage') }}</p>
-                <p class="mt-2 text-lg font-medium">{{ $this->business->stage->value }}</p>
-            </div>
-            <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
-                <p class="text-sm text-zinc-500">{{ __('Evaluation') }}</p>
-                <p class="mt-2 text-lg font-medium">{{ $this->business->evaluations()->latest()->exists() ? __('Started') : __('Not started') }}</p>
-            </div>
-            <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
-                <p class="text-sm text-zinc-500">{{ __('Next action') }}</p>
-                <p class="mt-2 text-lg font-medium">{{ __('Complete your evaluation') }}</p>
-            </div>
-            <a href="{{ route('business.opportunities') }}" wire:navigate class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900">
-                <p class="text-sm text-zinc-500">{{ __('Opportunities') }}</p>
-                <p class="mt-2 text-lg font-medium">{{ __('See current matches') }} →</p>
-            </a>
-        </div>
+                <flux:card class="min-w-0">
+                    <flux:text>{{ __('Evaluation') }}</flux:text>
+                    <flux:heading size="lg" class="mt-2">{{ $this->business->evaluations()->latest()->exists() ? __('Started') : __('Not started') }}</flux:heading>
+                </flux:card>
 
-        <livewire:business.recommendations />
+                <flux:card class="min-w-0">
+                    <flux:text>{{ __('Next action') }}</flux:text>
+                    <flux:heading size="lg" class="mt-2">{{ __('Complete your evaluation') }}</flux:heading>
+                </flux:card>
+
+                <a href="{{ route('business.opportunities') }}" wire:navigate class="block rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-950 dark:focus-visible:outline-white">
+                    <flux:card class="h-full min-w-0 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800">
+                        <flux:text>{{ __('Opportunities') }}</flux:text>
+                        <flux:heading size="lg" class="mt-2">{{ __('See current matches') }} <span aria-hidden="true">→</span></flux:heading>
+                    </flux:card>
+                </a>
+            </div>
+        </x-ui.section>
+
+        <x-ui.section>
+            <flux:heading level="2" size="lg">{{ __('Recommendations') }}</flux:heading>
+            <livewire:business.recommendations />
+        </x-ui.section>
+    @else
+        <x-ui.empty-state
+            :title="__('No business selected')"
+            :description="__('Create or select a business to continue.')"
+        />
     @endif
-</div>
+</x-ui.page>
