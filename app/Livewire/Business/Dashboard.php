@@ -136,7 +136,7 @@ final class Dashboard extends Component
         }
 
         $evaluation = $this->latestEvaluation();
-        if ($evaluation === null || $evaluation->status !== EvaluationStatus::Completed) {
+        if ($evaluation === null || $evaluation->getRawOriginal('status') !== EvaluationStatus::Completed->value) {
             return [
                 'label' => $evaluation === null ? __('Start your evaluation') : __('Continue your evaluation'),
                 'description' => __('Use your evaluation to establish the priorities that drive your next steps.'),
