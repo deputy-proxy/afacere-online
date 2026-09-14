@@ -24,7 +24,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -112,7 +111,7 @@ final class Ecosystem extends Component
     #[Computed]
     public function providers(): Collection
     {
-        return app(MarketplaceServiceLayer::class)->discover($this->business(), trim($this->search))->take(12);
+        return app(MarketplaceServiceLayer::class)->discover($this->businessOrFail(), trim($this->search))->take(12);
     }
 
     #[Computed]
@@ -124,7 +123,7 @@ final class Ecosystem extends Component
 
         return MarketplaceProvider::query()
             ->where('verification_status', 'verified')
-            ->with(['services' => fn ($query) => $query->where('is_published', true)])
+            ->with(['services' => fn (Builder $query): Builder => $query->where('is_published', true)])
             ->find($this->selectedProviderId);
     }
 
@@ -145,10 +144,12 @@ final class Ecosystem extends Component
         return CommunityPost::query()
             ->where('status', 'published')
             ->whereIn('visibility', ['community', 'anonymized'])
-            ->when(trim($this->search) !== '', fn (Builder $query) => $query->where(function (Builder $query): void {
+            ->when(trim($this->search) !== '', function (Builder $query): void {
                 $term = trim($this->search);
-                $query->where('title', 'like', "%{$term}%")->orWhere('body', 'like', "%{$term}%");
-            }))
+                $query->where(function (Builder $query) use ($term): void {
+                    $query->where('title', 'like', "%{$term}%")->orWhere('body', 'like', "%{$term}%");
+                });
+            })
             ->latest()
             ->limit(12)
             ->get();
@@ -171,9 +172,14 @@ final class Ecosystem extends Component
     #[Computed]
     public function peerReviews(): Collection
     {
+        $publishedPostIds = CommunityPost::query()
+            ->where('status', 'published')
+            ->whereIn('visibility', ['community', 'anonymized'])
+            ->pluck('id');
+
         return PeerReview::query()
             ->where('status', 'open')
-            ->whereHas('communityPost', fn (Builder $query) => $query->where('status', 'published'))
+            ->whereIn('community_post_id', $publishedPostIds)
             ->latest()
             ->limit(12)
             ->get();
@@ -186,10 +192,12 @@ final class Ecosystem extends Component
         return PlatformEvent::query()
             ->where('status', 'published')
             ->where('starts_at', '>=', now())
-            ->when(trim($this->search) !== '', fn (Builder $query) => $query->where(function (Builder $query): void {
+            ->when(trim($this->search) !== '', function (Builder $query): void {
                 $term = trim($this->search);
-                $query->where('title', 'like', "%{$term}%")->orWhere('description', 'like', "%{$term}%");
-            }))
+                $query->where(function (Builder $query) use ($term): void {
+                    $query->where('title', 'like', "%{$term}%")->orWhere('description', 'like', "%{$term}%");
+                });
+            })
             ->orderBy('starts_at')
             ->limit(12)
             ->get();
@@ -205,6 +213,7 @@ final class Ecosystem extends Component
         return PlatformEvent::query()->where('status', 'published')->find($this->selectedEventId);
     }
 
+    /** @return BaseCollection<int|string, int> */
     #[Computed]
     public function eventRegistrationIds(): BaseCollection
     {
@@ -233,7 +242,10 @@ final class Ecosystem extends Component
 
     public function requestConsultation(ExpertConsultationService $consultations): void
     {
-        $this->validate(['selectedAvailabilityId' => ['required', 'integer'], 'consultationNote' => ['nullable', 'string', 'max:2000']]);
+        $this->validate([
+            'selectedAvailabilityId' => ['required', 'integer'],
+            'consultationNote' => ['nullable', 'string', 'max:2000'],
+        ]);
         $expert = $this->selectedExpert;
         $availability = ExpertAvailability::query()->findOrFail($this->selectedAvailabilityId);
 
@@ -252,7 +264,10 @@ final class Ecosystem extends Component
 
     public function createMarketplaceLead(MarketplaceServiceLayer $marketplace): void
     {
-        $this->validate(['selectedServiceId' => ['required', 'integer'], 'leadMessage' => ['required', 'string', 'max:2000']]);
+        $this->validate([
+            'selectedServiceId' => ['required', 'integer'],
+            'leadMessage' => ['required', 'string', 'max:2000'],
+        ]);
         $provider = $this->selectedProvider;
         $service = $this->selectedService;
 
@@ -264,7 +279,10 @@ final class Ecosystem extends Component
 
     public function createPost(): void
     {
-        $this->validate(['postTitle' => ['required', 'string', 'max:255'], 'postBody' => ['required', 'string', 'max:10000']]);
+        $this->validate([
+            'postTitle' => ['required', 'string', 'max:255'],
+            'postBody' => ['required', 'string', 'max:10000'],
+        ]);
         CommunityPost::query()->create([
             'user_id' => $this->user()->id,
             'title' => trim($this->postTitle),
@@ -279,7 +297,10 @@ final class Ecosystem extends Component
 
     public function requestPeerReview(PeerReviewService $peerReviews): void
     {
-        $this->validate(['selectedPostId' => ['required', 'integer'], 'peerReviewVisibility' => ['required', 'in:private,selected,community,anonymized']]);
+        $this->validate([
+            'selectedPostId' => ['required', 'integer'],
+            'peerReviewVisibility' => ['required', 'in:private,selected,community,anonymized'],
+        ]);
         $post = $this->selectedPost;
         abort_unless($post !== null, 404);
         $peerReviews->request($this->user(), $post, $this->peerReviewVisibility);
