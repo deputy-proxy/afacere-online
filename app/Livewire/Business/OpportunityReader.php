@@ -6,6 +6,7 @@ namespace App\Livewire\Business;
 
 use App\Models\Business;
 use App\Models\Opportunity;
+use App\Models\OpportunityApplication;
 use App\Models\OpportunityMatch;
 use App\Models\User;
 use App\Services\BusinessContextService;
@@ -48,6 +49,17 @@ final class OpportunityReader extends Component
     }
 
     #[Computed]
+    public function application(): ?OpportunityApplication
+    {
+        return OpportunityApplication::query()
+            ->where('opportunity_id', $this->opportunityId)
+            ->where('business_id', $this->business()->id)
+            ->where('user_id', $this->user()->id)
+            ->latest('submitted_at')
+            ->first();
+    }
+
+    #[Computed]
     public function business(): Business
     {
         $business = app(BusinessContextService::class)->current($this->user());
@@ -59,7 +71,7 @@ final class OpportunityReader extends Component
     public function apply(OpportunityMatchingService $service): void
     {
         $service->apply($this->opportunity(), $this->business(), $this->user());
-        unset($this->match);
+        unset($this->match, $this->application);
     }
 
     private function user(): User
