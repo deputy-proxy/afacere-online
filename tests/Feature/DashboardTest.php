@@ -85,7 +85,7 @@ test('dashboard reflects the current business profile goals and metrics', functi
     $response->assertSee('1');
 });
 
-test('dashboard next action changes from evaluation to diagnosis when priorities exist', function (): void {
+test('dashboard next action changes from diagnosis to action plan when priorities exist', function (): void {
     $user = User::factory()->create();
     $business = Business::factory()->create();
     $business->members()->attach($user, ['role' => 'owner', 'joined_at' => now()]);
@@ -112,8 +112,8 @@ test('dashboard next action changes from evaluation to diagnosis when priorities
 
     Livewire::actingAs($user)
         ->test(Dashboard::class)
-        ->assertSee('Review your diagnosis')
-        ->assertSee('Improve customer acquisition');
+        ->assertSee('Improve customer acquisition')
+        ->assertSee('Build your Action Plan');
 });
 
 test('authenticated dashboard remains isolated to businesses the user can access', function (): void {
