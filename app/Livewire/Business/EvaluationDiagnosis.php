@@ -38,7 +38,11 @@ final class EvaluationDiagnosis extends Component
     #[Computed]
     public function evaluation(): Evaluation
     {
-        return Evaluation::query()->whereKey($this->evaluationId)->where('business_id', $this->business()->id)->with('version', 'findings')->firstOrFail();
+        return Evaluation::query()
+            ->whereKey($this->evaluationId)
+            ->where('business_id', $this->business()->id)
+            ->with('version', 'findings')
+            ->firstOrFail();
     }
 
     /** @return Collection<int, EvaluationFinding> */
@@ -93,6 +97,7 @@ final class EvaluationDiagnosis extends Component
     {
         $recommendation = $this->recommendations()->firstWhere('id', $id);
         abort_unless($recommendation !== null, 404);
+
         return $recommendation;
     }
 
@@ -101,6 +106,7 @@ final class EvaluationDiagnosis extends Component
     {
         $business = app(BusinessContextService::class)->current($this->user());
         abort_unless($business !== null, 404);
+
         return $business;
     }
 
@@ -108,6 +114,7 @@ final class EvaluationDiagnosis extends Component
     {
         $user = Auth::user();
         abort_unless($user instanceof User, 401);
+
         return $user;
     }
 
