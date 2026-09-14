@@ -59,7 +59,7 @@ function makeEvaluationWorkflowFixture(): array
     return [$user, $business, $version];
 }
 
-it('walks through every question, preserves answers, and resumes at the first unanswered question', function (): void {
+it('walks through every question, preserves answers, and completes the evaluation', function (): void {
     [$user, $business, $version] = makeEvaluationWorkflowFixture();
     $this->actingAs($user);
 
@@ -135,5 +135,5 @@ it('renders diagnosis findings and applies recommendation transitions through au
     Livewire::test(EvaluationDiagnosis::class)
         ->call('prioritizeRecommendation', $prioritizable->id);
 
-    expect(Priority::query()->where('recommendation_id', $prioritizable->id)->value('position'))->toBe(1);
+    expect((int) Priority::query()->where('recommendation_id', $prioritizable->id)->value('position'))->toBe(1);
 });
