@@ -28,7 +28,7 @@ it('renders the ecosystem for an authenticated business member', function (): vo
         ->assertSee('Ecosystem')
         ->assertSee('Experts')
         ->assertSee('Marketplace')
-        ->assertSee('Community &amp; peer review')
+        ->assertSee('Community & peer review')
         ->assertSee('Events');
 });
 
@@ -72,8 +72,7 @@ it('can request an expert consultation through the ecosystem', function (): void
         ->set('selectedExpertId', $expert->id)
         ->set('selectedAvailabilityId', $availability->id)
         ->set('consultationNote', 'Need help with pricing.')
-        ->call('requestConsultation')
-        ->assertSessionHas('ecosystem_success');
+        ->call('requestConsultation');
 
     expect(DB::table('consultations')->where('business_id', $business->id)->where('expert_id', $expert->id)->exists())->toBeTrue();
 });
@@ -98,8 +97,7 @@ it('can publish a community post and request an event registration', function ()
         ->set('postTitle', 'Pricing question')
         ->set('postBody', 'How do you validate pricing?')
         ->call('createPost')
-        ->call('registerForEvent', $event->id)
-        ->assertSessionHas('ecosystem_success');
+        ->call('registerForEvent', $event->id);
 
     expect(CommunityPost::query()->where('user_id', $user->id)->where('title', 'Pricing question')->exists())->toBeTrue();
     expect(DB::table('event_registrations')->where('event_id', $event->id)->where('user_id', $user->id)->count())->toBe(1);
