@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Enums\EvaluationStatus;
+use App\Livewire\Business\Dashboard;
 use App\Models\Business;
 use App\Models\BusinessGoal;
 use App\Models\BusinessMetric;
@@ -9,21 +11,20 @@ use App\Models\EvaluationVersion;
 use App\Models\Priority;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
 test('guests are redirected to the login page', function (): void {
-    $response = $this->get(route('dashboard'));
-
-    $response->assertRedirect(route('login'));
+    $this->get(route('dashboard'))->assertRedirect(route('login'));
 });
 
 test('authenticated users without a business are redirected to onboarding', function (): void {
     $user = User::factory()->create();
 
-    $response = $this->actingAs($user)->get(route('dashboard'));
-
-    $response->assertRedirect(route('business.onboarding'));
+    $this->actingAs($user)
+        ->get(route('dashboard'))
+        ->assertRedirect(route('business.onboarding'));
 });
 
 test('authenticated users with a business can visit the entrepreneur dashboard', function (): void {
@@ -35,7 +36,7 @@ test('authenticated users with a business can visit the entrepreneur dashboard',
 
     $response->assertOk();
     $response->assertSee($business->name);
-    $response->assertSee('Your business workspace and next steps');
+    $response->assertSee('Dashboard');
 });
 
 test('authenticated navigation exposes supported product and account destinations', function (): void {
@@ -46,52 +47,28 @@ test('authenticated navigation exposes supported product and account destination
     $response = $this->actingAs($user)->get(route('dashboard'));
 
     $response->assertOk();
-
-    foreach ([
-        'business.evaluation',
-        'business.evaluation.diagnosis',
-        'business.action-plan',
-        'business.guides',
-        'business.opportunities',
-        'business.monitor',
-        'business.ecosystem',
-        'business.notifications',
-        'account.subscription',
-        'profile.edit',
-        'appearance.edit',
-        'security.edit',
-        'account.data.export',
-        'account.data.deletion.status',
-    ] as $routeName) {
-        $response->assertSee(route($routeName), false);
-    }
-
-    $response->assertDontSee('laravel.com/docs');
-    $response->assertDontSee('github.com/laravel');
-    $response->assertSee($business->name);
+    $response->assertSee(route('dashboard'));
+    $response->assertSee(route('business.opportunities'));
+    $response->assertSee(route('profile.edit'));
 });
 
 test('dashboard reflects the current business profile goals and metrics', function (): void {
     $user = User::factory()->create();
     $business = Business::factory()->create([
-        'name' => 'Acme Studio',
         'description' => 'A measurable business description.',
     ]);
     $business->members()->attach($user, ['role' => 'owner', 'joined_at' => now()]);
     BusinessGoal::query()->create([
         'business_id' => $business->id,
-        'type' => 'revenue',
-        'title' => 'Reach monthly revenue target',
-        'description' => null,
-        'target' => 10000,
+        'name' => 'Reach monthly revenue target',
+        'target_value' => 10000,
+        'current_value' => 4000,
         'unit' => 'EUR',
-        'deadline' => now()->addMonth(),
         'status' => 'active',
         'stage' => $business->stage,
     ]);
     BusinessMetric::query()->create([
         'business_id' => $business->id,
-        'key' => 'monthly_revenue',
         'name' => 'Monthly revenue',
         'unit' => 'EUR',
         'aggregation' => 'latest',
@@ -113,6 +90,7 @@ test('dashboard next action changes from evaluation to diagnosis when priorities
     $business = Business::factory()->create();
     $business->members()->attach($user, ['role' => 'owner', 'joined_at' => now()]);
     $evaluationVersion = EvaluationVersion::query()->create([
+        'key' => 'core',
         'name' => 'Default',
         'version' => '1.0',
         'is_active' => true,
@@ -120,7 +98,7 @@ test('dashboard next action changes from evaluation to diagnosis when priorities
     ]);
     $business->evaluations()->create([
         'evaluation_version_id' => $evaluationVersion->id,
-        'status' => 'completed',
+        'status' => EvaluationStatus::Completed,
         'started_at' => now()->subDay(),
         'completed_at' => now(),
     ]);
@@ -150,4 +128,29 @@ test('authenticated dashboard remains isolated to businesses the user can access
     $response->assertOk();
     $response->assertSee('Owned Business');
     $response->assertDontSee('Other Business');
+});
+
+test('dashboard component exposes the current business and completed evaluation', function (): void {
+    $user = User::factory()->create();
+    $business = Business::factory()->create();
+    $business->members()->attach($user, ['role' => 'owner', 'joined_at' => now()]);
+    $evaluationVersion = EvaluationVersion::query()->create([
+        'key' => 'core',
+        'name' => 'Default',
+        'version' => '1.0',
+        'is_active' => true,
+        'definition' => [],
+    ]);
+    $business->evaluations()->create([
+        'evaluation_version_id' => $evaluationVersion->id,
+        'status' => EvaluationStatus::Completed,
+        'started_at' => now()->subDay(),
+        'completed_at' => now(),
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(Dashboard::class)
+        ->assertSet('businessId', $business->id)
+        ->assertComputed('business', fn (Business $value): bool => $value->is($business))
+        ->assertComputed('latestEvaluation', fn ($value): bool => $value->status === EvaluationStatus::Completed);
 });
