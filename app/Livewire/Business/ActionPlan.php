@@ -19,9 +19,11 @@ use App\Services\BusinessContextService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
+#[Layout('layouts.app')]
 #[Title('Action Plan')]
 final class ActionPlan extends Component
 {
@@ -94,7 +96,12 @@ final class ActionPlan extends Component
     #[Computed]
     public function revisions(): Collection
     {
-        return $this->plan()?->revisions ?? collect();
+        $plan = $this->plan();
+        if ($plan === null) {
+            return collect();
+        }
+
+        return $plan->revisions;
     }
 
     public function createPlan(ActionPlanService $service, ActionPlanRevisionService $revisions): void
