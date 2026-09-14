@@ -60,19 +60,19 @@ test('dashboard reflects the current business profile goals and metrics', functi
     $business->members()->attach($user, ['role' => 'owner', 'joined_at' => now()]);
     BusinessGoal::query()->create([
         'business_id' => $business->id,
-        'name' => 'Reach monthly revenue target',
-        'target_value' => 10000,
-        'current_value' => 4000,
+        'type' => 'revenue',
+        'title' => 'Reach monthly revenue target',
+        'target' => 10000,
         'unit' => 'EUR',
         'status' => 'active',
         'stage' => $business->stage,
     ]);
     BusinessMetric::query()->create([
         'business_id' => $business->id,
+        'key' => 'monthly-revenue',
         'name' => 'Monthly revenue',
         'unit' => 'EUR',
         'aggregation' => 'latest',
-        'stage' => $business->stage,
     ]);
 
     $response = $this->actingAs($user)->get(route('dashboard'));
