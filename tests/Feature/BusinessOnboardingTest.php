@@ -16,6 +16,27 @@ test('guests cannot access business onboarding', function (): void {
     $response->assertRedirect(route('login'));
 });
 
+test('business onboarding uses the product setup vocabulary', function (): void {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->get(route('business.onboarding'))
+        ->assertOk()
+        ->assertSee('Business details')
+        ->assertSee('Create business')
+        ->assertSee('Your workspace is created securely on the server.');
+});
+
+test('an authenticated user with an existing business is redirected to the dashboard', function (): void {
+    $user = User::factory()->create();
+    $business = Business::factory()->create();
+    $business->members()->attach($user->id, ['role' => 'owner', 'joined_at' => now()]);
+
+    Livewire::actingAs($user)
+        ->test(Onboarding::class)
+        ->assertRedirect(route('dashboard'));
+});
+
 test('an authenticated user can create their first business', function (): void {
     $user = User::factory()->create();
 
