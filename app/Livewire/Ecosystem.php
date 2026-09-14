@@ -96,11 +96,12 @@ final class Ecosystem extends Component
     #[Computed]
     public function expertAvailabilities(): Collection
     {
-        if ($this->selectedExpert === null) {
+        $expert = $this->selectedExpert();
+        if ($expert === null) {
             return new Collection;
         }
 
-        return $this->selectedExpert->availabilities()->where('is_bookable', true)->where('starts_at', '>=', now())->orderBy('starts_at')->limit(8)->get();
+        return $expert->availabilities()->where('is_bookable', true)->where('starts_at', '>=', now())->orderBy('starts_at')->limit(8)->get();
     }
 
     /** @return Collection<int, MarketplaceProvider> */
@@ -117,17 +118,18 @@ final class Ecosystem extends Component
             return null;
         }
 
-        return MarketplaceProvider::query()->where('verification_status', 'verified')->with(['services' => fn (Builder $query): Builder => $query->where('is_published', true)])->find($this->selectedProviderId);
+        return MarketplaceProvider::query()->where('verification_status', 'verified')->with('services')->find($this->selectedProviderId);
     }
 
     #[Computed]
     public function selectedService(): ?MarketplaceService
     {
-        if ($this->selectedProvider === null || $this->selectedServiceId === null) {
+        $provider = $this->selectedProvider();
+        if ($provider === null || $this->selectedServiceId === null) {
             return null;
         }
 
-        return $this->selectedProvider->services->firstWhere('id', $this->selectedServiceId);
+        return $provider->services->where('is_published', true)->firstWhere('id', $this->selectedServiceId);
     }
 
     /** @return Collection<int, CommunityPost> */
@@ -210,7 +212,7 @@ final class Ecosystem extends Component
     public function requestConsultation(ExpertConsultationService $consultations): void
     {
         $this->validate(['selectedAvailabilityId' => ['required', 'integer'], 'consultationNote' => ['nullable', 'string', 'max:2000']]);
-        $expert = $this->selectedExpert;
+        $expert = $this->selectedExpert();
         $availability = ExpertAvailability::query()->findOrFail($this->selectedAvailabilityId);
         abort_unless($expert !== null, 404);
         $consultations->request($this->businessOrFail(), $this->user(), $expert, $availability, trim($this->consultationNote) !== '' ? trim($this->consultationNote) : null);
@@ -228,8 +230,8 @@ final class Ecosystem extends Component
     public function createMarketplaceLead(MarketplaceServiceLayer $marketplace): void
     {
         $this->validate(['selectedServiceId' => ['required', 'integer'], 'leadMessage' => ['required', 'string', 'max:2000']]);
-        $provider = $this->selectedProvider;
-        $service = $this->selectedService;
+        $provider = $this->selectedProvider();
+        $service = $this->selectedService();
         abort_unless($provider !== null && $service !== null, 404);
         $marketplace->createLead($this->user(), $this->businessOrFail(), $provider, $service, trim($this->leadMessage));
         $this->leadMessage = '';
@@ -248,7 +250,7 @@ final class Ecosystem extends Component
     public function requestPeerReview(PeerReviewService $peerReviews): void
     {
         $this->validate(['selectedPostId' => ['required', 'integer'], 'peerReviewVisibility' => ['required', 'in:private,selected,community,anonymized']]);
-        $post = $this->selectedPost;
+        $post = $this->selectedPost();
         abort_unless($post !== null, 404);
         $peerReviews->request($this->user(), $post, $this->peerReviewVisibility);
         session()->flash('ecosystem_success', 'Peer review requested.');
