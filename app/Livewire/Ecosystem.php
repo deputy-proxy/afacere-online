@@ -96,7 +96,7 @@ final class Ecosystem extends Component
     public function expertAvailabilities(): Collection
     {
         if ($this->selectedExpert === null) {
-            return new Collection();
+            return new Collection;
         }
 
         return $this->selectedExpert->availabilities()
