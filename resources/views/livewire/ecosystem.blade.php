@@ -19,7 +19,7 @@
             'community' => 'Community',
             'events' => 'Events',
         ] as $key => $label)
-            <button type="button" wire:click="showSection('{{ $key }}')" class="rounded-lg border px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-zinc-500 {{ $section === $key ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-200 bg-white text-zinc-700' }}">
+            <button type="button" wire:click="showSection('{{ $key }}')" aria-pressed="{{ $section === $key ? 'true' : 'false' }}" class="rounded-lg border px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-zinc-500 {{ $section === $key ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-200 bg-white text-zinc-700' }}">
                 {{ $label }}
             </button>
         @endforeach
@@ -87,8 +87,8 @@
                                     @endif
                                     <label for="consultation-note" class="mt-3 block text-sm font-medium">Request note</label>
                                     <textarea id="consultation-note" wire:model="consultationNote" rows="3" class="mt-1 block w-full rounded-lg border-zinc-300 text-sm" placeholder="What would you like help with?"></textarea>
-                                    @error('selectedAvailabilityId') <p class="mt-1 text-sm text-red-700">{{ $message }}</p> @enderror
-                                    @error('consultationNote') <p class="mt-1 text-sm text-red-700">{{ $message }}</p> @enderror
+                                    @error('selectedAvailabilityId') <p class="mt-1 text-sm text-red-700" role="alert">{{ $message }}</p> @enderror
+                                    @error('consultationNote') <p class="mt-1 text-sm text-red-700" role="alert">{{ $message }}</p> @enderror
                                     <button type="button" wire:click="requestConsultation" class="mt-3 w-full rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-zinc-500">Request consultation</button>
                                 </div>
                             @else
@@ -134,7 +134,7 @@
                                         @if ($selectedProviderId === $provider->id && $selectedServiceId === $service->id)
                                             <label for="lead-message-{{ $service->id }}" class="mt-3 block text-sm font-medium">Message</label>
                                             <textarea id="lead-message-{{ $service->id }}" wire:model="leadMessage" rows="3" class="mt-1 block w-full rounded-lg border-zinc-300 text-sm" placeholder="Tell the provider what you need."></textarea>
-                                            @error('leadMessage') <p class="mt-1 text-sm text-red-700">{{ $message }}</p> @enderror
+                                            @error('leadMessage') <p class="mt-1 text-sm text-red-700" role="alert">{{ $message }}</p> @enderror
                                             <button type="button" wire:click="createMarketplaceLead" class="mt-2 rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-zinc-500">Contact provider</button>
                                         @else
                                             <button type="button" wire:click="selectProvider({{ $provider->id }}); $wire.set('selectedServiceId', {{ $service->id }})" class="mt-2 text-sm font-medium underline">Request this service</button>
@@ -161,12 +161,12 @@
                     <div>
                         <label for="post-title" class="block text-sm font-medium">Title</label>
                         <input id="post-title" wire:model="postTitle" type="text" class="mt-1 block w-full rounded-lg border-zinc-300 text-sm" />
-                        @error('postTitle') <p class="mt-1 text-sm text-red-700">{{ $message }}</p> @enderror
+                        @error('postTitle') <p class="mt-1 text-sm text-red-700" role="alert">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label for="post-body" class="block text-sm font-medium">Question or insight</label>
                         <textarea id="post-body" wire:model="postBody" rows="4" class="mt-1 block w-full rounded-lg border-zinc-300 text-sm"></textarea>
-                        @error('postBody') <p class="mt-1 text-sm text-red-700">{{ $message }}</p> @enderror
+                        @error('postBody') <p class="mt-1 text-sm text-red-700" role="alert">{{ $message }}</p> @enderror
                     </div>
                 </div>
                 <button type="submit" class="mt-4 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-zinc-500">Publish post</button>
@@ -220,7 +220,8 @@
                         <p class="font-medium">Peer review request #{{ $review->id }}</p>
                         <p class="mt-1 text-sm text-zinc-500">Visibility: {{ ucfirst($review->visibility) }}</p>
                         @if ($review->requester_id !== auth()->id())
-                            <textarea wire:model="reviewBody" rows="3" class="mt-3 block w-full rounded-lg border-zinc-300 text-sm" placeholder="Share constructive feedback."></textarea>
+                            <label for="review-body-{{ $review->id }}" class="mt-3 block text-sm font-medium">Response</label>
+                            <textarea id="review-body-{{ $review->id }}" wire:model="reviewBody" rows="3" class="mt-1 block w-full rounded-lg border-zinc-300 text-sm" placeholder="Share constructive feedback."></textarea>
                             <button type="button" wire:click="respondToPeerReview({{ $review->id }})" class="mt-2 rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white">Respond</button>
                         @else
                             <p class="mt-3 text-sm text-zinc-600">You requested this review. Another community member can respond.</p>

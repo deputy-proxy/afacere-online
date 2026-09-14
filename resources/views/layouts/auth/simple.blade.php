@@ -4,6 +4,7 @@
         @include('partials.head')
     </head>
     <body class="min-h-screen bg-zinc-50 antialiased dark:bg-zinc-950">
+        <a href="#auth-main-content" class="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-zinc-900 focus:shadow-lg dark:focus:bg-zinc-900 dark:focus:text-white">{{ __("Skip to main content") }}</a>
         <div class="min-h-svh lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(24rem,32rem)]">
             <aside class="hidden border-e border-zinc-200 bg-zinc-100 p-10 dark:border-zinc-800 dark:bg-zinc-900 lg:flex lg:flex-col lg:justify-between">
                 <a href="{{ route('home') }}" class="inline-flex w-fit items-center gap-3 font-semibold" wire:navigate>
@@ -20,7 +21,7 @@
                 <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('Business decisions stay with you.') }}</p>
             </aside>
 
-            <main class="flex min-h-svh flex-col justify-center px-6 py-10 sm:px-10">
+            <main id="auth-main-content" class="flex min-h-svh flex-col justify-center px-6 py-10 sm:px-10">
                 <div class="mx-auto w-full max-w-md">
                     <a href="{{ route('home') }}" class="mb-8 inline-flex items-center gap-3 font-semibold lg:hidden" wire:navigate>
                         <x-app-logo-icon class="size-8 fill-current text-zinc-900 dark:text-white" />
