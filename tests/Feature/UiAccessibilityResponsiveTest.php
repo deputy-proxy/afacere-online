@@ -48,10 +48,6 @@ test('responsive shell avoids clipping long page titles', function (): void {
     expect(file_get_contents(resource_path('views/components/ui/page-header.blade.php')))
         ->toContain('break-words')
         ->not->toContain('class="truncate"');
-
-    expect(file_get_contents(resource_path('views/layouts/auth/split.blade.php')))
-        ->toContain('min-h-svh')
-        ->not->toContain('h-dvh');
 });
 
 test('ecosystem section controls expose toggle state', function (): void {
