@@ -12,6 +12,7 @@ use App\Models\Business;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 uses(RefreshDatabase::class);
 
@@ -102,5 +103,5 @@ test('action plan denies access to actions belonging to another business', funct
     expect(fn () => Livewire::actingAs($user)
         ->test(ActionPlan::class)
         ->call('updateStatus', $action->id, ActionStatus::Completed->value))
-        ->toThrow(Symfony\Component\HttpKernel\Exception\HttpException::class);
+        ->toThrow(HttpException::class);
 });
